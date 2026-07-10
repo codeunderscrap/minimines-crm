@@ -1,23 +1,30 @@
-import { defineObject, defineField } from 'twenty-sdk/define';
+import { defineObject, FieldType } from 'twenty-sdk/define';
 
 export default defineObject({
+  universalIdentifier: '6eb74c1e-bb61-4a12-ba76-849c9db2c3d0',
   nameSingular: 'SalesOrder',
   namePlural: 'SalesOrders',
   labelSingular: 'Sales Order',
   labelPlural: 'Sales Orders',
   description: 'Specific order linked to a contract',
-  fields: {
-    orderNumber: defineField.text({ label: 'Order Number' }),
-    orderDate: defineField.dateTime({ label: 'Order Date' }),
-    quantity: defineField.number({ label: 'Quantity (MT)' }),
-    contractId: defineField.relation({ label: 'Contract', object: 'Contract' }),
-    fulfillmentStatus: defineField.select({
+  icon: 'IconBox',
+  labelIdentifierFieldMetadataUniversalIdentifier: 'c83b1a20-3b99-4c22-b7e2-45e0f22281aa',
+  fields: [
+    { universalIdentifier: 'c83b1a20-3b99-4c22-b7e2-45e0f22281aa', name: 'name', type: FieldType.TEXT, label: 'Order Name' },
+    { universalIdentifier: 'd45b1a20-3b99-4c22-b7e2-45e0f22281bb', name: 'orderNumber', type: FieldType.TEXT, label: 'Order Number' },
+    { universalIdentifier: 'e56b1a20-3b99-4c22-b7e2-45e0f22281cc', name: 'orderDate', type: FieldType.DATE_TIME, label: 'Order Date' },
+    { universalIdentifier: 'f67b1a20-3b99-4c22-b7e2-45e0f22281dd', name: 'quantity', type: FieldType.NUMBER, label: 'Quantity (MT)' },
+    { universalIdentifier: 'a78b1a20-3b99-4c22-b7e2-45e0f22281ee', name: 'contractId', type: FieldType.TEXT, label: 'Contract ID' },
+    {
+      universalIdentifier: 'b89b1a20-3b99-4c22-b7e2-45e0f22281ff',
+      name: 'fulfillmentStatus',
+      type: FieldType.SELECT,
       label: 'Fulfillment Status',
       options: [
         { label: 'Pending', value: 'PENDING' },
         { label: 'In Progress', value: 'IN_PROGRESS' },
         { label: 'Shipped', value: 'SHIPPED' }
       ]
-    })
-  }
+    }
+  ]
 });
