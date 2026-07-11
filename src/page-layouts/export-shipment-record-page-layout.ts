@@ -14,6 +14,15 @@ export default definePageLayout({
       layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
       widgets: [
         {
+          universalIdentifier: '64a938c4-cff3-4b6e-add1-b75560959828',
+          title: 'Transit Progress',
+          type: 'FRONT_COMPONENT',
+          configuration: {
+            configurationType: 'FRONT_COMPONENT',
+            frontComponentUniversalIdentifier: 'c87af8fb-27cb-4b36-a19e-4c55d064a371'
+          },
+        },
+        {
           universalIdentifier: 'cc903b7a-91a6-4c21-bcf2-dbe0da80b7f7',
           title: 'Fields',
           type: 'FIELDS',

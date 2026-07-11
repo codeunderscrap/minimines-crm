@@ -248,16 +248,19 @@ const MainPage = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
                   {[
-                    { id: 1, metal: 'Aluminium', date: 'Jul 11, 2026', rate: '$2,450.50', trend: '+1.2%' },
-                    { id: 2, metal: 'Copper', date: 'Jul 11, 2026', rate: '$9,840.00', trend: '-0.5%' },
-                    { id: 3, metal: 'Iron', date: 'Jul 11, 2026', rate: '$105.20', trend: '+2.1%' }
+                    { id: 1, metal: 'Aluminium', date: 'Jul 11, 2026', rateUSD: 2450.50, trend: '+1.2%' },
+                    { id: 2, metal: 'Copper', date: 'Jul 11, 2026', rateUSD: 9840.00, trend: '-0.5%' },
+                    { id: 3, metal: 'Iron', date: 'Jul 11, 2026', rateUSD: 105.20, trend: '+2.1%' }
                   ].map(rate => (
                     <div key={rate.id} style={{ border: '1px solid #54595F', padding: '16px', backgroundColor: '#FAFAFA' }}>
                       <div style={{ fontSize: '12px', color: '#7A7A7A', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>{rate.date}</div>
                       <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '24px', color: '#001B2E', marginBottom: '4px' }}>{rate.metal}</div>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-                        <span style={{ fontSize: '28px', fontWeight: 'bold', color: '#001B2E' }}>{rate.rate}</span>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '28px', fontWeight: 'bold', color: '#001B2E' }}>${rate.rateUSD.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
                         <span style={{ fontSize: '14px', fontWeight: 'bold', color: rate.trend.startsWith('+') ? '#04AED1' : '#54595F' }}>{rate.trend}</span>
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#54595F', fontWeight: 500 }}>
+                        ≈ ₹{(rate.rateUSD * 83.5).toLocaleString('en-IN', {maximumFractionDigits: 0})} INR
                       </div>
                     </div>
                   ))}

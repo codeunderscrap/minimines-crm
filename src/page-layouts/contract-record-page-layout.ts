@@ -14,6 +14,15 @@ export default definePageLayout({
       layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
       widgets: [
         {
+          universalIdentifier: 'ebc13284-a15d-4f17-8e6f-bb3e3a39e802',
+          title: 'Contract Analytics',
+          type: 'FRONT_COMPONENT',
+          configuration: {
+            configurationType: 'FRONT_COMPONENT',
+            frontComponentUniversalIdentifier: 'c35471eb-1b1d-453b-9e48-3a25ef14b439'
+          },
+        },
+        {
           universalIdentifier: '83817eb7-83b6-4d5d-959d-b320c03fef74',
           title: 'Fields',
           type: 'FIELDS',
