@@ -220,6 +220,7 @@ const MainPage = () => {
               <a href="/object/exportShipments" className="btn btn-outline">Shipments</a>
               <a href="/object/lMETrackers" className="btn btn-outline">LME Tracker</a>
             </div>
+          </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '40px' }}>
             <StatCard label="Active Contracts" value="24" sub="4 awaiting renewal" />
