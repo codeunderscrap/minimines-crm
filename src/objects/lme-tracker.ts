@@ -17,11 +17,11 @@ export default defineObject({
       type: FieldType.SELECT,
       label: 'Metal Type',
       options: [
-        { label: 'Aluminum', value: 'AL' },
-        { label: 'Iron', value: 'FE' },
-        { label: 'Copper', value: 'CU' },
-        { label: 'Cobalt', value: 'CO' },
-        { label: 'Lithium', value: 'LI' }
+        { position: 0, label: 'Aluminum', value: 'AL' },
+        { position: 1, label: 'Iron', value: 'FE' },
+        { position: 2, label: 'Copper', value: 'CU' },
+        { position: 3, label: 'Cobalt', value: 'CO' },
+        { position: 4, label: 'Lithium', value: 'LI' }
       ]
     },
     { universalIdentifier: 'e56b1a20-3b99-4c22-b7e2-45e0f44481cc', name: 'rateDate', type: FieldType.DATE_TIME, label: 'Rate Date' },
