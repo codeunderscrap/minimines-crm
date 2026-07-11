@@ -6,7 +6,8 @@ export default defineFrontComponent({
   name: 'LmeDashboardWidget',
   description: 'A beautiful dashboard widget displaying LME rates',
   component: function LmeDashboardWidget() {
-    const [rates, setRates] = useState<{id: number, metal: string, date: string, rate: string, trend: string}[]>([]);
+    type Rate = { id: number, metal: string, date: string, rate: string, trend: string };
+    const [rates, setRates] = useState<Rate[]>([]);
     
     useEffect(() => {
       // Data matching the seeded rate from earlier for accurate real data representation
