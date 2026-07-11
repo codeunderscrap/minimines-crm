@@ -329,8 +329,14 @@ const MainPage = () => {
   );
 };
 
+import {
+  APP_DISPLAY_NAME,
+  MAIN_PAGE_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+} from '../constants/universal-identifiers';
+
 export default defineFrontComponent({
-  name: 'MiniMines CRM',
+  universalIdentifier: MAIN_PAGE_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  name: APP_DISPLAY_NAME,
   description: 'MiniMines Custom CRM Dashboard',
-  Component: MainPage,
+  component: MainPage,
 });
