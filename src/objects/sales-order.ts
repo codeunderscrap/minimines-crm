@@ -21,9 +21,9 @@ export default defineObject({
       type: FieldType.SELECT,
       label: 'Fulfillment Status',
       options: [
-        { position: 0, label: 'Pending', value: 'PENDING' },
-        { position: 1, label: 'In Progress', value: 'IN_PROGRESS' },
-        { position: 2, label: 'Shipped', value: 'SHIPPED' }
+        { position: 0, color: 'green', label: 'Pending', value: 'PENDING' },
+        { position: 1, color: 'green', label: 'In Progress', value: 'IN_PROGRESS' },
+        { position: 2, color: 'green', label: 'Shipped', value: 'SHIPPED' }
       ]
     }
   ]

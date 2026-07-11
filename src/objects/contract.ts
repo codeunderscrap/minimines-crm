@@ -21,9 +21,9 @@ export default defineObject({
       type: FieldType.SELECT,
       label: 'Status',
       options: [
-        { position: 0, label: 'Draft', value: 'DRAFT' },
-        { position: 1, label: 'Active', value: 'ACTIVE' },
-        { position: 2, label: 'Expired', value: 'EXPIRED' }
+        { position: 0, color: 'green', label: 'Draft', value: 'DRAFT' },
+        { position: 1, color: 'green', label: 'Active', value: 'ACTIVE' },
+        { position: 2, color: 'green', label: 'Expired', value: 'EXPIRED' }
       ]
     }
   ]

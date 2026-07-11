@@ -21,9 +21,9 @@ export default defineObject({
       type: FieldType.SELECT,
       label: 'QA Status',
       options: [
-        { position: 0, label: 'Pending', value: 'PENDING' },
-        { position: 1, label: 'Passed', value: 'PASSED' },
-        { position: 2, label: 'Failed', value: 'FAILED' }
+        { position: 0, color: 'green', label: 'Pending', value: 'PENDING' },
+        { position: 1, color: 'green', label: 'Passed', value: 'PASSED' },
+        { position: 2, color: 'green', label: 'Failed', value: 'FAILED' }
       ]
     },
     {
@@ -32,8 +32,8 @@ export default defineObject({
       type: FieldType.SELECT,
       label: 'Documentation Status',
       options: [
-        { position: 0, label: 'Incomplete', value: 'INCOMPLETE' },
-        { position: 1, label: 'Ready', value: 'READY' }
+        { position: 0, color: 'green', label: 'Incomplete', value: 'INCOMPLETE' },
+        { position: 1, color: 'green', label: 'Ready', value: 'READY' }
       ]
     }
   ]
