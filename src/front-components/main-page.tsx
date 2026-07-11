@@ -276,7 +276,7 @@ const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
 
   const shipment = shipments.find(s => s.id === selectedId) || shipments[0];
 
-  const currentStatus = (shipment.qaStatus || 'DOCUMENTATION').toUpperCase();
+  const currentStatus = (shipment.transitStatus || 'DOCUMENTATION').toUpperCase();
 
   const steps = [
     { label: 'Documentation', active: true },
@@ -313,7 +313,7 @@ const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
             <span style={{ fontWeight: 600, color: BRAND.primary, fontSize: '15px' }}>{shipment.containerNumber || 'TBD'}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${BRAND.border}`, paddingTop: '12px', marginTop: '4px' }}>
-            <span style={{ color: BRAND.text, fontSize: '15px' }}>Status Log:</span>
+            <span style={{ color: BRAND.text, fontSize: '15px' }}>Transit Status:</span>
             <span style={{ fontWeight: 600, color: BRAND.accent, fontSize: '15px' }}>{currentStatus}</span>
           </div>
         </div>
