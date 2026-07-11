@@ -215,12 +215,11 @@ const MainPage = () => {
               <div className="subtitle">Corporate Command Center</div>
             </div>
             <div style={{ display: 'flex', gap: '16px' }}>
-              <a href="/object/contract" className="btn btn-outline">Contracts</a>
-              <a href="/object/salesOrder" className="btn btn-outline">Sales Orders</a>
-              <a href="/object/exportShipment" className="btn btn-outline">Shipments</a>
-              <a href="/object/lmeTracker" className="btn btn-outline">LME Tracker</a>
+              <a href="/object/contracts" className="btn btn-outline">Contracts</a>
+              <a href="/object/salesOrders" className="btn btn-outline">Sales Orders</a>
+              <a href="/object/exportShipments" className="btn btn-outline">Shipments</a>
+              <a href="/object/lMETrackers" className="btn btn-outline">LME Tracker</a>
             </div>
-          </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '40px' }}>
             <StatCard label="Active Contracts" value="24" sub="4 awaiting renewal" />
@@ -274,10 +273,10 @@ const MainPage = () => {
             <div>
               <h2 className="h2">System Links</h2>
               <div className="card" style={{ gap: '16px' }}>
-                <a href="/object/contract" style={{ color: BRAND.primary, textDecoration: 'none', fontWeight: 500 }}>&rarr; Manage Contracts</a>
-                <a href="/object/salesOrder" style={{ color: BRAND.primary, textDecoration: 'none', fontWeight: 500 }}>&rarr; Manage Sales Orders</a>
-                <a href="/object/exportShipment" style={{ color: BRAND.primary, textDecoration: 'none', fontWeight: 500 }}>&rarr; Manage Export Shipments</a>
-                <a href="/object/lmeTracker" style={{ color: BRAND.primary, textDecoration: 'none', fontWeight: 500 }}>&rarr; LME Price Feeds</a>
+                <a href="/object/contracts" style={{ color: BRAND.primary, textDecoration: 'none', fontWeight: 500 }}>&rarr; Manage Contracts</a>
+                <a href="/object/salesOrders" style={{ color: BRAND.primary, textDecoration: 'none', fontWeight: 500 }}>&rarr; Manage Sales Orders</a>
+                <a href="/object/exportShipments" style={{ color: BRAND.primary, textDecoration: 'none', fontWeight: 500 }}>&rarr; Manage Export Shipments</a>
+                <a href="/object/lMETrackers" style={{ color: BRAND.primary, textDecoration: 'none', fontWeight: 500 }}>&rarr; LME Price Feeds</a>
                 
                 <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: `1px solid ${BRAND.border}` }}>
                   <div className="stat-label" style={{ marginBottom: '8px' }}>Module Status</div>
