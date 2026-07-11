@@ -2,8 +2,8 @@ import { defineObject, FieldType } from 'twenty-sdk/define';
 
 export default defineObject({
   universalIdentifier: '651890c3-6208-429c-8e72-3e99adeb480e',
-  nameSingular: 'Contract',
-  namePlural: 'Contracts',
+  nameSingular: 'contract',
+  namePlural: 'contracts',
   labelSingular: 'Contract',
   labelPlural: 'Contracts',
   description: 'Umbrella agreement for sales',

@@ -2,8 +2,8 @@ import { defineObject, FieldType } from 'twenty-sdk/define';
 
 export default defineObject({
   universalIdentifier: '6eb74c1e-bb61-4a12-ba76-849c9db2c3d0',
-  nameSingular: 'SalesOrder',
-  namePlural: 'SalesOrders',
+  nameSingular: 'salesOrder',
+  namePlural: 'salesOrders',
   labelSingular: 'Sales Order',
   labelPlural: 'Sales Orders',
   description: 'Specific order linked to a contract',

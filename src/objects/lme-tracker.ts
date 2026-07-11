@@ -2,8 +2,8 @@ import { defineObject, FieldType } from 'twenty-sdk/define';
 
 export default defineObject({
   universalIdentifier: '03987302-22c9-4308-a280-e16738c722af',
-  nameSingular: 'LMETracker',
-  namePlural: 'LMETrackers',
+  nameSingular: 'lMETracker',
+  namePlural: 'lMETrackers',
   labelSingular: 'LME Tracker',
   labelPlural: 'LME Trackers',
   description: 'Tracks daily London Metal Exchange rates for pricing calculation',

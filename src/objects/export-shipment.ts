@@ -2,8 +2,8 @@ import { defineObject, FieldType } from 'twenty-sdk/define';
 
 export default defineObject({
   universalIdentifier: '04acd819-f079-4dde-b36d-1eb14b47167d',
-  nameSingular: 'ExportShipment',
-  namePlural: 'ExportShipments',
+  nameSingular: 'exportShipment',
+  namePlural: 'exportShipments',
   labelSingular: 'Export Shipment',
   labelPlural: 'Export Shipments',
   description: 'Logistics tracking for export orders',

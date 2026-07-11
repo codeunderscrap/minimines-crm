@@ -5,8 +5,8 @@ export const NAME_FIELD_UNIVERSAL_IDENTIFIER =
 
 export default defineObject({
   universalIdentifier: 'b93b6468-40b4-4555-9541-d59a854c46da',
-  nameSingular: 'Demo',
-  namePlural: 'DemoDemos',
+  nameSingular: 'demo',
+  namePlural: 'demoDemos',
   labelSingular: 'Demos',
   labelPlural: 'Demo',
   icon: 'IconBox',
