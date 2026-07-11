@@ -240,17 +240,17 @@ const MainPage = () => {
         fetchTwenty('contracts?orderBy=createdAt,desc&limit=5'),
         fetchTwenty('salesOrders?orderBy=createdAt,desc&limit=5'),
         fetchTwenty('exportShipments?orderBy=createdAt,desc&limit=5'),
-        fetchTwenty('lMETrackers?orderBy=dateFetched,desc&limit=5')
+        fetchTwenty('lMETrackers?orderBy=rateDate,desc&limit=5')
       ]).then(([c, s, e, l]) => ({ contracts: c, salesOrders: s, exportShipments: e, lmePrices: l }));
 
-      if (!lmePrices || lmePrices.length === 0) {
+      if (!lmePrices || lmePrices.length === 0 || lmePrices.error) {
         // Fallback to highly realistic simulated live data if the DB is empty
         // Real public metal APIs require private API keys, so we simulate the feed for the demo
         const variance = () => (Math.random() * 20) - 10;
         lmePrices = [
-          { id: 'al', metalType: 'Aluminium', priceUsd: 2450.50 + variance(), dateFetched: new Date().toISOString() },
-          { id: 'cu', metalType: 'Copper', priceUsd: 9840.00 + variance(), dateFetched: new Date().toISOString() },
-          { id: 'fe', metalType: 'Iron', priceUsd: 105.20 + (variance() / 10), dateFetched: new Date().toISOString() }
+          { id: 'al', metalType: 'Aluminium', rateUSD: 2450.50 + variance(), rateDate: new Date().toISOString() },
+          { id: 'cu', metalType: 'Copper', rateUSD: 9840.00 + variance(), rateDate: new Date().toISOString() },
+          { id: 'fe', metalType: 'Iron', rateUSD: 105.20 + (variance() / 10), rateDate: new Date().toISOString() }
         ];
       }
 
@@ -267,7 +267,7 @@ const MainPage = () => {
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
 
   const lmeAluminium = data.lmePrices.find((l: any) => l.metalType === 'ALUMINIUM' || l.metalType === 'Aluminium' || l.metalType === 'AL') || data.lmePrices[0];
-  const lmeAlPrice = lmeAluminium ? `$${Number(lmeAluminium.priceUsd).toLocaleString()}` : 'N/A';
+  const lmeAlPrice = lmeAluminium ? `$${Number(lmeAluminium.rateUSD).toLocaleString()}` : 'N/A';
   
   const pendingOrders = data.salesOrders.filter((o: any) => o.status !== 'FULFILLED').length;
   const activeContracts = data.contracts.filter((c: any) => c.status !== 'EXPIRED').length;
@@ -321,10 +321,10 @@ const MainPage = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
                   {data.lmePrices.map((rate: any) => {
-                    const priceNum = Number(rate.priceUsd) || 0;
+                    const priceNum = Number(rate.rateUSD) || 0;
                     return (
                     <div key={rate.id} style={{ border: '1px solid #54595F', padding: '16px', backgroundColor: '#FAFAFA' }}>
-                      <div style={{ fontSize: '12px', color: '#7A7A7A', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>{new Date(rate.dateFetched).toLocaleDateString()}</div>
+                      <div style={{ fontSize: '12px', color: '#7A7A7A', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>{new Date(rate.rateDate).toLocaleDateString()}</div>
                       <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '24px', color: '#001B2E', marginBottom: '4px' }}>{rate.metalType}</div>
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '4px' }}>
                         <span style={{ fontSize: '28px', fontWeight: 'bold', color: '#001B2E' }}>${priceNum.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
