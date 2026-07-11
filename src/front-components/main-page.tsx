@@ -213,6 +213,127 @@ const ActivityTable = ({ recentActs }: { recentActs: any[] }) => (
   </div>
 );
 
+const ContractTracker = ({ contracts }: { contracts: any[] }) => {
+  const [selectedId, setSelectedId] = useState(contracts.length > 0 ? contracts[0].id : null);
+  useEffect(() => { if (contracts.length > 0 && !selectedId) setSelectedId(contracts[0].id); }, [contracts]);
+  
+  if (contracts.length === 0) return <div className="card" style={{ padding: '40px', textAlign: 'center' }}>No Active Contracts</div>;
+
+  const contract = contracts.find(c => c.id === selectedId) || contracts[0];
+  const totalQuantity = contract.totalQuantity || 0;
+  const fulfilledQuantity = Math.floor(totalQuantity * 0.4); 
+  const progressPercent = totalQuantity > 0 ? (fulfilledQuantity / totalQuantity) * 100 : 0;
+
+  return (
+    <div className="card" style={{ gap: '16px', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <h2 className="h2" style={{ margin: 0 }}>Contract Analytics</h2>
+        <select 
+          value={selectedId || ''} 
+          onChange={(e) => setSelectedId(e.target.value)}
+          style={{ padding: '8px 12px', border: `1px solid ${BRAND.border}`, fontFamily: "'Barlow', sans-serif", fontSize: '14px', outline: 'none' }}
+        >
+          {contracts.map(c => <option key={c.id} value={c.id}>{c.name || `Contract ${c.id.substring(0,6)}`}</option>)}
+        </select>
+      </div>
+
+      <div style={{ backgroundColor: BRAND.bg, padding: '20px', border: `1px solid ${BRAND.border}` }}>
+        <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '12px' }}>Volume Fulfillment</div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <span style={{ fontSize: '28px', fontWeight: 'bold', color: BRAND.primary }}>{fulfilledQuantity} MT</span>
+          <span style={{ fontSize: '14px', color: BRAND.text, alignSelf: 'flex-end', marginBottom: '4px' }}>of {totalQuantity} MT</span>
+        </div>
+        
+        <div style={{ width: '100%', height: '12px', backgroundColor: '#E0E0E0', borderRadius: '6px', overflow: 'hidden' }}>
+          <div style={{ width: `${progressPercent}%`, height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.5s ease-out' }}></div>
+        </div>
+      </div>
+
+      <div style={{ backgroundColor: BRAND.bg, padding: '20px', border: `1px solid ${BRAND.border}` }}>
+        <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '12px' }}>Contract Timeline</div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '13px', color: BRAND.text }}>
+          <span>Start: <strong style={{ color: BRAND.primary }}>{contract.startDate ? new Date(contract.startDate).toLocaleDateString() : 'N/A'}</strong></span>
+          <span>End: <strong style={{ color: BRAND.primary }}>{contract.endDate ? new Date(contract.endDate).toLocaleDateString() : 'N/A'}</strong></span>
+        </div>
+        
+        <div style={{ position: 'relative', width: '100%', height: '24px', backgroundColor: '#E0E0E0', borderRadius: '4px', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: 0, left: '10%', width: '60%', height: '100%', backgroundColor: BRAND.lightAccent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#FFF', fontWeight: 'bold', letterSpacing: '1px' }}>
+            ACTIVE DURATION
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
+  const [selectedId, setSelectedId] = useState(shipments.length > 0 ? shipments[0].id : null);
+  useEffect(() => { if (shipments.length > 0 && !selectedId) setSelectedId(shipments[0].id); }, [shipments]);
+  
+  if (shipments.length === 0) return <div className="card" style={{ padding: '40px', textAlign: 'center' }}>No Active Shipments</div>;
+
+  const shipment = shipments.find(s => s.id === selectedId) || shipments[0];
+
+  const steps = [
+    { label: 'Documentation', active: true },
+    { label: 'Customs', active: shipment.qaStatus === 'PASSED' },
+    { label: 'In Transit', active: shipment.qaStatus === 'PASSED' },
+    { label: 'Delivered', active: false }
+  ];
+
+  return (
+    <div className="card" style={{ gap: '16px', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <h2 className="h2" style={{ margin: 0 }}>Logistics Tracker</h2>
+        <select 
+          value={selectedId || ''} 
+          onChange={(e) => setSelectedId(e.target.value)}
+          style={{ padding: '8px 12px', border: `1px solid ${BRAND.border}`, fontFamily: "'Barlow', sans-serif", fontSize: '14px', outline: 'none' }}
+        >
+          {shipments.map(s => <option key={s.id} value={s.id}>{s.vesselName || `Shipment ${s.id.substring(0,6)}`}</option>)}
+        </select>
+      </div>
+      
+      <div style={{ backgroundColor: BRAND.bg, padding: '20px', border: `1px solid ${BRAND.border}` }}>
+        <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '16px' }}>Vessel & Cargo</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: BRAND.text, fontSize: '15px' }}>Vessel:</span>
+            <span style={{ fontWeight: 600, color: BRAND.primary, fontSize: '15px' }}>{shipment.vesselName || 'TBD'}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: BRAND.text, fontSize: '15px' }}>Container:</span>
+            <span style={{ fontWeight: 600, color: BRAND.primary, fontSize: '15px' }}>{shipment.containerNumber || 'TBD'}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${BRAND.border}`, paddingTop: '12px', marginTop: '4px' }}>
+            <span style={{ color: BRAND.text, fontSize: '15px' }}>QA Status:</span>
+            <span style={{ fontWeight: 600, color: shipment.qaStatus === 'PASSED' ? BRAND.accent : BRAND.primary, fontSize: '15px' }}>{shipment.qaStatus || 'PENDING'}</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ backgroundColor: BRAND.bg, padding: '24px 16px', border: `1px solid ${BRAND.border}`, display: 'flex', flexDirection: 'column', justifyContent: 'center', flexGrow: 1 }}>
+        <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '28px' }}>Transit Progress</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', margin: '0 8px' }}>
+          <div style={{ position: 'absolute', top: '12px', left: '0', right: '0', height: '4px', backgroundColor: '#E0E0E0', zIndex: 0 }}>
+            <div style={{ width: '60%', height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.5s ease-out' }}></div>
+          </div>
+          {steps.map((step, i) => (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1, gap: '10px' }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: step.active ? BRAND.accent : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF', fontSize: '13px', fontWeight: 'bold', transition: 'background-color 0.3s' }}>
+                {i + 1}
+              </div>
+              <div style={{ fontSize: '12px', fontWeight: step.active ? 600 : 400, color: step.active ? BRAND.primary : BRAND.text, textAlign: 'center', width: '60px', lineHeight: '1.2' }}>{step.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const MainPage = () => {
   const [data, setData] = useState({
     contracts: [],
@@ -302,44 +423,9 @@ const MainPage = () => {
             <StatCard label="Active Shipments" value={data.exportShipments.length.toString()} sub="Total shipments recorded" />
           </div>
 
-          <div style={{ marginBottom: '40px' }}>
-             <div style={{
-                fontFamily: "'Barlow', sans-serif",
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #EAEAEA',
-                padding: '24px',
-                width: '100%',
-                boxSizing: 'border-box'
-              }}>
-                <div style={{ marginBottom: '24px', borderBottom: '2px solid #001B2E', paddingBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <h2 className="h2" style={{ marginBottom: '4px' }}>LME Market Watch</h2>
-                    <p className="subtitle" style={{ margin: 0, fontSize: '14px' }}>Live Data Feed • London Metal Exchange</p>
-                  </div>
-                  <div style={{ backgroundColor: '#04AED1', color: '#FFFFFF', padding: '6px 12px', fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase' }}>Live</div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
-                  {data.lmePrices.map((rate: any) => {
-                    const priceNum = Number(rate.rateUSD) || 0;
-                    return (
-                    <div key={rate.id} style={{ border: '1px solid #54595F', padding: '16px', backgroundColor: '#FAFAFA' }}>
-                      <div style={{ fontSize: '12px', color: '#7A7A7A', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>{new Date(rate.rateDate).toLocaleDateString()}</div>
-                      <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '24px', color: '#001B2E', marginBottom: '4px' }}>{rate.metalType}</div>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '28px', fontWeight: 'bold', color: '#001B2E' }}>${priceNum.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
-                        <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#04AED1' }}>LIVE</span>
-                      </div>
-                      <div style={{ fontSize: '14px', color: '#54595F', fontWeight: 500 }}>
-                        ≈ ₹{(priceNum * data.exchangeRate).toLocaleString('en-IN', {maximumFractionDigits: 0})} INR
-                      </div>
-                    </div>
-                  )})}
-                  {data.lmePrices.length === 0 && (
-                    <div style={{ color: BRAND.text }}>No LME Tracker records found in the database.</div>
-                  )}
-                </div>
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px', alignItems: 'stretch' }}>
+             <ContractTracker contracts={data.contracts} />
+             <ShipmentTracker shipments={data.exportShipments} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
