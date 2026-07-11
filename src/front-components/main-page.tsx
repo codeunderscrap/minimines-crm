@@ -218,12 +218,24 @@ const MainPage = () => {
     contracts: [],
     salesOrders: [],
     exportShipments: [],
-    lmePrices: []
+    lmePrices: [],
+    exchangeRate: 85.53 // fallback rate
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
+      let currentRate = 85.53;
+      try {
+        const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const rateJson = await rateRes.json();
+        if (rateJson && rateJson.rates && rateJson.rates.INR) {
+          currentRate = rateJson.rates.INR;
+        }
+      } catch (err) {
+        console.error('Failed to fetch dynamic exchange rate', err);
+      }
+
       const [contracts, salesOrders, exportShipments, lmePrices] = await Promise.all([
         fetchTwenty('contracts?orderBy=createdAt,desc&limit=5'),
         fetchTwenty('salesOrders?orderBy=createdAt,desc&limit=5'),
@@ -231,7 +243,7 @@ const MainPage = () => {
         fetchTwenty('lMETrackers?orderBy=dateFetched,desc&limit=5')
       ]);
 
-      setData({ contracts, salesOrders, exportShipments, lmePrices });
+      setData({ contracts, salesOrders, exportShipments, lmePrices, exchangeRate: currentRate });
       setLoading(false);
     };
     loadData();
@@ -308,7 +320,7 @@ const MainPage = () => {
                         <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#04AED1' }}>LIVE</span>
                       </div>
                       <div style={{ fontSize: '14px', color: '#54595F', fontWeight: 500 }}>
-                        ≈ ₹{(priceNum * 83.5).toLocaleString('en-IN', {maximumFractionDigits: 0})} INR
+                        ≈ ₹{(priceNum * data.exchangeRate).toLocaleString('en-IN', {maximumFractionDigits: 0})} INR
                       </div>
                     </div>
                   )})}
