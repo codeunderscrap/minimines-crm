@@ -1,5 +1,5 @@
 import { defineFrontComponent } from 'twenty-sdk/define';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import {
   APP_DISPLAY_NAME,
@@ -163,46 +163,96 @@ const StatCard = ({ label, value, sub }: any) => (
   </div>
 );
 
-const ActivityTable = () => (
+const API_KEY = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYyMDI2ODQzLTA5ZDItNDM5My05NTM1LTZlODJhNTE3ZjRmNCJ9.eyJzdWIiOiI2MWJlMjBjYi1jMGQ2LTRiZTAtYWYxNy02YzUwMDY3NmRmOWIiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNjFiZTIwY2ItYzBkNi00YmUwLWFmMTctNmM1MDA2NzZkZjliIiwiaWF0IjoxNzgzNjg1MzQ0LCJleHAiOjQ5MzcyODUzNDEsImp0aSI6Ijg5YjcwMjEyLTY0NzktNDc2Zi05Y2ZlLTEyMTVkZDgyZWVmZCJ9.lPQmTpJ7lAK73_4ToKzb_FeiQbXbgC-h732qCGP7ezgBj8sPolSaILQh755UcVcr_pesNJdMI9gMS7V2c1GjsA';
+
+const fetchTwenty = async (endpoint: string) => {
+  try {
+    const res = await fetch(`https://api.twenty.com/rest/${endpoint}`, {
+      headers: { 'Authorization': API_KEY }
+    });
+    const json = await res.json();
+    const key = endpoint.split('?')[0]; // Extract base path
+    let items = json.data && json.data[key] ? json.data[key] : [];
+    if (items && items.edges) {
+      items = items.edges.map((e: any) => e.node);
+    }
+    return items;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+};
+
+const ActivityTable = ({ recentActs }: { recentActs: any[] }) => (
   <div className="card" style={{ padding: 0 }}>
     <table className="data-table">
       <thead>
         <tr>
           <th>Reference ID</th>
           <th>Type</th>
-          <th>Client / Details</th>
           <th>Status</th>
           <th>Date</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>SO-2024-142</td>
-          <td>Sales Order</td>
-          <td>Aluminium Billets 500MT</td>
-          <td><span className="status-badge" style={{ borderColor: BRAND.secondary, color: BRAND.secondary }}>PENDING</span></td>
-          <td style={{ color: BRAND.text }}>Today</td>
-        </tr>
-        <tr>
-          <td>EXP-2024-089</td>
-          <td>Export Shipment</td>
-          <td>Rotterdam Port</td>
-          <td><span className="status-badge">IN TRANSIT</span></td>
-          <td style={{ color: BRAND.text }}>Yesterday</td>
-        </tr>
-        <tr>
-          <td>CTR-2024-004</td>
-          <td>Contract</td>
-          <td>Annual Supply - TechCorp</td>
-          <td><span className="status-badge">ACTIVE</span></td>
-          <td style={{ color: BRAND.text }}>Oct 12</td>
-        </tr>
+        {recentActs.map((act, i) => (
+          <tr key={i}>
+            <td>{act.referenceId || act.id.substring(0, 8)}</td>
+            <td>{act.type}</td>
+            <td><span className="status-badge">{act.status}</span></td>
+            <td style={{ color: BRAND.text }}>{new Date(act.date).toLocaleDateString()}</td>
+          </tr>
+        ))}
+        {recentActs.length === 0 && (
+          <tr>
+            <td colSpan={4} style={{ textAlign: 'center', color: BRAND.text }}>No recent operations found.</td>
+          </tr>
+        )}
       </tbody>
     </table>
   </div>
 );
 
 const MainPage = () => {
+  const [data, setData] = useState({
+    contracts: [],
+    salesOrders: [],
+    exportShipments: [],
+    lmePrices: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const [contracts, salesOrders, exportShipments, lmePrices] = await Promise.all([
+        fetchTwenty('contracts?orderBy=createdAt,desc&limit=5'),
+        fetchTwenty('salesOrders?orderBy=createdAt,desc&limit=5'),
+        fetchTwenty('exportShipments?orderBy=createdAt,desc&limit=5'),
+        fetchTwenty('lMETrackers?orderBy=dateFetched,desc&limit=5')
+      ]);
+
+      setData({ contracts, salesOrders, exportShipments, lmePrices });
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
+  const recentActs = [
+    ...data.contracts.map((c: any) => ({ type: 'Contract', referenceId: c.name || c.id, status: c.status || 'ACTIVE', date: c.createdAt })),
+    ...data.salesOrders.map((o: any) => ({ type: 'Sales Order', referenceId: o.orderNumber || o.id, status: o.status || 'PENDING', date: o.createdAt })),
+    ...data.exportShipments.map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.qaStatus || 'IN TRANSIT', date: s.createdAt }))
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+
+  const lmeAluminium = data.lmePrices.find((l: any) => l.metalType === 'ALUMINIUM' || l.metalType === 'Aluminium' || l.metalType === 'AL') || data.lmePrices[0];
+  const lmeAlPrice = lmeAluminium ? `$${Number(lmeAluminium.priceUsd).toLocaleString()}` : 'N/A';
+  
+  const pendingOrders = data.salesOrders.filter((o: any) => o.status !== 'FULFILLED').length;
+  const activeContracts = data.contracts.filter((c: any) => c.status !== 'EXPIRED').length;
+
+  if (loading) {
+    return <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif" }}>Loading secure CRM data...</div>;
+  }
+
   return (
     <>
       <style>{FONTS}</style>
@@ -223,10 +273,10 @@ const MainPage = () => {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '40px' }}>
-            <StatCard label="Active Contracts" value="24" sub="4 awaiting renewal" />
-            <StatCard label="LME Aluminium" value="$2,450.50" sub="Last update: 14:00 GMT" />
-            <StatCard label="Pending Orders" value="14" sub="Requires fulfillment" />
-            <StatCard label="Active Shipments" value="8" sub="In transit / Customs" />
+            <StatCard label="Active Contracts" value={activeContracts.toString()} sub="Total Active" />
+            <StatCard label="LME Aluminium" value={lmeAlPrice} sub="Real-time data feed" />
+            <StatCard label="Pending Orders" value={pendingOrders.toString()} sub="Requires fulfillment" />
+            <StatCard label="Active Shipments" value={data.exportShipments.length.toString()} sub="Total shipments recorded" />
           </div>
 
           <div style={{ marginBottom: '40px' }}>
@@ -247,23 +297,24 @@ const MainPage = () => {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
-                  {[
-                    { id: 1, metal: 'Aluminium', date: 'Jul 11, 2026', rateUSD: 2450.50, trend: '+1.2%' },
-                    { id: 2, metal: 'Copper', date: 'Jul 11, 2026', rateUSD: 9840.00, trend: '-0.5%' },
-                    { id: 3, metal: 'Iron', date: 'Jul 11, 2026', rateUSD: 105.20, trend: '+2.1%' }
-                  ].map(rate => (
+                  {data.lmePrices.map((rate: any) => {
+                    const priceNum = Number(rate.priceUsd) || 0;
+                    return (
                     <div key={rate.id} style={{ border: '1px solid #54595F', padding: '16px', backgroundColor: '#FAFAFA' }}>
-                      <div style={{ fontSize: '12px', color: '#7A7A7A', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>{rate.date}</div>
-                      <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '24px', color: '#001B2E', marginBottom: '4px' }}>{rate.metal}</div>
+                      <div style={{ fontSize: '12px', color: '#7A7A7A', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>{new Date(rate.dateFetched).toLocaleDateString()}</div>
+                      <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '24px', color: '#001B2E', marginBottom: '4px' }}>{rate.metalType}</div>
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '28px', fontWeight: 'bold', color: '#001B2E' }}>${rate.rateUSD.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
-                        <span style={{ fontSize: '14px', fontWeight: 'bold', color: rate.trend.startsWith('+') ? '#04AED1' : '#54595F' }}>{rate.trend}</span>
+                        <span style={{ fontSize: '28px', fontWeight: 'bold', color: '#001B2E' }}>${priceNum.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                        <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#04AED1' }}>LIVE</span>
                       </div>
                       <div style={{ fontSize: '14px', color: '#54595F', fontWeight: 500 }}>
-                        ≈ ₹{(rate.rateUSD * 83.5).toLocaleString('en-IN', {maximumFractionDigits: 0})} INR
+                        ≈ ₹{(priceNum * 83.5).toLocaleString('en-IN', {maximumFractionDigits: 0})} INR
                       </div>
                     </div>
-                  ))}
+                  )})}
+                  {data.lmePrices.length === 0 && (
+                    <div style={{ color: BRAND.text }}>No LME Tracker records found in the database.</div>
+                  )}
                 </div>
               </div>
           </div>
@@ -271,7 +322,7 @@ const MainPage = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
             <div>
               <h2 className="h2">Recent Operations</h2>
-              <ActivityTable />
+              <ActivityTable recentActs={recentActs} />
             </div>
             
             <div>
