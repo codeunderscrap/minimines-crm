@@ -73,13 +73,13 @@ const InternAnalytics = () => {
             {/* Native CSS Bar Chart */}
             <div style={{ width: '100%', height: '16px', backgroundColor: '#E0E0E0', borderRadius: '4px', overflow: 'hidden', display: 'flex' }}>
               <div style={{ 
-                width: \`\${(intern.calls / maxCalls) * 100}%\`, 
+                width: `${(intern.calls / maxCalls) * 100}%`, 
                 height: '100%', 
                 backgroundColor: BRAND.lightAccent,
                 position: 'relative'
               }}>
                 <div style={{
-                  width: \`\${(intern.converted / intern.calls) * 100}%\`,
+                  width: `${(intern.converted / intern.calls) * 100}%`,
                   height: '100%',
                   backgroundColor: BRAND.accent
                 }}></div>
@@ -89,7 +89,7 @@ const InternAnalytics = () => {
         ))}
       </div>
       
-      <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: \`1px solid \${BRAND.border}\`, display: 'flex', gap: '16px', fontSize: '12px', color: BRAND.secondary }}>
+      <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, display: 'flex', gap: '16px', fontSize: '12px', color: BRAND.secondary }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <div style={{ width: '12px', height: '12px', backgroundColor: BRAND.lightAccent, borderRadius: '2px' }}></div>
           Total Calls Made

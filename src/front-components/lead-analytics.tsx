@@ -78,7 +78,7 @@ const LeadAnalytics = () => {
           <div style={{ width: '100%', height: '24px', borderRadius: '4px', overflow: 'hidden', display: 'flex', marginBottom: '20px' }}>
             {leadSources.map((source, i) => (
               <div key={i} style={{ 
-                width: \`\${(source.count / totalLeads) * 100}%\`, 
+                width: `${(source.count / totalLeads) * 100}%`, 
                 height: '100%', 
                 backgroundColor: source.color,
                 borderRight: i < leadSources.length - 1 ? '1px solid #FFF' : 'none'
@@ -112,7 +112,7 @@ const LeadAnalytics = () => {
                 
                 <div style={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
                   <div style={{ 
-                    width: \`\${stage.percent}%\`, 
+                    width: `${stage.percent}%`, 
                     minWidth: '4px',
                     height: '28px', 
                     backgroundColor: i === funnelData.length - 1 ? BRAND.success : BRAND.accent, 

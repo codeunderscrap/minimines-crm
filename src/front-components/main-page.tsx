@@ -369,8 +369,8 @@ const InternTracker = () => {
               </span>
             </div>
             <div style={{ width: '100%', height: '16px', backgroundColor: '#E0E0E0', borderRadius: '4px', overflow: 'hidden', display: 'flex' }}>
-              <div style={{ width: \`\${(intern.calls / maxCalls) * 100}%\`, height: '100%', backgroundColor: BRAND.lightAccent, position: 'relative' }}>
-                <div style={{ width: \`\${(intern.converted / intern.calls) * 100}%\`, height: '100%', backgroundColor: BRAND.accent }}></div>
+              <div style={{ width: `${(intern.calls / maxCalls) * 100}%`, height: '100%', backgroundColor: BRAND.lightAccent, position: 'relative' }}>
+                <div style={{ width: `${(intern.converted / intern.calls) * 100}%`, height: '100%', backgroundColor: BRAND.accent }}></div>
               </div>
             </div>
           </div>
@@ -428,7 +428,7 @@ const LeadFunnel = () => {
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ width: '60px', fontSize: '12px', color: BRAND.text, textAlign: 'right' }}>{stage.stage}</div>
                 <div style={{ flexGrow: 1, display: 'flex' }}>
-                  <div style={{ width: \`\${stage.percent}%\`, height: '20px', backgroundColor: i === funnelData.length - 1 ? '#28A745' : BRAND.accent, borderRadius: '2px' }}></div>
+                  <div style={{ width: `${stage.percent}%`, height: '20px', backgroundColor: i === funnelData.length - 1 ? '#28A745' : BRAND.accent, borderRadius: '2px' }}></div>
                 </div>
                 <div style={{ width: '30px', fontSize: '12px', fontWeight: 600, color: BRAND.primary }}>{stage.percent}%</div>
               </div>
