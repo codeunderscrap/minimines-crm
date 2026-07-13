@@ -9,8 +9,9 @@ export default defineObject({
   labelPlural: 'Export Documents',
   description: 'Manage 8+ export declarations (EVD, FEMA, SCOMET, HSN, etc.)',
   icon: 'IconFiles',
-  labelIdentifierFieldMetadataUniversalIdentifier: '97e3ba9b-164a-4f94-b71f-2c44b87c45e3',
+  labelIdentifierFieldMetadataUniversalIdentifier: 'c83b1a20-3b99-4c22-b7e2-45e0f3338101',
   fields: [
+    { universalIdentifier: 'c83b1a20-3b99-4c22-b7e2-45e0f3338101', name: 'documentName', type: FieldType.TEXT, label: 'Document Name' },
     {
       universalIdentifier: '97e3ba9b-164a-4f94-b71f-2c44b87c45e3',
       name: 'documentType',
