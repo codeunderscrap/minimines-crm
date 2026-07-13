@@ -276,17 +276,12 @@ const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
 
   const shipment = shipments.find(s => s.id === selectedId) || shipments[0];
 
-  const currentStatus = (shipment.qaStatus || 'DOCUMENTATION').toUpperCase();
-
   const steps = [
     { label: 'Documentation', active: true },
-    { label: 'Customs', active: ['CUSTOMS', 'IN_TRANSIT', 'DELIVERED', 'PASSED'].includes(currentStatus) },
-    { label: 'In Transit', active: ['IN_TRANSIT', 'DELIVERED'].includes(currentStatus) },
-    { label: 'Delivered', active: ['DELIVERED'].includes(currentStatus) }
+    { label: 'Customs', active: shipment.qaStatus === 'PASSED' },
+    { label: 'In Transit', active: shipment.qaStatus === 'PASSED' },
+    { label: 'Delivered', active: false }
   ];
-  
-  const activeStepsCount = steps.filter(s => s.active).length;
-  const progressPercent = ((activeStepsCount - 1) / (steps.length - 1)) * 100;
 
   return (
     <div className="card" style={{ gap: '16px', height: '100%' }}>
@@ -313,8 +308,8 @@ const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
             <span style={{ fontWeight: 600, color: BRAND.primary, fontSize: '15px' }}>{shipment.containerNumber || 'TBD'}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${BRAND.border}`, paddingTop: '12px', marginTop: '4px' }}>
-            <span style={{ color: BRAND.text, fontSize: '15px' }}>Status Log:</span>
-            <span style={{ fontWeight: 600, color: BRAND.accent, fontSize: '15px' }}>{currentStatus}</span>
+            <span style={{ color: BRAND.text, fontSize: '15px' }}>QA Status:</span>
+            <span style={{ fontWeight: 600, color: shipment.qaStatus === 'PASSED' ? BRAND.accent : BRAND.primary, fontSize: '15px' }}>{shipment.qaStatus || 'PENDING'}</span>
           </div>
         </div>
       </div>
@@ -323,7 +318,7 @@ const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
         <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '28px' }}>Transit Progress</div>
         <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', margin: '0 8px' }}>
           <div style={{ position: 'absolute', top: '12px', left: '0', right: '0', height: '4px', backgroundColor: '#E0E0E0', zIndex: 0 }}>
-            <div style={{ width: `${progressPercent}%`, height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.5s ease-out' }}></div>
+            <div style={{ width: '60%', height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.5s ease-out' }}></div>
           </div>
           {steps.map((step, i) => (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1, gap: '10px' }}>
