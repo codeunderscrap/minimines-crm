@@ -50,14 +50,17 @@ const FONTS = `
   .card {
     background: ${BRAND.white};
     border: 1px solid ${BRAND.border};
-    padding: 24px;
+    border-radius: 8px;
+    padding: 28px;
     display: flex;
     flex-direction: column;
-    transition: border-color 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 27, 46, 0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
   }
   
   .card:hover {
-    border-color: ${BRAND.accent};
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 27, 46, 0.08);
   }
 
   .stat-value {
@@ -132,16 +135,20 @@ const FONTS = `
     font-family: 'Barlow Condensed', sans-serif;
     text-transform: uppercase;
     font-weight: 600;
-    font-size: 16px;
-    padding: 12px 24px;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    padding: 10px 20px;
+    border-radius: 6px;
     border: none;
     cursor: pointer;
     text-decoration: none;
-    transition: background 0.2s;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
   
   .btn:hover {
     background: ${BRAND.accent};
+    transform: translateY(-1px);
   }
   
   .btn-outline {
