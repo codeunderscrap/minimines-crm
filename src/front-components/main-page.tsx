@@ -300,7 +300,7 @@ const ShipmentTracker = ({ shipments = [] }: { shipments: any[] }) => {
   const shipment = safeShipments.find(s => s.id === selectedId) || safeShipments[0];
   if (!shipment) return <div className="card">Error loading shipment</div>;
 
-  const currentStatus = (shipment.qaStatus || 'DOCUMENTATION').toUpperCase();
+  const currentStatus = (shipment.transitExport || 'DOCUMENTATION').toUpperCase();
 
   const steps = [
     { label: 'Documentation', active: true },
@@ -564,7 +564,7 @@ const MainPage = () => {
   const recentActs = [
     ...safeContracts.map((c: any) => ({ type: 'Contract', referenceId: c.name || c.id, status: c.status || 'ACTIVE', date: c.createdAt })),
     ...safeSalesOrders.map((o: any) => ({ type: 'Sales Order', referenceId: o.orderNumber || o.id, status: o.status || 'PENDING', date: o.createdAt })),
-    ...safeShipments.map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.qaStatus || 'IN TRANSIT', date: s.createdAt }))
+    ...safeShipments.map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.transitExport || 'IN TRANSIT', date: s.createdAt }))
   ].sort((a, b) => new Date(b?.date || 0).getTime() - new Date(a?.date || 0).getTime()).slice(0, 5);
 
   const lmePricesArray = Array.isArray(data.lmePrices) ? data.lmePrices : [];
