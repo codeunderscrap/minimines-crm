@@ -109,7 +109,7 @@ const QuotationDashboard = () => {
           <div style={{ position: 'relative', padding: '20px 0 40px 0', marginTop: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
               <div style={{ position: 'absolute', top: '14px', left: '0', right: '0', height: '4px', backgroundColor: '#E0E0E0', zIndex: 0 }}>
-                <div style={{ width: \`\${progressPercent}%\`, height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.5s ease-out' }}></div>
+                <div style={{ width: `${progressPercent}%`, height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.5s ease-out' }}></div>
               </div>
               {steps.map((step, i) => {
                 const isActive = i <= currentStepIndex;
@@ -121,7 +121,7 @@ const QuotationDashboard = () => {
                       height: isCurrent ? '32px' : '28px', 
                       borderRadius: '50%', 
                       backgroundColor: isActive ? BRAND.accent : '#E0E0E0', 
-                      border: isCurrent ? \`3px solid \${BRAND.lightAccent}\` : 'none',
+                      border: isCurrent ? `3px solid ${BRAND.lightAccent}` : 'none',
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'center', 
@@ -143,11 +143,11 @@ const QuotationDashboard = () => {
         )}
 
         <div style={{ marginTop: '24px', display: 'flex', gap: '24px' }}>
-           <div style={{ flex: 1, padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: \`1px solid \${BRAND.border}\` }}>
+           <div style={{ flex: 1, padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: `1px solid ${BRAND.border}` }}>
               <div style={{ fontSize: '12px', textTransform: 'uppercase', color: BRAND.text }}>Requested Quantity</div>
               <div style={{ fontSize: '24px', fontWeight: 600, color: BRAND.primary }}>{quotation.quantity || 0} MT</div>
            </div>
-           <div style={{ flex: 1, padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: \`1px solid \${BRAND.border}\` }}>
+           <div style={{ flex: 1, padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: `1px solid ${BRAND.border}` }}>
               <div style={{ fontSize: '12px', textTransform: 'uppercase', color: BRAND.text }}>Proposed Rate</div>
               <div style={{ fontSize: '24px', fontWeight: 600, color: BRAND.primary }}>₹{Number(quotation.proposedRate || 0).toLocaleString()}</div>
            </div>

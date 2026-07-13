@@ -109,8 +109,8 @@ const ExportDocumentTracker = () => {
                 padding: '12px 16px', 
                 backgroundColor: BRAND.bg, 
                 borderRadius: '6px', 
-                border: \`1px solid \${isSubmitted ? BRAND.green : BRAND.border}\`,
-                borderLeft: \`4px solid \${statusColor}\`
+                border: `1px solid ${isSubmitted ? BRAND.green : BRAND.border}`,
+                borderLeft: `4px solid ${statusColor}`
               }}>
                 <div style={{ fontWeight: 600, color: BRAND.primary }}>{docType.replace('_', ' ')}</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

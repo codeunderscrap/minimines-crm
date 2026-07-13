@@ -84,28 +84,28 @@ const ProductDashboard = () => {
         <h2 className="h2">Product Specifications</h2>
         
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginTop: '16px' }}>
-           <div style={{ padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: \`1px solid \${BRAND.border}\` }}>
+           <div style={{ padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: `1px solid ${BRAND.border}` }}>
               <div style={{ fontSize: '12px', textTransform: 'uppercase', color: BRAND.text }}>Material SKU</div>
               <div style={{ fontSize: '20px', fontWeight: 600, color: BRAND.primary }}>{product.sku || 'N/A'}</div>
            </div>
            
-           <div style={{ padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: \`1px solid \${BRAND.border}\` }}>
+           <div style={{ padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: `1px solid ${BRAND.border}` }}>
               <div style={{ fontSize: '12px', textTransform: 'uppercase', color: BRAND.text }}>Category</div>
               <div style={{ fontSize: '20px', fontWeight: 600, color: BRAND.primary }}>{(product.category || 'N/A').replace('_', ' ')}</div>
            </div>
 
-           <div style={{ padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: \`1px solid \${BRAND.border}\`, gridColumn: 'span 2' }}>
+           <div style={{ padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: `1px solid ${BRAND.border}`, gridColumn: 'span 2' }}>
               <div style={{ fontSize: '12px', textTransform: 'uppercase', color: BRAND.text }}>Base Composition</div>
               <div style={{ fontSize: '16px', fontWeight: 500, color: BRAND.secondary, marginTop: '8px' }}>
                 {product.baseComposition || 'No composition specified.'}
               </div>
            </div>
 
-           <div style={{ padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: \`1px solid \${BRAND.border}\`, gridColumn: 'span 2' }}>
+           <div style={{ padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: `1px solid ${BRAND.border}`, gridColumn: 'span 2' }}>
               <div style={{ fontSize: '12px', textTransform: 'uppercase', color: BRAND.text }}>Pricing Strategy</div>
               <div style={{ fontSize: '16px', fontWeight: 500, color: BRAND.secondary, marginTop: '8px' }}>
                 {product.targetLmeLinkage 
-                  ? \`Linked to: \${product.targetLmeLinkage}\` 
+                  ? `Linked to: ${product.targetLmeLinkage}` 
                   : 'Fixed domestic pricing model (No LME linkage).'}
               </div>
            </div>
