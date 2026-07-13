@@ -276,7 +276,8 @@ const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
 
   const shipment = shipments.find(s => s.id === selectedId) || shipments[0];
 
-  const currentStatus = (shipment.transitStatus || shipment.shipmentStatus || 'DOCUMENTATION').toUpperCase();
+  const rawStatus = shipment.transitStatus || shipment.shipmentStatus || 'DOCUMENTATION';
+  const currentStatus = (typeof rawStatus === 'string' ? rawStatus : String(rawStatus)).toUpperCase();
 
   const steps = [
     { label: 'Documentation', active: true },
@@ -488,16 +489,16 @@ const MainPage = () => {
   }, []);
 
   const recentActs = [
-    ...data.contracts.map((c: any) => ({ type: 'Contract', referenceId: c.name || c.id, status: c.status || 'ACTIVE', date: c.createdAt })),
-    ...data.salesOrders.map((o: any) => ({ type: 'Sales Order', referenceId: o.orderNumber || o.id, status: o.status || 'PENDING', date: o.createdAt })),
-    ...data.exportShipments.map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.shipmentStatus || 'IN TRANSIT', date: s.createdAt }))
+    ...(Array.isArray(data.contracts) ? data.contracts : []).map((c: any) => ({ type: 'Contract', referenceId: c.name || c.id, status: c.status || 'ACTIVE', date: c.createdAt })),
+    ...(Array.isArray(data.salesOrders) ? data.salesOrders : []).map((o: any) => ({ type: 'Sales Order', referenceId: o.orderNumber || o.id, status: o.status || 'PENDING', date: o.createdAt })),
+    ...(Array.isArray(data.exportShipments) ? data.exportShipments : []).map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.shipmentStatus || 'IN TRANSIT', date: s.createdAt }))
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
 
   const lmeAluminium = data.lmePrices.find((l: any) => l.metalType === 'ALUMINIUM' || l.metalType === 'Aluminium' || l.metalType === 'AL') || data.lmePrices[0];
   const lmeAlPrice = lmeAluminium ? `$${Number(lmeAluminium.rateUSD).toLocaleString()}` : 'N/A';
   
-  const pendingOrders = data.salesOrders.filter((o: any) => o.status !== 'FULFILLED').length;
-  const activeContracts = data.contracts.filter((c: any) => c.status !== 'EXPIRED').length;
+  const pendingOrders = (Array.isArray(data.salesOrders) ? data.salesOrders : []).filter((o: any) => o.status !== 'FULFILLED').length;
+  const activeContracts = (Array.isArray(data.contracts) ? data.contracts : []).filter((c: any) => c.status !== 'EXPIRED').length;
 
   if (loading) {
     return <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif" }}>Loading secure CRM data...</div>;
@@ -526,12 +527,12 @@ const MainPage = () => {
             <StatCard label="Active Contracts" value={activeContracts.toString()} sub="Total Active" />
             <StatCard label="LME Aluminium" value={lmeAlPrice} sub="Real-time data feed" />
             <StatCard label="Pending Orders" value={pendingOrders.toString()} sub="Requires fulfillment" />
-            <StatCard label="Active Shipments" value={data.exportShipments.length.toString()} sub="Total shipments recorded" />
+            <StatCard label="Active Shipments" value={(Array.isArray(data.exportShipments) ? data.exportShipments.length : 0).toString()} sub="Total shipments recorded" />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px', alignItems: 'stretch' }}>
-             <ContractTracker contracts={data.contracts} />
-             <ShipmentTracker shipments={data.exportShipments} />
+             <ContractTracker contracts={Array.isArray(data.contracts) ? data.contracts : []} />
+             <ShipmentTracker shipments={Array.isArray(data.exportShipments) ? data.exportShipments : []} />
           </div>
 
           {/* New Sales Team Trackers */}
