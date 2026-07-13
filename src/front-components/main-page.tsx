@@ -172,7 +172,7 @@ const StatCard = ({ label, value, sub }: any) => (
 );
 
 const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
-  const url = `http://localhost:3000/rest/${path}`;
+  const url = `https://api.twenty.com/rest/${path}`;
   const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYyMDI2ODQzLTA5ZDItNDM5My05NTM1LTZlODJhNTE3ZjRmNCJ9.eyJzdWIiOiI2MWJlMjBjYi1jMGQ2LTRiZTAtYWYxNy02YzUwMDY3NmRmOWIiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNjFiZTIwY2ItYzBkNi00YmUwLWFmMTctNmM1MDA2NzZkZjliIiwiaWF0IjoxNzgzNjg1MzQ0LCJleHAiOjQ5MzcyODUzNDEsImp0aSI6Ijg5YjcwMjEyLTY0NzktNDc2Zi05Y2ZlLTEyMTVkZDgyZWVmZCJ9.lPQmTpJ7lAK73_4ToKzb_FeiQbXbgC-h732qCGP7ezgBj8sPolSaILQh755UcVcr_pesNJdMI9gMS7V2c1GjsA';
   
   const options: any = {
@@ -184,7 +184,18 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
   try {
     const res = await fetch(url, options);
     const json = await res.json();
-    return method === 'GET' ? (json?.data?.items || json?.data || []) : json;
+    
+    if (method !== 'GET') return json;
+
+    const key = path.split('?')[0]; // Extract base path e.g. contracts
+    let items = json.data && json.data[key] ? json.data[key] : [];
+    if (items && items.edges) {
+      items = items.edges.map((e: any) => e.node);
+    }
+    if (!Array.isArray(items)) {
+      items = [];
+    }
+    return items;
   } catch (error) {
     console.error('Fetch error:', error);
     return method === 'GET' ? [] : null;
