@@ -276,7 +276,7 @@ const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
 
   const shipment = shipments.find(s => s.id === selectedId) || shipments[0];
 
-  const currentStatus = (shipment.transitStatus || shipment.qaStatus || 'DOCUMENTATION').toUpperCase();
+  const currentStatus = (shipment.transitStatus || shipment.shipmentStatus || 'DOCUMENTATION').toUpperCase();
 
   const steps = [
     { label: 'Documentation', active: true },
@@ -490,7 +490,7 @@ const MainPage = () => {
   const recentActs = [
     ...data.contracts.map((c: any) => ({ type: 'Contract', referenceId: c.name || c.id, status: c.status || 'ACTIVE', date: c.createdAt })),
     ...data.salesOrders.map((o: any) => ({ type: 'Sales Order', referenceId: o.orderNumber || o.id, status: o.status || 'PENDING', date: o.createdAt })),
-    ...data.exportShipments.map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.qaStatus || 'IN TRANSIT', date: s.createdAt }))
+    ...data.exportShipments.map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.shipmentStatus || 'IN TRANSIT', date: s.createdAt }))
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
 
   const lmeAluminium = data.lmePrices.find((l: any) => l.metalType === 'ALUMINIUM' || l.metalType === 'Aluminium' || l.metalType === 'AL') || data.lmePrices[0];
