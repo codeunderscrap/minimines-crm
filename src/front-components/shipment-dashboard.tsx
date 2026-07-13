@@ -41,7 +41,7 @@ const ShipmentDashboard = () => {
 
   if (!shipment) return null;
 
-  const currentStatus = (shipment.transitStatus || 'DOCUMENTATION').toUpperCase();
+  const currentStatus = (shipment.transitStatus || shipment.qaStatus || 'DOCUMENTATION').toUpperCase();
 
   const steps = [
     { label: 'Documentation', active: true },

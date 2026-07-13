@@ -276,7 +276,7 @@ const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
 
   const shipment = shipments.find(s => s.id === selectedId) || shipments[0];
 
-  const currentStatus = (shipment.transitStatus || 'DOCUMENTATION').toUpperCase();
+  const currentStatus = (shipment.transitStatus || shipment.qaStatus || 'DOCUMENTATION').toUpperCase();
 
   const steps = [
     { label: 'Documentation', active: true },
@@ -333,6 +333,107 @@ const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
               <div style={{ fontSize: '12px', fontWeight: step.active ? 600 : 400, color: step.active ? BRAND.primary : BRAND.text, textAlign: 'center', width: '60px', lineHeight: '1.2' }}>{step.label}</div>
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const InternTracker = () => {
+  const internData = [
+    { name: 'Arsalan A.', calls: 145, converted: 12 },
+    { name: 'Intern B', calls: 98, converted: 5 },
+    { name: 'Intern C', calls: 112, converted: 8 },
+    { name: 'Intern D', calls: 87, converted: 2 },
+  ];
+  const maxCalls = Math.max(...internData.map(d => d.calls));
+
+  return (
+    <div className="card" style={{ height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div>
+          <h2 className="h2" style={{ margin: '0 0 4px 0' }}>Intern Performance</h2>
+          <div style={{ fontSize: '14px', color: BRAND.text }}>Outbound call volume vs Conversions</div>
+        </div>
+        <div style={{ padding: '6px 12px', backgroundColor: BRAND.bg, border: `1px solid ${BRAND.border}`, fontSize: '12px', fontWeight: 600, color: BRAND.secondary }}>
+          THIS MONTH
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {internData.map((intern, i) => (
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+              <span style={{ fontWeight: 600, color: BRAND.primary, fontSize: '15px' }}>{intern.name}</span>
+              <span style={{ fontSize: '13px', color: BRAND.secondary }}>
+                <strong>{intern.calls}</strong> Calls &nbsp;|&nbsp; <strong style={{ color: BRAND.accent }}>{intern.converted}</strong> Conv
+              </span>
+            </div>
+            <div style={{ width: '100%', height: '16px', backgroundColor: '#E0E0E0', borderRadius: '4px', overflow: 'hidden', display: 'flex' }}>
+              <div style={{ width: \`\${(intern.calls / maxCalls) * 100}%\`, height: '100%', backgroundColor: BRAND.lightAccent, position: 'relative' }}>
+                <div style={{ width: \`\${(intern.converted / intern.calls) * 100}%\`, height: '100%', backgroundColor: BRAND.accent }}></div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const LeadFunnel = () => {
+  const leadSources = [
+    { source: 'LinkedIn Ads', count: 145, color: BRAND.primary },
+    { source: 'Website Forms', count: 86, color: BRAND.accent },
+    { source: 'Facebook Ads', count: 42, color: BRAND.lightAccent },
+    { source: 'Cold Calls', count: 28, color: BRAND.secondary },
+  ];
+  const funnelData = [
+    { stage: 'Total Leads', count: 301, percent: 100 },
+    { stage: 'Contacted', count: 184, percent: 61 },
+    { stage: 'Qualified', count: 85, percent: 28 },
+    { stage: 'Converted', count: 27, percent: 9 },
+  ];
+  const totalLeads = leadSources.reduce((sum, item) => sum + item.count, 0);
+
+  return (
+    <div className="card" style={{ height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div>
+          <h2 className="h2" style={{ margin: '0 0 4px 0' }}>Lead Pipeline</h2>
+          <div style={{ fontSize: '14px', color: BRAND.text }}>Source distribution & funnel</div>
+        </div>
+        <div style={{ padding: '6px 12px', backgroundColor: BRAND.bg, border: `1px solid ${BRAND.border}`, fontSize: '12px', fontWeight: 600, color: BRAND.secondary }}>
+          YTD DATA
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        <div>
+          <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '16px' }}>Lead Sources</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {leadSources.map((source, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '12px', height: '12px', borderRadius: '2px', backgroundColor: source.color }}></div>
+                  <span style={{ fontSize: '14px', color: BRAND.primary }}>{source.source}</span>
+                </div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: BRAND.primary }}>{source.count}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '16px' }}>Conversion Funnel</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {funnelData.map((stage, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '60px', fontSize: '12px', color: BRAND.text, textAlign: 'right' }}>{stage.stage}</div>
+                <div style={{ flexGrow: 1, display: 'flex' }}>
+                  <div style={{ width: \`\${stage.percent}%\`, height: '20px', backgroundColor: i === funnelData.length - 1 ? '#28A745' : BRAND.accent, borderRadius: '2px' }}></div>
+                </div>
+                <div style={{ width: '30px', fontSize: '12px', fontWeight: 600, color: BRAND.primary }}>{stage.percent}%</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -428,9 +529,15 @@ const MainPage = () => {
             <StatCard label="Active Shipments" value={data.exportShipments.length.toString()} sub="Total shipments recorded" />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px', alignItems: 'stretch' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px', alignItems: 'stretch' }}>
              <ContractTracker contracts={data.contracts} />
              <ShipmentTracker shipments={data.exportShipments} />
+          </div>
+
+          {/* New Sales Team Trackers */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px', alignItems: 'stretch' }}>
+             <InternTracker />
+             <LeadFunnel />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
