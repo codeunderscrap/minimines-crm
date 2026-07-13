@@ -23,6 +23,15 @@ export default definePageLayout({
           },
         },
         {
+          universalIdentifier: '20350202-e1ff-47cb-8445-bb1a91ba7ee8',
+          title: 'Export Compliance Checklist',
+          type: 'FRONT_COMPONENT',
+          configuration: {
+            configurationType: 'FRONT_COMPONENT',
+            frontComponentUniversalIdentifier: 'd3087b5b-ef89-475d-8caa-629abff0be7e'
+          },
+        },
+        {
           universalIdentifier: 'cc903b7a-91a6-4c21-bcf2-dbe0da80b7f7',
           title: 'Fields',
           type: 'FIELDS',
