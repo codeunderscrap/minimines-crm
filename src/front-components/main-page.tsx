@@ -488,17 +488,22 @@ const MainPage = () => {
     loadData();
   }, []);
 
+  const safeContracts = Array.isArray(data.contracts) ? data.contracts : [];
+  const safeOrders = Array.isArray(data.salesOrders) ? data.salesOrders : [];
+  const safeShipments = Array.isArray(data.exportShipments) ? data.exportShipments : [];
+  const safeLme = Array.isArray(data.lmePrices) ? data.lmePrices : [];
+
   const recentActs = [
-    ...(Array.isArray(data.contracts) ? data.contracts : []).map((c: any) => ({ type: 'Contract', referenceId: c.name || c.id, status: c.status || 'ACTIVE', date: c.createdAt })),
-    ...(Array.isArray(data.salesOrders) ? data.salesOrders : []).map((o: any) => ({ type: 'Sales Order', referenceId: o.orderNumber || o.id, status: o.status || 'PENDING', date: o.createdAt })),
-    ...(Array.isArray(data.exportShipments) ? data.exportShipments : []).map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.shipmentStatus || 'IN TRANSIT', date: s.createdAt }))
+    ...safeContracts.map((c: any) => ({ type: 'Contract', referenceId: c?.name || c?.id || 'N/A', status: c?.status || 'ACTIVE', date: c?.createdAt || new Date() })),
+    ...safeOrders.map((o: any) => ({ type: 'Sales Order', referenceId: o?.orderNumber || o?.id || 'N/A', status: o?.status || 'PENDING', date: o?.createdAt || new Date() })),
+    ...safeShipments.map((s: any) => ({ type: 'Shipment', referenceId: s?.containerNumber || s?.id || 'N/A', status: s?.qaStatus || 'IN TRANSIT', date: s?.createdAt || new Date() }))
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
 
-  const lmeAluminium = data.lmePrices.find((l: any) => l.metalType === 'ALUMINIUM' || l.metalType === 'Aluminium' || l.metalType === 'AL') || data.lmePrices[0];
-  const lmeAlPrice = lmeAluminium ? `$${Number(lmeAluminium.rateUSD).toLocaleString()}` : 'N/A';
+  const lmeAluminium = safeLme.find((l: any) => l?.metalType?.toUpperCase() === 'ALUMINIUM' || l?.metalType?.toUpperCase() === 'AL') || safeLme[0];
+  const lmeAlPrice = lmeAluminium?.rateUSD ? `$${Number(lmeAluminium.rateUSD).toLocaleString()}` : 'N/A';
   
-  const pendingOrders = (Array.isArray(data.salesOrders) ? data.salesOrders : []).filter((o: any) => o.status !== 'FULFILLED').length;
-  const activeContracts = (Array.isArray(data.contracts) ? data.contracts : []).filter((c: any) => c.status !== 'EXPIRED').length;
+  const pendingOrders = safeOrders.filter((o: any) => o?.status !== 'FULFILLED').length;
+  const activeContracts = safeContracts.filter((c: any) => c?.status !== 'EXPIRED').length;
 
   if (loading) {
     return <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif" }}>Loading secure CRM data...</div>;
