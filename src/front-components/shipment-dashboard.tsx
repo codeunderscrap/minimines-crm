@@ -41,8 +41,7 @@ const ShipmentDashboard = () => {
 
   if (!shipment) return null;
 
-  const rawStatus = shipment.transitStatus || shipment.shipmentStatus || 'DOCUMENTATION';
-  const currentStatus = (typeof rawStatus === 'string' ? rawStatus : String(rawStatus)).toUpperCase();
+  const currentStatus = (shipment.qaStatus || 'DOCUMENTATION').toUpperCase();
 
   const steps = [
     { label: 'Documentation', active: true },
@@ -82,7 +81,7 @@ const ShipmentDashboard = () => {
               <span style={{ fontWeight: 600, color: BRAND.primary }}>{shipment.containerNumber || 'TBD'}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${BRAND.border}`, paddingTop: '8px', marginTop: '4px' }}>
-              <span style={{ color: BRAND.text, fontSize: '14px' }}>Transit Status:</span>
+              <span style={{ color: BRAND.text, fontSize: '14px' }}>Status Log:</span>
               <span style={{ fontWeight: 600, color: BRAND.accent }}>{currentStatus}</span>
             </div>
           </div>
