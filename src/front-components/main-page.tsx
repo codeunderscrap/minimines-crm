@@ -176,6 +176,9 @@ const fetchTwenty = async (endpoint: string) => {
     if (items && items.edges) {
       items = items.edges.map((e: any) => e.node);
     }
+    if (!Array.isArray(items)) {
+      items = [];
+    }
     return items;
   } catch (e) {
     console.error(e);
@@ -195,15 +198,15 @@ const ActivityTable = ({ recentActs }: { recentActs: any[] }) => (
         </tr>
       </thead>
       <tbody>
-        {recentActs.map((act, i) => (
+        {(Array.isArray(recentActs) ? recentActs : []).map((act, i) => (
           <tr key={i}>
-            <td>{act.referenceId || act.id.substring(0, 8)}</td>
-            <td>{act.type}</td>
-            <td><span className="status-badge">{act.status}</span></td>
-            <td style={{ color: BRAND.text }}>{new Date(act.date).toLocaleDateString()}</td>
+            <td>{act?.referenceId || (act?.id ? String(act.id).substring(0, 8) : 'N/A')}</td>
+            <td>{act?.type || 'Unknown'}</td>
+            <td><span className="status-badge">{act?.status || 'N/A'}</span></td>
+            <td style={{ color: BRAND.text }}>{act?.date ? new Date(act.date).toLocaleDateString() : 'N/A'}</td>
           </tr>
         ))}
-        {recentActs.length === 0 && (
+        {(!recentActs || recentActs.length === 0) && (
           <tr>
             <td colSpan={4} style={{ textAlign: 'center', color: BRAND.text }}>No recent operations found.</td>
           </tr>
@@ -213,13 +216,16 @@ const ActivityTable = ({ recentActs }: { recentActs: any[] }) => (
   </div>
 );
 
-const ContractTracker = ({ contracts }: { contracts: any[] }) => {
-  const [selectedId, setSelectedId] = useState(contracts.length > 0 ? contracts[0].id : null);
-  useEffect(() => { if (contracts.length > 0 && !selectedId) setSelectedId(contracts[0].id); }, [contracts]);
+const ContractTracker = ({ contracts = [] }: { contracts: any[] }) => {
+  const safeContracts = Array.isArray(contracts) ? contracts : [];
+  const [selectedId, setSelectedId] = useState(safeContracts.length > 0 ? safeContracts[0].id : null);
+  useEffect(() => { if (safeContracts.length > 0 && !selectedId) setSelectedId(safeContracts[0].id); }, [safeContracts]);
   
-  if (contracts.length === 0) return <div className="card" style={{ padding: '40px', textAlign: 'center' }}>No Active Contracts</div>;
+  if (safeContracts.length === 0) return <div className="card" style={{ padding: '40px', textAlign: 'center' }}>No Active Contracts</div>;
 
-  const contract = contracts.find(c => c.id === selectedId) || contracts[0];
+  const contract = safeContracts.find(c => c.id === selectedId) || safeContracts[0];
+  if (!contract) return <div className="card">Error loading contract</div>;
+
   const totalQuantity = contract.totalQuantity || 0;
   const fulfilledQuantity = Math.floor(totalQuantity * 0.4); 
   const progressPercent = totalQuantity > 0 ? (fulfilledQuantity / totalQuantity) * 100 : 0;
@@ -233,7 +239,7 @@ const ContractTracker = ({ contracts }: { contracts: any[] }) => {
           onChange={(e) => setSelectedId(e.target.value)}
           style={{ padding: '8px 12px', border: `1px solid ${BRAND.border}`, fontFamily: "'Barlow', sans-serif", fontSize: '14px', outline: 'none' }}
         >
-          {contracts.map(c => <option key={c.id} value={c.id}>{c.name || `Contract ${c.id.substring(0,6)}`}</option>)}
+          {safeContracts.map(c => <option key={c.id} value={c.id}>{c.name || `Contract ${(c.id || '').substring(0,6)}`}</option>)}
         </select>
       </div>
 
@@ -268,20 +274,27 @@ const ContractTracker = ({ contracts }: { contracts: any[] }) => {
   );
 };
 
-const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
-  const [selectedId, setSelectedId] = useState(shipments.length > 0 ? shipments[0].id : null);
-  useEffect(() => { if (shipments.length > 0 && !selectedId) setSelectedId(shipments[0].id); }, [shipments]);
+const ShipmentTracker = ({ shipments = [] }: { shipments: any[] }) => {
+  const safeShipments = Array.isArray(shipments) ? shipments : [];
+  const [selectedId, setSelectedId] = useState(safeShipments.length > 0 ? safeShipments[0].id : null);
+  useEffect(() => { if (safeShipments.length > 0 && !selectedId) setSelectedId(safeShipments[0].id); }, [safeShipments]);
   
-  if (shipments.length === 0) return <div className="card" style={{ padding: '40px', textAlign: 'center' }}>No Active Shipments</div>;
+  if (safeShipments.length === 0) return <div className="card" style={{ padding: '40px', textAlign: 'center' }}>No Active Shipments</div>;
 
-  const shipment = shipments.find(s => s.id === selectedId) || shipments[0];
+  const shipment = safeShipments.find(s => s.id === selectedId) || safeShipments[0];
+  if (!shipment) return <div className="card">Error loading shipment</div>;
+
+  const currentStatus = (shipment.qaStatus || 'DOCUMENTATION').toUpperCase();
 
   const steps = [
     { label: 'Documentation', active: true },
-    { label: 'Customs', active: shipment.qaStatus === 'PASSED' },
-    { label: 'In Transit', active: shipment.qaStatus === 'PASSED' },
-    { label: 'Delivered', active: false }
+    { label: 'Customs', active: ['CUSTOMS', 'IN_TRANSIT', 'DELIVERED', 'PASSED'].includes(currentStatus) },
+    { label: 'In Transit', active: ['IN_TRANSIT', 'DELIVERED'].includes(currentStatus) },
+    { label: 'Delivered', active: ['DELIVERED'].includes(currentStatus) }
   ];
+  
+  const activeStepsCount = steps.filter(s => s.active).length;
+  const progressPercent = ((activeStepsCount - 1) / (Math.max(steps.length - 1, 1))) * 100;
 
   return (
     <div className="card" style={{ gap: '16px', height: '100%' }}>
@@ -292,7 +305,7 @@ const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
           onChange={(e) => setSelectedId(e.target.value)}
           style={{ padding: '8px 12px', border: `1px solid ${BRAND.border}`, fontFamily: "'Barlow', sans-serif", fontSize: '14px', outline: 'none' }}
         >
-          {shipments.map(s => <option key={s.id} value={s.id}>{s.vesselName || `Shipment ${s.id.substring(0,6)}`}</option>)}
+          {safeShipments.map(s => <option key={s.id} value={s.id}>{s.vesselName || `Shipment ${(s.id || '').substring(0,6)}`}</option>)}
         </select>
       </div>
       
@@ -318,7 +331,7 @@ const ShipmentTracker = ({ shipments }: { shipments: any[] }) => {
         <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '28px' }}>Transit Progress</div>
         <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', margin: '0 8px' }}>
           <div style={{ position: 'absolute', top: '12px', left: '0', right: '0', height: '4px', backgroundColor: '#E0E0E0', zIndex: 0 }}>
-            <div style={{ width: '60%', height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.5s ease-out' }}></div>
+            <div style={{ width: `${progressPercent}%`, height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.5s ease-out' }}></div>
           </div>
           {steps.map((step, i) => (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1, gap: '10px' }}>
@@ -381,17 +394,22 @@ const MainPage = () => {
     loadData();
   }, []);
 
-  const recentActs = [
-    ...data.contracts.map((c: any) => ({ type: 'Contract', referenceId: c.name || c.id, status: c.status || 'ACTIVE', date: c.createdAt })),
-    ...data.salesOrders.map((o: any) => ({ type: 'Sales Order', referenceId: o.orderNumber || o.id, status: o.status || 'PENDING', date: o.createdAt })),
-    ...data.exportShipments.map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.qaStatus || 'IN TRANSIT', date: s.createdAt }))
-  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
-
-  const lmeAluminium = data.lmePrices.find((l: any) => l.metalType === 'ALUMINIUM' || l.metalType === 'Aluminium' || l.metalType === 'AL') || data.lmePrices[0];
-  const lmeAlPrice = lmeAluminium ? `$${Number(lmeAluminium.rateUSD).toLocaleString()}` : 'N/A';
+  const safeContracts = Array.isArray(data.contracts) ? data.contracts : [];
+  const safeSalesOrders = Array.isArray(data.salesOrders) ? data.salesOrders : [];
+  const safeShipments = Array.isArray(data.exportShipments) ? data.exportShipments : [];
   
-  const pendingOrders = data.salesOrders.filter((o: any) => o.status !== 'FULFILLED').length;
-  const activeContracts = data.contracts.filter((c: any) => c.status !== 'EXPIRED').length;
+  const recentActs = [
+    ...safeContracts.map((c: any) => ({ type: 'Contract', referenceId: c.name || c.id, status: c.status || 'ACTIVE', date: c.createdAt })),
+    ...safeSalesOrders.map((o: any) => ({ type: 'Sales Order', referenceId: o.orderNumber || o.id, status: o.status || 'PENDING', date: o.createdAt })),
+    ...safeShipments.map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.qaStatus || 'IN TRANSIT', date: s.createdAt }))
+  ].sort((a, b) => new Date(b?.date || 0).getTime() - new Date(a?.date || 0).getTime()).slice(0, 5);
+
+  const lmePricesArray = Array.isArray(data.lmePrices) ? data.lmePrices : [];
+  const lmeAluminium = lmePricesArray.find((l: any) => l?.metalType === 'ALUMINIUM' || l?.metalType === 'Aluminium' || l?.metalType === 'AL') || lmePricesArray[0];
+  const lmeAlPrice = lmeAluminium && lmeAluminium.rateUSD ? `$${Number(lmeAluminium.rateUSD).toLocaleString()}` : 'N/A';
+  
+  const pendingOrders = safeSalesOrders.filter((o: any) => o?.status !== 'FULFILLED').length;
+  const activeContracts = safeContracts.filter((c: any) => c?.status !== 'EXPIRED').length;
 
   if (loading) {
     return <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif" }}>Loading secure CRM data...</div>;
