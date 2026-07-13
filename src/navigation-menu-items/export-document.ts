@@ -1,5 +1,4 @@
-import { defineNavigationMenuItem } from 'twenty-sdk/define';
-import { NavigationMenuItemType } from 'twenty-sdk/types';
+import { defineNavigationMenuItem, NavigationMenuItemType } from 'twenty-sdk/define';
 
 import {
   EXPORT_DOCUMENT_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
@@ -8,6 +7,9 @@ import {
 
 export default defineNavigationMenuItem({
   universalIdentifier: EXPORT_DOCUMENT_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
-  type: NavigationMenuItemType.Object,
-  objectUniversalIdentifier: EXPORT_DOCUMENT_OBJECT_UNIVERSAL_IDENTIFIER,
+  name: 'Export Documents',
+  icon: 'IconFileText',
+  position: 5,
+  type: NavigationMenuItemType.OBJECT,
+  targetObjectUniversalIdentifier: EXPORT_DOCUMENT_OBJECT_UNIVERSAL_IDENTIFIER,
 });
