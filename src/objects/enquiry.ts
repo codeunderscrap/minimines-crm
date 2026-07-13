@@ -23,10 +23,10 @@ export default defineObject({
       type: FieldType.SELECT,
       label: 'Source',
       options: [
-        { label: 'Website', value: 'WEBSITE' },
-        { label: 'Email', value: 'EMAIL' },
-        { label: 'LinkedIn', value: 'LINKEDIN' },
-        { label: 'Phone', value: 'PHONE' },
+        { label: 'Website', value: 'WEBSITE', position: 0 },
+        { label: 'Email', value: 'EMAIL', position: 1 },
+        { label: 'LinkedIn', value: 'LINKEDIN', position: 2 },
+        { label: 'Phone', value: 'PHONE', position: 3 },
       ],
     },
     {
@@ -48,8 +48,8 @@ export default defineObject({
       label: 'Status',
       defaultValue: "'UNANSWERED'",
       options: [
-        { label: 'Unanswered', value: 'UNANSWERED' },
-        { label: 'Replied', value: 'REPLIED' },
+        { label: 'Unanswered', value: 'UNANSWERED', position: 0 },
+        { label: 'Replied', value: 'REPLIED', position: 1 },
       ],
     },
   ],
