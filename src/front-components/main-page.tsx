@@ -1,5 +1,7 @@
 import { defineFrontComponent } from 'twenty-sdk/define';
 import React, { useState, useEffect } from 'react';
+import { useRecordId } from 'twenty-sdk/front-component';
+import { EnquiryQuickReply } from './enquiry-quick-reply';
 
 import {
   APP_DISPLAY_NAME,
@@ -455,8 +457,8 @@ const MainPage = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
             <div>
-              <h2 className="h2">Recent Operations</h2>
-              <ActivityTable recentActs={recentActs} />
+              <h2 className="h2">Incoming Enquiries</h2>
+              <EnquiryQuickReply />
             </div>
             
             <div>
