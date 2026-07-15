@@ -1,0 +1,70 @@
+import { defineObject, FieldType } from 'twenty-sdk/define';
+import { LEAD_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+
+export default defineObject({
+  nameSingular: 'lead',
+  namePlural: 'leads',
+  labelSingular: 'Lead',
+  labelPlural: 'Leads',
+  universalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
+  description: 'A prospect lead captured from website, LinkedIn, calls, or direct sources.',
+  icon: 'IconUserPlus',
+  labelIdentifierFieldMetadataUniversalIdentifier: '12b90fc3-ebff-4269-a4f1-ec1d1634aad7',
+  fields: [
+    {
+      universalIdentifier: '12b90fc3-ebff-4269-a4f1-ec1d1634aad7',
+      name: 'name',
+      type: FieldType.TEXT,
+      label: 'Lead Name',
+    },
+    {
+      universalIdentifier: '3c5dbbb2-5915-4e16-bb7c-61cdab1a628d',
+      name: 'company',
+      type: FieldType.TEXT,
+      label: 'Company / Organization',
+    },
+    {
+      universalIdentifier: 'b21064a2-b73d-4680-8525-0a19f04ec0e4',
+      name: 'email',
+      type: FieldType.EMAILS,
+      label: 'Email',
+    },
+    {
+      universalIdentifier: 'ddc9818e-4ad2-46af-9536-fcbb5a37f8a4',
+      name: 'phone',
+      type: FieldType.PHONES,
+      label: 'Phone Number',
+    },
+    {
+      universalIdentifier: '620d71c8-ff98-465e-a2d6-234531ba3858',
+      name: 'source',
+      type: FieldType.SELECT,
+      label: 'Lead Source',
+      options: [
+        { label: 'Website (WordPress)', value: 'WEBSITE', position: 0, color: 'blue' },
+        { label: 'LinkedIn', value: 'LINKEDIN', position: 1, color: 'sky' },
+        { label: 'Call', value: 'CALL', position: 2, color: 'green' },
+        { label: 'Direct', value: 'DIRECT', position: 3, color: 'gray' },
+      ],
+    },
+    {
+      universalIdentifier: '0739daf4-5a5d-4fed-9132-fef2eb371192',
+      name: 'status',
+      type: FieldType.SELECT,
+      label: 'Status',
+      defaultValue: "'NEW'",
+      options: [
+        { label: 'New', value: 'NEW', position: 0, color: 'sky' },
+        { label: 'Contacted', value: 'CONTACTED', position: 1, color: 'yellow' },
+        { label: 'Qualified', value: 'QUALIFIED', position: 2, color: 'green' },
+        { label: 'Disqualified', value: 'DISQUALIFIED', position: 3, color: 'red' },
+      ],
+    },
+    {
+      universalIdentifier: 'ab3b68ff-a256-474f-a59d-c148ba58a602',
+      name: 'notes',
+      type: FieldType.TEXT,
+      label: 'Internal Notes',
+    },
+  ],
+});

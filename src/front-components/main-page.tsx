@@ -66,10 +66,10 @@ const FONTS = `
 
   .stat-value {
     font-family: 'Barlow', sans-serif;
-    font-size: 36px;
+    font-size: 28px;
     font-weight: 600;
     color: ${BRAND.primary};
-    margin-top: 12px;
+    margin-top: 8px;
   }
 
   .stat-label {
@@ -163,13 +163,20 @@ const FONTS = `
   }
 `;
 
-const StatCard = ({ label, value, sub }: any) => (
-  <div className="card">
-    <div className="stat-label">{label}</div>
-    <div className="stat-value">{value}</div>
-    <div className="stat-sub">{sub}</div>
-  </div>
-);
+const StatCard = ({ label, value, sub, link }: any) => {
+  const content = (
+    <div className="card" style={{ padding: '20px' }}>
+      <div className="stat-label">{label}</div>
+      <div className="stat-value">{value}</div>
+      <div className="stat-sub">{sub}</div>
+    </div>
+  );
+  
+  if (link) {
+    return <a href={link} style={{ textDecoration: 'none', color: 'inherit' }}>{content}</a>;
+  }
+  return content;
+};
 
 const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
   const url = `https://api.twenty.com/rest/${path}`;
@@ -515,43 +522,22 @@ const MainPage = () => {
     contracts: [],
     salesOrders: [],
     exportShipments: [],
-    lmePrices: [],
-    exchangeRate: 85.53 // fallback rate
+    opportunities: [],
+    leads: []
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
-      let currentRate = 85.53;
-      try {
-        const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-        const rateJson = await rateRes.json();
-        if (rateJson && rateJson.rates && rateJson.rates.INR) {
-          currentRate = rateJson.rates.INR;
-        }
-      } catch (err) {
-        console.error('Failed to fetch dynamic exchange rate', err);
-      }
-
-      let { contracts, salesOrders, exportShipments, lmePrices } = await Promise.all([
+      let { contracts, salesOrders, exportShipments, opportunities, leads } = await Promise.all([
         fetchTwenty('contracts?orderBy=createdAt,desc&limit=5'),
         fetchTwenty('salesOrders?orderBy=createdAt,desc&limit=5'),
         fetchTwenty('exportShipments?orderBy=createdAt,desc&limit=5'),
-        fetchTwenty('lMETrackers?orderBy=rateDate,desc&limit=5')
-      ]).then(([c, s, e, l]) => ({ contracts: c, salesOrders: s, exportShipments: e, lmePrices: l }));
+        fetchTwenty('opportunities?limit=50'),
+        fetchTwenty('leads?limit=50')
+      ]).then(([c, s, e, o, l]) => ({ contracts: c, salesOrders: s, exportShipments: e, opportunities: o, leads: l }));
 
-      if (!lmePrices || lmePrices.length === 0 || lmePrices.error) {
-        // Fallback to highly realistic simulated live data if the DB is empty
-        // Real public metal APIs require private API keys, so we simulate the feed for the demo
-        const variance = () => (Math.random() * 20) - 10;
-        lmePrices = [
-          { id: 'al', metalType: 'Aluminium', rateUSD: 2450.50 + variance(), rateDate: new Date().toISOString() },
-          { id: 'cu', metalType: 'Copper', rateUSD: 9840.00 + variance(), rateDate: new Date().toISOString() },
-          { id: 'fe', metalType: 'Iron', rateUSD: 105.20 + (variance() / 10), rateDate: new Date().toISOString() }
-        ];
-      }
-
-      setData({ contracts, salesOrders, exportShipments, lmePrices, exchangeRate: currentRate });
+      setData({ contracts, salesOrders, exportShipments, opportunities, leads });
       setLoading(false);
     };
     loadData();
@@ -567,12 +553,13 @@ const MainPage = () => {
     ...safeShipments.map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.transitExport || 'IN TRANSIT', date: s.createdAt }))
   ].sort((a, b) => new Date(b?.date || 0).getTime() - new Date(a?.date || 0).getTime()).slice(0, 5);
 
-  const lmePricesArray = Array.isArray(data.lmePrices) ? data.lmePrices : [];
-  const lmeAluminium = lmePricesArray.find((l: any) => l?.metalType === 'ALUMINIUM' || l?.metalType === 'Aluminium' || l?.metalType === 'AL') || lmePricesArray[0];
-  const lmeAlPrice = lmeAluminium && lmeAluminium.rateUSD ? `$${Number(lmeAluminium.rateUSD).toLocaleString()}` : 'N/A';
+  const safeOpportunities = Array.isArray(data.opportunities) ? data.opportunities : [];
+  const safeLeads = Array.isArray(data.leads) ? data.leads : [];
   
-  const pendingOrders = safeSalesOrders.filter((o: any) => o?.status !== 'FULFILLED').length;
   const activeContracts = safeContracts.filter((c: any) => c?.status !== 'EXPIRED').length;
+  
+  const openOpportunities = safeOpportunities.filter((o: any) => o?.stage !== 'CLOSED_WON' && o?.stage !== 'CLOSED_LOST').length;
+  const totalLeadsCount = safeLeads.length;
 
   if (loading) {
     return <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif" }}>Loading secure CRM data...</div>;
@@ -598,10 +585,10 @@ const MainPage = () => {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '40px' }}>
-            <StatCard label="Active Contracts" value={activeContracts.toString()} sub="Total Active" />
-            <StatCard label="LME Aluminium" value={lmeAlPrice} sub="Real-time data feed" />
-            <StatCard label="Pending Orders" value={pendingOrders.toString()} sub="Requires fulfillment" />
-            <StatCard label="Active Shipments" value={data.exportShipments.length.toString()} sub="Total shipments recorded" />
+            <StatCard label="Active Contracts" value={activeContracts.toString()} sub="Total Active" link="/objects/contracts" />
+            <StatCard label="Active Shipments" value={data.exportShipments.length.toString()} sub="Total shipments recorded" link="/objects/exportShipments" />
+            <StatCard label="Open Opportunities" value={openOpportunities.toString()} sub="In Pipeline" link="/objects/opportunities" />
+            <StatCard label="Total Leads" value={totalLeadsCount.toString()} sub="New Prospects" link="/objects/leads" />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px', alignItems: 'stretch' }}>
