@@ -5,7 +5,7 @@ export default defineNavigationMenuItem({
   universalIdentifier: LEAD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
   name: 'Leads',
   icon: 'IconUserPlus',
-  position: 6,
+  position: 1,
   type: NavigationMenuItemType.OBJECT,
   targetObjectUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
 });
