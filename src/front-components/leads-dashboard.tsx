@@ -242,7 +242,9 @@ const LeadsDashboard = () => {
                   </div>
                   <div>
                     <div style={{ fontWeight: 600, color: BRAND.primary }}>{lead.name}</div>
-                    <div style={{ fontSize: '12px', color: BRAND.secondary }}>{lead.email}</div>
+                    <div style={{ fontSize: '12px', color: BRAND.secondary }}>
+                      {typeof lead.email === 'string' ? lead.email : (lead.email?.primaryEmail || '-')}
+                    </div>
                   </div>
                   <div style={{ color: BRAND.secondary }}>
                     {lead.company || '-'}
