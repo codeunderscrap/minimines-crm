@@ -61,6 +61,19 @@ export default defineObject({
       ],
     },
     {
+      universalIdentifier: 'd584e26d-46a1-4181-b54d-cfae9849ac8d',
+      name: 'assignedTo',
+      type: FieldType.SELECT,
+      label: 'Assigned Executive',
+      options: [
+        { label: 'Unassigned', value: 'UNASSIGNED', position: 0, color: 'gray' },
+        { label: 'Manish', value: 'MANISH', position: 1, color: 'blue' },
+        { label: 'Executive 1', value: 'EXECUTIVE_1', position: 2, color: 'green' },
+        { label: 'Executive 2', value: 'EXECUTIVE_2', position: 3, color: 'purple' },
+      ],
+      defaultValue: "'UNASSIGNED'",
+    },
+    {
       universalIdentifier: 'ab3b68ff-a256-474f-a59d-c148ba58a602',
       name: 'notes',
       type: FieldType.TEXT,
