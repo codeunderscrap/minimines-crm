@@ -9,7 +9,7 @@ export default defineNavigationMenuItem({
   universalIdentifier: EXPORT_DOCUMENT_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
   name: 'Export Documents',
   icon: 'IconFileText',
-  position: 1,
+  position: 106,
   type: NavigationMenuItemType.OBJECT,
   targetObjectUniversalIdentifier: EXPORT_DOCUMENT_OBJECT_UNIVERSAL_IDENTIFIER,
 });
