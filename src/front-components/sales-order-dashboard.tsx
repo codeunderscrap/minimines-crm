@@ -166,7 +166,7 @@ const SalesOrderDashboard = () => {
                       Push to Shipment
                     </button>
                   ) : (
-                    <a href="/objects/exportShipments" target="_parent" style={{ color: BRAND.green, fontSize: '12px', fontWeight: 600, textDecoration: 'none' }}>
+                    <a href="/object/exportShipment" target="_parent" style={{ color: BRAND.green, fontSize: '12px', fontWeight: 600, textDecoration: 'none' }}>
                       View in Shipments →
                     </a>
                   )}
