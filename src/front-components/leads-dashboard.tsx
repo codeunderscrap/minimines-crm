@@ -118,7 +118,7 @@ const LeadsDashboard = () => {
     setIsUpdating(true);
     try {
       // 1. Create Opportunity
-      const opp = await fetchTwenty('opportunities', 'POST', {
+      const opp = await fetchTwenty('bdOpportunities', 'POST', {
         name: `${lead.company || lead.name} - Opportunity`,
         linkedLeadId: lead.id,
         companyName: lead.company || '',
