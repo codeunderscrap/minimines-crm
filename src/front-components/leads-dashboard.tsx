@@ -71,6 +71,7 @@ const LeadsDashboard = () => {
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
   const [selectedExecutive, setSelectedExecutive] = useState('UNASSIGNED');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -167,9 +168,10 @@ const LeadsDashboard = () => {
   const handleSendAcknowledgment = async (leadId: string) => {
     setIsUpdating(true);
     try {
-      // Mock sending email
-      alert('Acknowledgment email sent to Lead!');
-      await fetchTwenty(`leads/${leadId}`, 'PATCH', { acknowledgmentSent: true });
+      await fetchTwenty(`leads/${leadId}`, 'PATCH', {
+        acknowledgmentSent: 'true'
+      });
+      setSuccessMsg('Acknowledgment email sent to Lead!');
       await loadData();
     } catch (e) {
       console.error("Failed to send ack", e);
@@ -210,6 +212,12 @@ const LeadsDashboard = () => {
       <div className="minimines-leads-dashboard">
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           
+          {successMsg && (
+            <div style={{ padding: '16px', backgroundColor: '#ECFDF5', color: '#065F46', border: '1px solid #10B981', borderRadius: '4px', marginBottom: '24px' }}>
+              {successMsg}
+            </div>
+          )}
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', borderBottom: `2px solid ${BRAND.primary}`, paddingBottom: '24px' }}>
             <div>
               <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '32px', color: BRAND.primary, margin: '0 0 8px 0', textTransform: 'uppercase' }}>
@@ -260,9 +268,12 @@ const LeadsDashboard = () => {
               
               <div style={{ width: '1px', height: '24px', backgroundColor: BRAND.border, margin: '0 8px' }}></div>
               
-              <button 
-                onClick={() => window.location.assign('/object/lead/new')}
+              <a 
+                href="/object/lead/new"
+                target="_parent"
                 style={{
+                  display: 'inline-block',
+                  textDecoration: 'none',
                   backgroundColor: BRAND.green,
                   color: BRAND.white,
                   border: 'none',
@@ -274,7 +285,7 @@ const LeadsDashboard = () => {
                 }}
               >
                 + Add Lead
-              </button>
+              </a>
             </div>
           </div>
 

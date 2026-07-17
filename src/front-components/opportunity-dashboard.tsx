@@ -65,6 +65,8 @@ const OpportunityDashboard = () => {
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<any>(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -86,6 +88,8 @@ const OpportunityDashboard = () => {
 
   const handleGenerateSalesOrder = async (opp: any) => {
     setIsUpdating(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
     try {
       const so = await fetchTwenty('salesOrders', 'POST', {
         name: `Order for ${opp.companyName || opp.name}`,
@@ -100,17 +104,28 @@ const OpportunityDashboard = () => {
       else if (so?.id) newSoId = so.id;
 
       if (newSoId) {
-        // Automatically navigate to the newly created Sales Order page to fill in details
-        window.location.assign(`/object/salesOrder/${newSoId}`);
+        setSuccessMsg(
+          <div style={{ padding: '16px', backgroundColor: '#ECFDF5', color: '#065F46', border: '1px solid #10B981', borderRadius: '4px', marginBottom: '24px' }}>
+            Sales Order generated successfully!{' '}
+            <a href={`/object/salesOrder/${newSoId}`} target="_parent" style={{ color: '#047857', fontWeight: 'bold', textDecoration: 'underline' }}>
+              Click here to open and edit the order.
+            </a>
+          </div>
+        );
       } else {
-        alert('Sales Order generated successfully!');
-        await loadData();
+        setSuccessMsg(
+          <div style={{ padding: '16px', backgroundColor: '#ECFDF5', color: '#065F46', border: '1px solid #10B981', borderRadius: '4px', marginBottom: '24px' }}>
+            Sales Order generated successfully!
+          </div>
+        );
       }
+      await loadData();
     } catch (e) {
       console.error(e);
-      alert('Failed to generate sales order.');
+      setErrorMsg('Failed to generate sales order.');
+    } finally {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   if (loading && opportunities.length === 0) {
@@ -120,10 +135,17 @@ const OpportunityDashboard = () => {
   return (
     <>
       <style>{FONTS}</style>
-      <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif", backgroundColor: BRAND.bg, minHeight: '100vh' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      <div className="minimines-opportunity-dashboard" style={{ padding: '40px', fontFamily: "'Barlow', sans-serif", backgroundColor: BRAND.bg, minHeight: '100vh' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           
-          <div style={{ marginBottom: '40px', borderBottom: `2px solid ${BRAND.primary}`, paddingBottom: '24px' }}>
+          {errorMsg && (
+            <div style={{ padding: '16px', backgroundColor: '#FEF2F2', color: '#991B1B', border: '1px solid #EF4444', borderRadius: '4px', marginBottom: '24px' }}>
+              {errorMsg}
+            </div>
+          )}
+          {successMsg && successMsg}
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', borderBottom: `2px solid ${BRAND.primary}`, paddingBottom: '24px' }}>
             <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '32px', color: BRAND.primary, margin: '0 0 8px 0', textTransform: 'uppercase' }}>
               BD Opportunity Pipeline
             </h1>
