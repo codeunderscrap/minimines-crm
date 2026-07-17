@@ -93,7 +93,19 @@ const OpportunityDashboard = () => {
         quantity: 0,
         fulfillmentStatus: 'PENDING',
       });
-      alert('Sales Order generated successfully!');
+      
+      let newSoId = null;
+      if (so?.data?.id) newSoId = so.data.id;
+      else if (so?.data?.createSalesOrder?.id) newSoId = so.data.createSalesOrder.id;
+      else if (so?.id) newSoId = so.id;
+
+      if (newSoId) {
+        // Automatically navigate to the newly created Sales Order page to fill in details
+        window.location.assign(`/object/salesOrder/${newSoId}`);
+      } else {
+        alert('Sales Order generated successfully!');
+        await loadData();
+      }
     } catch (e) {
       console.error(e);
       alert('Failed to generate sales order.');
