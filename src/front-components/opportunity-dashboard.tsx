@@ -31,8 +31,8 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
   try {
     const opts: any = {
       method,
+      credentials: 'include',
       headers: { 
-        'Authorization': `Bearer ${(window as any).TWENTY_ACCESS_TOKEN}`,
         'Content-Type': 'application/json'
       }
     };

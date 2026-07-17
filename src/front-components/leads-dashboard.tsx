@@ -35,8 +35,8 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
   try {
     const opts: any = {
       method,
+      credentials: 'include',
       headers: { 
-        'Authorization': `Bearer ${(window as any).TWENTY_ACCESS_TOKEN}`,
         'Content-Type': 'application/json'
       }
     };
@@ -258,7 +258,7 @@ const LeadsDashboard = () => {
               <div style={{ width: '1px', height: '24px', backgroundColor: BRAND.border, margin: '0 8px' }}></div>
               
               <button 
-                onClick={() => window.open('/object/lead/new', '_blank')}
+                onClick={() => window.location.assign('/object/lead/new')}
                 style={{
                   backgroundColor: BRAND.green,
                   color: BRAND.white,
