@@ -47,6 +47,9 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
     
     if (method !== 'GET') return json;
 
+    if (json.data && Array.isArray(json.data)) {
+      return json.data;
+    }
     const key = path.split('?')[0]; // Extract base path e.g. leads
     let items = json.data && json.data[key] ? json.data[key] : [];
     if (items && items.edges) {
@@ -250,6 +253,24 @@ const LeadsDashboard = () => {
                 }}
               >
                 {isUpdating ? 'Assigning...' : 'Bulk Assign'}
+              </button>
+              
+              <div style={{ width: '1px', height: '24px', backgroundColor: BRAND.border, margin: '0 8px' }}></div>
+              
+              <button 
+                onClick={() => window.open('/object/lead/new', '_blank')}
+                style={{
+                  backgroundColor: BRAND.green,
+                  color: BRAND.white,
+                  border: 'none',
+                  padding: '10px 24px',
+                  borderRadius: '4px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+              >
+                + Add Lead
               </button>
             </div>
           </div>
