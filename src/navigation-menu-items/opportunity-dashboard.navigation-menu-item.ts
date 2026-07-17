@@ -10,5 +10,5 @@ export default defineNavigationMenuItem({
   icon: 'IconTarget',
   position: 2, // Right after leads
   type: NavigationMenuItemType.PAGE_LAYOUT,
-  targetPageLayoutUniversalIdentifier: OPPORTUNITY_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  pageLayoutUniversalIdentifier: OPPORTUNITY_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });

@@ -10,5 +10,5 @@ export default defineNavigationMenuItem({
   icon: 'IconChartBar',
   position: 1, // Before leads
   type: NavigationMenuItemType.PAGE_LAYOUT,
-  targetPageLayoutUniversalIdentifier: LEAD_ANALYTICS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  pageLayoutUniversalIdentifier: LEAD_ANALYTICS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });

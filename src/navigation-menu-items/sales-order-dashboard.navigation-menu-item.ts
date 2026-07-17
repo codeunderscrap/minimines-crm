@@ -10,5 +10,5 @@ export default defineNavigationMenuItem({
   icon: 'IconBox',
   position: 3,
   type: NavigationMenuItemType.PAGE_LAYOUT,
-  targetPageLayoutUniversalIdentifier: SALES_ORDER_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  pageLayoutUniversalIdentifier: SALES_ORDER_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });

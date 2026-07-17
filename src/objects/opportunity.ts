@@ -2,8 +2,8 @@ import { defineObject, FieldType } from 'twenty-sdk/define';
 import { OPPORTUNITY_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
 
 export default defineObject({
-  nameSingular: 'opportunity',
-  namePlural: 'opportunities',
+  nameSingular: 'bdOpportunity',
+  namePlural: 'bdOpportunities',
   labelSingular: 'Opportunity',
   labelPlural: 'Opportunities',
   universalIdentifier: OPPORTUNITY_OBJECT_UNIVERSAL_IDENTIFIER,

@@ -103,7 +103,7 @@ export default defineObject({
       name: 'acknowledgmentSent',
       type: FieldType.BOOLEAN,
       label: 'Acknowledgment Sent',
-      defaultValue: 'false',
+      defaultValue: "'false'",
     },
   ],
 });
