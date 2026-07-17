@@ -61,10 +61,7 @@ const SalesOrderDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     const data = await fetchTwenty('salesOrders?limit=100');
-    let items = data.data && data.data.salesOrders ? data.data.salesOrders : [];
-    if (items && items.edges) items = items.edges.map((e: any) => e.node);
-    if (!Array.isArray(items)) items = data.data?.edges?.map((e: any) => e.node) || data.data || [];
-    setOrders(items);
+    setOrders(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 

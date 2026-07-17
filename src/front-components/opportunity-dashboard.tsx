@@ -69,10 +69,7 @@ const OpportunityDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     const data = await fetchTwenty('bdOpportunities?limit=100');
-    let items = data.data && data.data.bdOpportunities ? data.data.bdOpportunities : [];
-    if (items && items.edges) items = items.edges.map((e: any) => e.node);
-    if (!Array.isArray(items)) items = data.data?.edges?.map((e: any) => e.node) || data.data || [];
-    setOpportunities(items);
+    setOpportunities(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 
