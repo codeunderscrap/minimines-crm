@@ -28,17 +28,20 @@ const STAGES = [
 ];
 
 const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
+  const url = `https://api.twenty.com/rest/${path}`;
+  const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYyMDI2ODQzLTA5ZDItNDM5My05NTM1LTZlODJhNTE3ZjRmNCJ9.eyJzdWIiOiI2MWJlMjBjYi1jMGQ2LTRiZTAtYWYxNy02YzUwMDY3NmRmOWIiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNjFiZTIwY2ItYzBkNi00YmUwLWFmMTctNmM1MDA2NzZkZjliIiwiaWF0IjoxNzgzNjg1MzQ0LCJleHAiOjQ5MzcyODUzNDEsImp0aSI6Ijg5YjcwMjEyLTY0NzktNDc2Zi05Y2ZlLTEyMTVkZDgyZWVmZCJ9.lPQmTpJ7lAK73_4ToKzb_FeiQbXbgC-h732qCGP7ezgBj8sPolSaILQh755UcVcr_pesNJdMI9gMS7V2c1GjsA';
+  
   try {
     const opts: any = {
       method,
-      credentials: 'include',
       headers: { 
+        'Authorization': apiKey,
         'Content-Type': 'application/json'
       }
     };
     if (body) opts.body = JSON.stringify(body);
     
-    const res = await fetch(`/rest/${path}`, opts);
+    const res = await fetch(url, opts);
     const json = await res.json();
     
     if (method !== 'GET') return json;
