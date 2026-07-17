@@ -100,17 +100,66 @@ const LeadsDashboard = () => {
     setIsUpdating(true);
     
     try {
-      // Execute PATCH for each selected lead (In a real scenario, use a batch API if available)
       const promises = Array.from(selectedLeadIds).map(id => 
         fetchTwenty(`leads/${id}`, 'PATCH', { assignedTo: selectedExecutive })
       );
       await Promise.all(promises);
       
-      // Clear selection and reload
       setSelectedLeadIds(new Set());
       await loadData();
     } catch (e) {
       console.error("Failed bulk assign", e);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleConvertToOpportunity = async (lead: any) => {
+    setIsUpdating(true);
+    try {
+      // 1. Create Opportunity
+      const opp = await fetchTwenty('opportunities', 'POST', {
+        name: `${lead.company || lead.name} - Opportunity`,
+        linkedLeadId: lead.id,
+        companyName: lead.company || '',
+        stage: 'REQUIREMENTS',
+      });
+      // 2. Update Lead
+      if (opp && opp.data && opp.data.id) {
+        await fetchTwenty(`leads/${lead.id}`, 'PATCH', {
+          convertedToOpportunityId: opp.data.id,
+          status: 'QUALIFIED'
+        });
+      }
+      await loadData();
+    } catch (e) {
+      console.error("Failed to convert", e);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleUpdateFollowUp = async (leadId: string, followUpStatus: string) => {
+    setIsUpdating(true);
+    try {
+      await fetchTwenty(`leads/${leadId}`, 'PATCH', { followUpStatus });
+      await loadData();
+    } catch (e) {
+      console.error("Failed to update follow up", e);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleSendAcknowledgment = async (leadId: string) => {
+    setIsUpdating(true);
+    try {
+      // Mock sending email
+      alert('Acknowledgment email sent to Lead!');
+      await fetchTwenty(`leads/${leadId}`, 'PATCH', { acknowledgmentSent: true });
+      await loadData();
+    } catch (e) {
+      console.error("Failed to send ack", e);
     } finally {
       setIsUpdating(false);
     }
@@ -201,7 +250,7 @@ const LeadsDashboard = () => {
           <div style={{ backgroundColor: BRAND.white, border: `1px solid ${BRAND.border}`, borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0, 27, 46, 0.04)' }}>
             
             {/* Table Header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '40px 2fr 1.5fr 1fr 1fr 1fr', gap: '16px', padding: '16px 24px', backgroundColor: BRAND.bg, borderBottom: `1px solid ${BRAND.border}`, fontWeight: 600, color: BRAND.primary }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '40px 2fr 1.5fr 1fr 1fr 1fr 2fr', gap: '16px', padding: '16px 24px', backgroundColor: BRAND.bg, borderBottom: `1px solid ${BRAND.border}`, fontWeight: 600, color: BRAND.primary }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <input 
                   type="checkbox" 
@@ -215,6 +264,7 @@ const LeadsDashboard = () => {
               <div>Source</div>
               <div>Status</div>
               <div>Assigned To</div>
+              <div>Actions</div>
             </div>
 
             {/* Table Body */}
@@ -224,7 +274,7 @@ const LeadsDashboard = () => {
               return (
                 <div key={lead.id} style={{ 
                   display: 'grid', 
-                  gridTemplateColumns: '40px 2fr 1.5fr 1fr 1fr 1fr', 
+                  gridTemplateColumns: '40px 2fr 1.5fr 1fr 1fr 1fr 2fr', 
                   gap: '16px', 
                   padding: '16px 24px', 
                   borderBottom: `1px solid ${BRAND.border}`,
@@ -274,6 +324,34 @@ const LeadsDashboard = () => {
                     }}>
                       {formatAssignedTo(lead.assignedTo)}
                     </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <select
+                      value={lead.followUpStatus || 'NONE'}
+                      onChange={e => handleUpdateFollowUp(lead.id, e.target.value)}
+                      style={{ fontSize: '11px', padding: '4px', borderRadius: '4px', border: `1px solid ${BRAND.border}` }}
+                    >
+                      <option value="NONE">Follow Up</option>
+                      <option value="FOLLOW_UP_1">Follow Up 1</option>
+                      <option value="FOLLOW_UP_2">Follow Up 2</option>
+                      <option value="FOLLOW_UP_3">Follow Up 3</option>
+                    </select>
+
+                    <button 
+                      onClick={() => handleConvertToOpportunity(lead)}
+                      disabled={!!lead.convertedToOpportunityId || isUpdating}
+                      style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: lead.convertedToOpportunityId ? BRAND.border : BRAND.primary, color: lead.convertedToOpportunityId ? BRAND.text : BRAND.white, border: 'none', borderRadius: '4px', cursor: lead.convertedToOpportunityId ? 'not-allowed' : 'pointer' }}
+                    >
+                      {lead.convertedToOpportunityId ? 'Converted' : 'To Opp'}
+                    </button>
+
+                    <button 
+                      onClick={() => handleSendAcknowledgment(lead.id)}
+                      disabled={lead.acknowledgmentSent || isUpdating}
+                      style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: lead.acknowledgmentSent ? BRAND.green : BRAND.secondary, color: BRAND.white, border: 'none', borderRadius: '4px', cursor: lead.acknowledgmentSent ? 'not-allowed' : 'pointer' }}
+                    >
+                      {lead.acknowledgmentSent ? 'Ack Sent' : 'Send Ack'}
+                    </button>
                   </div>
                 </div>
               );

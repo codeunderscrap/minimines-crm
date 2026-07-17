@@ -79,5 +79,31 @@ export default defineObject({
       type: FieldType.TEXT,
       label: 'Internal Notes',
     },
+    {
+      universalIdentifier: '820464be-4131-482a-a9e9-d7b4db1b4432',
+      name: 'convertedToOpportunityId',
+      type: FieldType.TEXT,
+      label: 'Converted To Opportunity ID',
+    },
+    {
+      universalIdentifier: '368e7b51-512c-47bc-ad7f-d38a83ed1fbc',
+      name: 'followUpStatus',
+      type: FieldType.SELECT,
+      label: 'Follow Up Status',
+      options: [
+        { label: 'None', value: 'NONE', position: 0, color: 'gray' },
+        { label: 'Follow Up 1', value: 'FOLLOW_UP_1', position: 1, color: 'yellow' },
+        { label: 'Follow Up 2', value: 'FOLLOW_UP_2', position: 2, color: 'orange' },
+        { label: 'Follow Up 3', value: 'FOLLOW_UP_3', position: 3, color: 'red' },
+      ],
+      defaultValue: "'NONE'",
+    },
+    {
+      universalIdentifier: '9bdde85a-038b-4b2a-8884-6330ce1484f1',
+      name: 'acknowledgmentSent',
+      type: FieldType.BOOLEAN,
+      label: 'Acknowledgment Sent',
+      defaultValue: 'false',
+    },
   ],
 });

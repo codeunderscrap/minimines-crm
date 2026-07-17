@@ -15,6 +15,7 @@ export default defineObject({
     { universalIdentifier: 'e56b1a20-3b99-4c22-b7e2-45e0f22281cc', name: 'orderDate', type: FieldType.DATE_TIME, label: 'Order Date' },
     { universalIdentifier: 'f67b1a20-3b99-4c22-b7e2-45e0f22281dd', name: 'quantity', type: FieldType.NUMBER, label: 'Quantity (MT)' },
     { universalIdentifier: 'a78b1a20-3b99-4c22-b7e2-45e0f22281ee', name: 'contractId', type: FieldType.TEXT, label: 'Contract ID' },
+    { universalIdentifier: 'a21c1a20-3b99-4c22-b7e2-45e0f22281ab', name: 'linkedOpportunityId', type: FieldType.TEXT, label: 'Linked Opportunity ID' },
     {
       universalIdentifier: 'b89b1a20-3b99-4c22-b7e2-45e0f22281ff',
       name: 'fulfillmentStatus',
