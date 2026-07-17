@@ -8,7 +8,7 @@ export default defineNavigationMenuItem({
   universalIdentifier: OPPORTUNITY_DASHBOARD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
   name: 'Opportunity Pipeline',
   icon: 'IconTarget',
-  position: 12,
+  position: 2,
   type: NavigationMenuItemType.PAGE_LAYOUT,
   pageLayoutUniversalIdentifier: OPPORTUNITY_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });
