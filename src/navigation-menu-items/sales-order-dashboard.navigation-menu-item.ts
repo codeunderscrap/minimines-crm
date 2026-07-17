@@ -6,9 +6,9 @@ import {
 
 export default defineNavigationMenuItem({
   universalIdentifier: SALES_ORDER_DASHBOARD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
-  name: 'Sales Order Dashboard',
+  name: 'Sales Dashboard',
   icon: 'IconBox',
-  position: 60,
+  position: -2,
   type: NavigationMenuItemType.PAGE_LAYOUT,
   pageLayoutUniversalIdentifier: SALES_ORDER_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });

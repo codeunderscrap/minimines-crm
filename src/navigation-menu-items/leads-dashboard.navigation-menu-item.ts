@@ -6,9 +6,9 @@ import {
 
 export default defineNavigationMenuItem({
   universalIdentifier: LEADS_DASHBOARD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
-  name: 'Leads',
+  name: 'Lead Dashboard',
   icon: 'IconUserPlus',
-  position: 30,
+  position: -5,
   type: NavigationMenuItemType.PAGE_LAYOUT,
   pageLayoutUniversalIdentifier: LEADS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });
