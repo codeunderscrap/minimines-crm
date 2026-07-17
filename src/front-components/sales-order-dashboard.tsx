@@ -58,11 +58,12 @@ const SalesOrderDashboard = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<any>(null);
 
   const loadData = async () => {
     setLoading(true);
-    const data = await fetchTwenty('salesOrders');
-    setOrders(data);
+    const data = await fetchTwenty('salesOrders?limit=100');
+    setOrders(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 
@@ -70,25 +71,32 @@ const SalesOrderDashboard = () => {
     loadData();
   }, []);
 
-  const handlePushToShipment = async (order: any) => {
+  const handleCreateShipment = async (order: any) => {
     setIsUpdating(true);
     try {
       // 1. Create Export Shipment
-      await fetchTwenty('exportShipments', 'POST', {
-        name: `Shipment for ${order.name || order.id}`,
+      const shipment = await fetchTwenty('exportShipments', 'POST', {
+        name: `Shipment for ${order.name || 'Order'}`,
         salesOrderId: order.id,
         qaStatus: 'PENDING',
         documentationStatus: 'INCOMPLETE'
       });
 
-      // 2. Update Sales Order
+      // 2. Update Sales Order status
       await fetchTwenty(`salesOrders/${order.id}`, 'PATCH', {
-        fulfillmentStatus: 'SHIPPED'
+        fulfillmentStatus: 'PROCESSING'
       });
 
+      let shipmentId = shipment?.data?.id || shipment?.id || shipment?.data?.createExportShipment?.id;
+
+      setSuccessMsg(
+        <span>
+          Shipment Created! <a href={`/object/exportShipment/${shipmentId}`} target="_parent" style={{ color: '#065F46', fontWeight: 'bold', textDecoration: 'underline' }}>View Shipment</a>
+        </span>
+      );
       await loadData();
     } catch (e) {
-      console.error('Failed to push to shipment', e);
+      console.error("Failed to create shipment", e);
     } finally {
       setIsUpdating(false);
     }
@@ -113,18 +121,24 @@ const SalesOrderDashboard = () => {
             </div>
           </div>
 
+          {successMsg && (
+            <div style={{ padding: '16px', backgroundColor: '#ECFDF5', color: '#065F46', border: '1px solid #10B981', borderRadius: '4px', marginBottom: '24px' }}>
+              {successMsg}
+            </div>
+          )}
+
           <div style={{ backgroundColor: BRAND.white, borderRadius: '8px', border: `1px solid ${BRAND.border}`, overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 2fr 1fr 2fr 1.5fr 1.5fr', gap: '16px', padding: '16px 24px', backgroundColor: BRAND.primary, color: BRAND.white, fontWeight: 600 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr', gap: '16px', padding: '16px 24px', backgroundColor: BRAND.primary, color: BRAND.white, fontWeight: 600 }}>
               <div>Order ID</div>
               <div>Name</div>
               <div>Qty (MT)</div>
               <div>Linked Opp ID</div>
               <div>Fulfillment Status</div>
-              <div>Shipment Action</div>
+              <div>Shipment</div>
             </div>
             
             {orders.map(order => (
-              <div key={order.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 2fr 1fr 2fr 1.5fr 1.5fr', gap: '16px', padding: '16px 24px', borderBottom: `1px solid ${BRAND.border}`, alignItems: 'center' }}>
+              <div key={order.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr', gap: '16px', padding: '16px 24px', borderBottom: `1px solid ${BRAND.border}`, alignItems: 'center' }}>
                 <div style={{ fontSize: '12px', color: BRAND.secondary, fontFamily: 'monospace' }}>
                   {order.id.slice(0, 8)}...
                 </div>
@@ -134,14 +148,12 @@ const SalesOrderDashboard = () => {
                 <div style={{ color: BRAND.text }}>
                   {order.quantity || 0} MT
                 </div>
-                <div>
+                <div style={{ fontSize: '12px', color: BRAND.blue, textDecoration: 'underline' }}>
                   {order.linkedOpportunityId ? (
-                    <a href={`/object/bdOpportunity/${order.linkedOpportunityId}`} target="_parent" style={{ fontSize: '12px', color: BRAND.blue, textDecoration: 'underline', cursor: 'pointer' }}>
+                    <a href={`/object/bdOpportunity/${order.linkedOpportunityId}`} target="_parent" style={{ color: 'inherit' }}>
                       {order.linkedOpportunityId.slice(0,8) + '...'}
                     </a>
-                  ) : (
-                    <span style={{ fontSize: '12px', color: BRAND.secondary }}>Direct Order</span>
-                  )}
+                  ) : 'Direct Order'}
                 </div>
                 <div>
                   <span style={{ 
@@ -153,23 +165,16 @@ const SalesOrderDashboard = () => {
                   </span>
                 </div>
                 <div>
-                  {(!order.fulfillmentStatus || order.fulfillmentStatus === 'PENDING') ? (
-                    <button 
-                      onClick={() => handlePushToShipment(order)}
-                      disabled={isUpdating}
-                      style={{ 
-                        backgroundColor: BRAND.primary, color: BRAND.white, border: 'none', 
-                        padding: '6px 12px', borderRadius: '4px', fontSize: '12px', fontWeight: 600, 
-                        cursor: isUpdating ? 'not-allowed' : 'pointer', opacity: isUpdating ? 0.7 : 1 
-                      }}
-                    >
-                      Push to Shipment
-                    </button>
-                  ) : (
-                    <a href="/object/exportShipment" target="_parent" style={{ color: BRAND.green, fontSize: '12px', fontWeight: 600, textDecoration: 'none' }}>
-                      View in Shipments →
-                    </a>
-                  )}
+                  <button 
+                    onClick={() => handleCreateShipment(order)}
+                    disabled={isUpdating}
+                    style={{
+                      backgroundColor: BRAND.primary, color: BRAND.white, border: 'none', 
+                      padding: '8px 12px', borderRadius: '4px', cursor: isUpdating ? 'not-allowed' : 'pointer', fontSize: '12px', fontWeight: 600, transition: '0.2s'
+                    }}
+                  >
+                    To Shipment
+                  </button>
                 </div>
               </div>
             ))}
