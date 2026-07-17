@@ -8,7 +8,7 @@ export default defineNavigationMenuItem({
   universalIdentifier: LEAD_ANALYTICS_DASHBOARD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
   name: 'Lead Analytics',
   icon: 'IconChartBar',
-  position: 6,
+  position: -9994,
   type: NavigationMenuItemType.PAGE_LAYOUT,
   pageLayoutUniversalIdentifier: LEAD_ANALYTICS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });
