@@ -174,13 +174,23 @@ const LeadsDashboard = () => {
     }
   };
 
-  const handleSendAcknowledgment = async (leadId: string) => {
+  const handleSendAcknowledgment = async (lead: any) => {
     setIsUpdating(true);
     try {
-      await fetchTwenty(`leads/${leadId}`, 'PATCH', {
+      await fetchTwenty(`leads/${lead.id}`, 'PATCH', {
         acknowledgmentSent: 'true'
       });
-      setSuccessMsg('Acknowledgment email sent to Lead!');
+      
+      const leadEmail = lead.email?.primaryEmail || lead.email || '';
+      const subject = encodeURIComponent(`Thank you for reaching out to MiniMines`);
+      const body = encodeURIComponent(`Hi ${lead.name || 'there'},\n\nThank you for reaching out to MiniMines. We have received your inquiry and our BD team will get back to you shortly.\n\nBest regards,\nMiniMines BD Team`);
+      const mailtoLink = `mailto:${leadEmail}?subject=${subject}&body=${body}`;
+
+      setSuccessMsg(
+        <span>
+          Acknowledgment sent to CRM! <a href={mailtoLink} target="_parent" style={{ color: '#065F46', fontWeight: 'bold', textDecoration: 'underline' }}>Click here to send the actual email</a>
+        </span>
+      );
       await loadData();
     } catch (e) {
       console.error("Failed to send ack", e);
@@ -397,8 +407,8 @@ const LeadsDashboard = () => {
                     </button>
 
                     <button 
-                      onClick={() => handleSendAcknowledgment(lead.id)}
-                      disabled={lead.acknowledgmentSent || isUpdating}
+                      onClick={() => handleSendAcknowledgment(lead)}
+                      disabled={lead.acknowledgmentSent === 'true' || isUpdating}
                       style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: lead.acknowledgmentSent ? BRAND.green : BRAND.secondary, color: BRAND.white, border: 'none', borderRadius: '4px', cursor: lead.acknowledgmentSent ? 'not-allowed' : 'pointer' }}
                     >
                       {lead.acknowledgmentSent ? 'Ack Sent' : 'Send Ack'}
