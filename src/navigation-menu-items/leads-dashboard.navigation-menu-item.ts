@@ -8,7 +8,7 @@ export default defineNavigationMenuItem({
   universalIdentifier: LEADS_DASHBOARD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
   name: 'Leads',
   icon: 'IconUserPlus',
-  position: 1,
+  position: 30,
   type: NavigationMenuItemType.PAGE_LAYOUT,
   pageLayoutUniversalIdentifier: LEADS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });

@@ -131,7 +131,16 @@ const LeadsDashboard = () => {
         companyName: lead.company || '',
         stage: 'REQUIREMENTS',
       });
-      // 2. Update Lead
+      // 2. Also create a standard Opportunity so it shows in the built-in CRM tab
+      try {
+        await fetchTwenty('opportunities', 'POST', {
+          name: `${lead.company || lead.name} - BD Pipeline`
+        });
+      } catch (err) {
+        console.error("Failed to sync to built-in opportunity tab", err);
+      }
+
+      // 3. Update Lead
       let newOppId = null;
       if (opp?.data?.id) newOppId = opp.data.id;
       else if (opp?.data?.createBdOpportunity?.id) newOppId = opp.data.createBdOpportunity.id;
