@@ -20,18 +20,30 @@ const FONTS = `
   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Roboto+Slab:wght@300;400;600&display=swap');
 `;
 
-const fetchTwenty = async (path: string) => {
+const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
   try {
-    const res = await fetch(`/rest/${path}`, {
-      headers: { 'Authorization': `Bearer ${(window as any).TWENTY_ACCESS_TOKEN}` }
-    });
-    if (!res.ok) return [];
+    const opts: any = {
+      method,
+      headers: { 
+        'Authorization': `Bearer ${(window as any).TWENTY_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    
+    const res = await fetch(`/rest/${path}`, opts);
     const json = await res.json();
-    const key = path.split('?')[0];
+    
+    if (method !== 'GET') return json;
+
+    const key = path.split('?')[0]; // Extract base path e.g. leads
     let items = json.data && json.data[key] ? json.data[key] : [];
-    if (items && items.edges) items = items.edges.map((e: any) => e.node);
+    if (items && items.edges) {
+      items = items.edges.map((e: any) => e.node);
+    }
     return Array.isArray(items) ? items : (json.data?.edges?.map((e: any) => e.node) || json.data || []);
-  } catch (e) {
+  } catch (error) {
+    console.error('fetchTwenty Error:', error);
     return [];
   }
 };

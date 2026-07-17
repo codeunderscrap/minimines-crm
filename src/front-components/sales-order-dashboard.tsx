@@ -30,11 +30,20 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
       }
     };
     if (body) opts.body = JSON.stringify(body);
+    
     const res = await fetch(`/rest/${path}`, opts);
-    if (!res.ok) return [];
     const json = await res.json();
-    return json;
-  } catch (e) {
+    
+    if (method !== 'GET') return json;
+
+    const key = path.split('?')[0]; // Extract base path e.g. leads
+    let items = json.data && json.data[key] ? json.data[key] : [];
+    if (items && items.edges) {
+      items = items.edges.map((e: any) => e.node);
+    }
+    return Array.isArray(items) ? items : (json.data?.edges?.map((e: any) => e.node) || json.data || []);
+  } catch (error) {
+    console.error('fetchTwenty Error:', error);
     return [];
   }
 };
