@@ -11,5 +11,5 @@ export default defineNavigationMenuItem({
   icon: 'IconBox',
   type: NavigationMenuItemType.OBJECT,
   targetObjectUniversalIdentifier: PRODUCT_OBJECT_UNIVERSAL_IDENTIFIER,
-  position: 101,
+  position: 102,
 });

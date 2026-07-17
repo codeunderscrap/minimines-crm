@@ -11,5 +11,5 @@ export default defineNavigationMenuItem({
   icon: 'IconReceipt',
   type: NavigationMenuItemType.OBJECT,
   targetObjectUniversalIdentifier: QUOTATION_OBJECT_UNIVERSAL_IDENTIFIER,
-  position: 102,
+  position: 103,
 });
