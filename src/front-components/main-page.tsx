@@ -180,7 +180,7 @@ const StatCard = ({ label, value, sub, link }: any) => {
 
 const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
   const url = `https://api.twenty.com/rest/${path}`;
-  const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU0NTUyLCJleHAiOjQ5Mzc5NTQ1NTEsImp0aSI6IjA3YzIwMGYzLTgxZGItNDY5Mi05OTMxLTA5MzYzNmY1ODU1OCJ9.FlDIj7bMA7uzrAjkRnhiEduNA2jhBKKhjzovFCIOuYpqapWX-JoazqwMiMzgHUk3ZxR_cXmpzqpk50MyVk4diw';
+  const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU3MTIwLCJleHAiOjQ5Mzc5NTcxMTksImp0aSI6IjZkODliNmU5LTcwZmYtNGIwZS05MzUyLTk0ZTljMmJiOGQ5MyJ9.al8pc21Lc12mGgMEKu8GaWZDJytK55FjUx5_egt8jd3rAhUa0TpCfq7PAWoCDX5KUeqt2VrLN29QSfXHicnbzQ';
   
   const options: any = {
     method,
@@ -630,3 +630,4 @@ export default defineFrontComponent({
   description: 'MiniMines Custom CRM Dashboard',
   component: MainPage,
 });
+
