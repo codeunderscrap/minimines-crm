@@ -8,3 +8,4 @@ export default defineNavigationMenuItem({
   type: NavigationMenuItemType.OBJECT,
   targetObjectUniversalIdentifier: '04acd819-f079-4dde-b36d-1eb14b47167d',
 });
+

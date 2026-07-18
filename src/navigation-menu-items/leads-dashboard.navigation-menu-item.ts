@@ -12,3 +12,4 @@ export default defineNavigationMenuItem({
   type: NavigationMenuItemType.PAGE_LAYOUT,
   pageLayoutUniversalIdentifier: LEADS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });
+

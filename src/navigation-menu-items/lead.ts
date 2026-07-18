@@ -8,7 +8,8 @@ export default defineNavigationMenuItem({
   universalIdentifier: LEAD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
   name: 'Lead Database',
   icon: 'IconDatabase',
-  position: 104,
+  position: 8,
   type: NavigationMenuItemType.OBJECT,
   targetObjectUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
 });
+

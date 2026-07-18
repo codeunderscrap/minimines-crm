@@ -4,7 +4,8 @@ export default defineNavigationMenuItem({
   universalIdentifier: '435c57bb-831a-40f0-8ca1-4539b0e22b82',
   name: 'salesOrder',
   icon: 'IconList',
-  position: 106,
+  position: 13,
   type: NavigationMenuItemType.OBJECT,
   targetObjectUniversalIdentifier: '6eb74c1e-bb61-4a12-ba76-849c9db2c3d0',
 });
+
