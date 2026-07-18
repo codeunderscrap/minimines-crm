@@ -2342,9 +2342,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimines-crm@workspace:.":
+"minimines-crm-v2@workspace:.":
   version: 0.0.0-use.local
-  resolution: "minimines-crm@workspace:."
+  resolution: "minimines-crm-v2@workspace:."
   dependencies:
     "@types/node": "npm:^24.7.2"
     "@types/react": "npm:^19.0.0"
