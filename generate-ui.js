@@ -39,7 +39,7 @@ function replaceUUIDs(content) {
   matches.forEach(m => {
     if (m === demoObjectId) return; // Keep object ID so we can replace it explicitly
     // keep applicationUniversalIdentifier if present
-    if (m === 'cfdfcebe-c9d2-4a51-b81b-777bb77fc140') return;
+    if (m === 'b4c9e8d1-72f3-4a1d-9e6b-3c5d8a2f1b4c') return;
     // keep field metadata ids from demo? No, we need fresh ones or it's fine, it will generate random UUIDs for view fields.
     if (!replacements[m]) {
       replacements[m] = crypto.randomUUID();
@@ -107,3 +107,4 @@ objects.forEach((obj, idx) => {
 
   console.log(`Generated UI files for ${obj.name}`);
 });
+
