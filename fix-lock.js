@@ -7,7 +7,7 @@ async function deleteApp() {
   const response = await fetch(url, {
     method: 'DELETE',
     headers: {
-      'Authorization': Bearer ,
+      'Authorization': 'Bearer ' + apiKey,
       'Content-Type': 'application/json'
     }
   });
