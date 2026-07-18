@@ -35,6 +35,18 @@ export default defineObject({
         { position: 0, color: 'green', label: 'Incomplete', value: 'INCOMPLETE' },
         { position: 1, color: 'green', label: 'Ready', value: 'READY' }
       ]
+    },
+    {
+      universalIdentifier: 'e86b1a20-3b99-4c22-b7e2-45e0f33382aa',
+      name: 'transitExport',
+      type: FieldType.SELECT,
+      label: 'Transit Status',
+      options: [
+        { position: 0, color: 'sky', label: 'Documentation', value: 'DOCUMENTATION' },
+        { position: 1, color: 'yellow', label: 'Customs', value: 'CUSTOMS' },
+        { position: 2, color: 'orange', label: 'In Transit', value: 'IN_TRANSIT' },
+        { position: 3, color: 'green', label: 'Delivered', value: 'DELIVERED' }
+      ]
     }
   ]
 });
