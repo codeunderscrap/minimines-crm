@@ -1,4 +1,4 @@
-import { defineView } from 'twenty-sdk/define';
+import { defineView, generateDefaultFieldUniversalIdentifier } from 'twenty-sdk/define';
 
 export default defineView({
   universalIdentifier: 'b8c4a1ab-f0e2-47d2-88cb-3cf8cc90d407',
