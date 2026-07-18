@@ -43,4 +43,3 @@ export default defineObject({
     { universalIdentifier: '45ef2116-2870-4803-aea8-2ff551d965fc', name: 'targetDate', type: FieldType.DATE_TIME, label: 'Target Completion Date' },
   ]
 });
-

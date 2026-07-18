@@ -29,4 +29,3 @@ export default defineObject({
     { universalIdentifier: 'a78b1a20-3b99-4c22-b7e2-45e0f44481ee', name: 'source', type: FieldType.TEXT, label: 'Data Source' }
   ]
 });
-

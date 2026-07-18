@@ -52,7 +52,7 @@ export default defineObject({
       name: 'status',
       type: FieldType.SELECT,
       label: 'Status',
-      defaultValue: "NEW",
+      defaultValue: "'NEW'",
       options: [
         { label: 'New', value: 'NEW', position: 0, color: 'sky' },
         { label: 'Contacted', value: 'CONTACTED', position: 1, color: 'yellow' },
@@ -71,7 +71,7 @@ export default defineObject({
         { label: 'Executive 1', value: 'EXECUTIVE_1', position: 2, color: 'green' },
         { label: 'Executive 2', value: 'EXECUTIVE_2', position: 3, color: 'purple' },
       ],
-      defaultValue: "UNASSIGNED",
+      defaultValue: "'UNASSIGNED'",
     },
     {
       universalIdentifier: 'ab3b68ff-a256-474f-a59d-c148ba58a602',
@@ -96,15 +96,14 @@ export default defineObject({
         { label: 'Follow Up 2', value: 'FOLLOW_UP_2', position: 2, color: 'orange' },
         { label: 'Follow Up 3', value: 'FOLLOW_UP_3', position: 3, color: 'red' },
       ],
-      defaultValue: "NONE",
+      defaultValue: "'NONE'",
     },
     {
       universalIdentifier: '9bdde85a-038b-4b2a-8884-6330ce1484f1',
       name: 'acknowledgmentSent',
       type: FieldType.BOOLEAN,
       label: 'Acknowledgment Sent',
-      defaultValue: "false",
+      defaultValue: "'false'",
     },
   ],
 });
-

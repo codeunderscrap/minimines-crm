@@ -288,7 +288,7 @@ const LeadsDashboard = () => {
               <div style={{ width: '1px', height: '24px', backgroundColor: BRAND.border, margin: '0 8px' }}></div>
               
               <a 
-                href="/object/lead"
+                href="/object/lead/new"
                 target="_parent"
                 style={{
                   display: 'inline-block',
