@@ -587,8 +587,8 @@ const MainPage = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '40px' }}>
             <StatCard label="Active Contracts" value={activeContracts.toString()} sub="Total Active" link="/objects/contracts" />
             <StatCard label="Active Shipments" value={data.exportShipments.length.toString()} sub="Total shipments recorded" link="/objects/exportShipments" />
-            <StatCard label="Open Opportunities" value={openOpportunities.toString()} sub="In Pipeline" link="/page/83b5f8a3-da06-4691-93a1-376c5de87e09" />
-            <StatCard label="Total Leads" value={totalLeadsCount.toString()} sub="New Prospects" link="/page/5bfac084-b742-465e-a848-b71479cc8707" />
+            <StatCard label="Open Opportunities" value={openOpportunities.toString()} sub="In Pipeline" link="/page/4f324362-46e8-45fd-b81a-f1b2e3b17e6b" />
+            <StatCard label="Total Leads" value={totalLeadsCount.toString()} sub="New Prospects" link="/page/210c2f1a-6ef4-4599-9027-60c70a118cef" />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px', alignItems: 'stretch' }}>
