@@ -29,3 +29,4 @@ export default defineObject({
     { universalIdentifier: '98e74564-3ff4-48f3-bc35-2f38cc2abf85', name: 'isAvailableForDomesticSale', type: FieldType.BOOLEAN, label: 'Available for Domestic Sale' }
   ]
 });
+

@@ -46,7 +46,7 @@ export default defineObject({
         { label: 'Won (Ready for Order)', value: 'WON', position: 2, color: 'green' },
         { label: 'Lost', value: 'LOST', position: 3, color: 'red' },
       ],
-      defaultValue: "'REQUIREMENTS'",
+      defaultValue: "REQUIREMENTS",
     },
     {
       universalIdentifier: '0739daf4-5a5d-4fed-9132-fef2eb371100',
@@ -56,3 +56,4 @@ export default defineObject({
     },
   ],
 });
+

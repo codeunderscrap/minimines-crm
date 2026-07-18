@@ -46,7 +46,7 @@ export default defineObject({
       name: 'status',
       type: FieldType.SELECT,
       label: 'Status',
-      defaultValue: "'UNANSWERED'",
+      defaultValue: "UNANSWERED",
       options: [
         { label: 'Unanswered', value: 'UNANSWERED', position: 0, color: 'red' },
         { label: 'Replied', value: 'REPLIED', position: 1, color: 'green' },
@@ -54,3 +54,4 @@ export default defineObject({
     },
   ],
 });
+
