@@ -422,7 +422,7 @@ const LeadsDashboard = () => {
               <div style={{ padding: '60px', textAlign: 'center', color: BRAND.text }}>
                 <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>📬</div>
                 <div style={{ fontSize: '18px', fontWeight: 500 }}>No leads available.</div>
-                <div style={{ marginTop: '8px' }}>Once your webhooks start firing, leads will appear here for allocation!</div>
+                <div style={{ marginTop: '8px' }}>Once leads are transferred here from SalesHub (or added directly), they'll appear here for allocation!</div>
               </div>
             )}
             
