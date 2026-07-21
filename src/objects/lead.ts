@@ -45,6 +45,7 @@ export default defineObject({
         { label: 'LinkedIn', value: 'LINKEDIN', position: 1, color: 'sky' },
         { label: 'Call', value: 'CALL', position: 2, color: 'green' },
         { label: 'Direct', value: 'DIRECT', position: 3, color: 'gray' },
+        { label: 'SalesHub', value: 'SALESHUB', position: 4, color: 'purple' },
       ],
     },
     {
