@@ -250,8 +250,18 @@ const ContractTracker = ({ contracts = [] }: { contracts: any[] }) => {
   if (!contract) return <div className="card">Error loading contract</div>;
 
   const totalQuantity = contract.totalQuantity || 0;
-  const fulfilledQuantity = Math.floor(totalQuantity * 0.4); 
+  const fulfilledQuantity = Math.floor(totalQuantity * 0.4);
   const progressPercent = totalQuantity > 0 ? (fulfilledQuantity / totalQuantity) * 100 : 0;
+
+  const startTime = contract.startDate ? new Date(contract.startDate).getTime() : null;
+  const endTime = contract.endDate ? new Date(contract.endDate).getTime() : null;
+  const now = Date.now();
+  let elapsedPercent = 0;
+  let timelineLabel = 'No dates set';
+  if (startTime && endTime && endTime > startTime) {
+    elapsedPercent = Math.max(0, Math.min(100, ((now - startTime) / (endTime - startTime)) * 100));
+    timelineLabel = now < startTime ? 'Not started yet' : now > endTime ? 'Contract ended' : `${Math.round(elapsedPercent)}% of duration elapsed`;
+  }
 
   return (
     <div className="card" style={{ gap: '16px', height: '100%' }}>
@@ -287,11 +297,15 @@ const ContractTracker = ({ contracts = [] }: { contracts: any[] }) => {
           <span>End: <strong style={{ color: BRAND.primary }}>{contract.endDate ? new Date(contract.endDate).toLocaleDateString() : 'N/A'}</strong></span>
         </div>
         
-        <div style={{ position: 'relative', width: '100%', height: '24px', backgroundColor: '#E0E0E0', borderRadius: '4px', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: 0, left: '10%', width: '60%', height: '100%', backgroundColor: BRAND.lightAccent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#FFF', fontWeight: 'bold', letterSpacing: '1px' }}>
-            ACTIVE DURATION
-          </div>
+        <div style={{ position: 'relative', width: '100%', height: '8px', backgroundColor: '#E0E0E0', borderRadius: '4px', margin: '18px 0 8px' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${elapsedPercent}%`, backgroundColor: BRAND.accent, borderRadius: '4px', transition: 'width 0.5s ease-out' }}></div>
+          <div style={{ position: 'absolute', top: '50%', left: 0, transform: 'translate(-50%, -50%)', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: BRAND.primary, border: '2px solid #FFF' }}></div>
+          <div style={{ position: 'absolute', top: '50%', left: '100%', transform: 'translate(-50%, -50%)', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: BRAND.lightAccent, border: '2px solid #FFF' }}></div>
+          {startTime && endTime && now >= startTime && now <= endTime && (
+            <div style={{ position: 'absolute', top: '50%', left: `${elapsedPercent}%`, transform: 'translate(-50%, -50%)', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: '#FFF', border: `3px solid ${BRAND.accent}` }} title="Today"></div>
+          )}
         </div>
+        <div style={{ textAlign: 'center', fontSize: '12px', fontWeight: 600, color: BRAND.secondary }}>{timelineLabel}</div>
       </div>
     </div>
   );
