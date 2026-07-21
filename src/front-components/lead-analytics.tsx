@@ -129,7 +129,7 @@ const LeadAnalytics = () => {
     const largeArc = angle > 180 ? 1 : 0;
     
     return {
-      src, count, color, percentage,
+      src, count: count as number, color, percentage,
       path: `M 0 0 L ${x1} ${y1} A 100 100 0 ${largeArc} 1 ${x2} ${y2} Z`
     };
   });

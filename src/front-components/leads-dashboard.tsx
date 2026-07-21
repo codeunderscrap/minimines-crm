@@ -71,7 +71,7 @@ const LeadsDashboard = () => {
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
   const [selectedExecutive, setSelectedExecutive] = useState('UNASSIGNED');
   const [isUpdating, setIsUpdating] = useState(false);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<React.ReactNode>(null);
 
   const loadData = async () => {
     setLoading(true);
