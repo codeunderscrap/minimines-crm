@@ -64,7 +64,7 @@ const fetchApi = async (path: string, method = 'GET', body: any = null) => {
 type Role = 'hod' | 'manager' | 'associate';
 
 const LeadsDashboard = () => {
-  const currentUserId = useUserId();
+  const rawUserId = useUserId();
   const [leads, setLeads] = useState<any[]>([]);
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,6 +86,15 @@ const LeadsDashboard = () => {
 
   useEffect(() => { loadData(); }, []);
 
+  const currentMember = useMemo(() => {
+    if (!rawUserId) return null;
+    return members.find((m: any) => m.id === rawUserId)
+      || members.find((m: any) => m.userId === rawUserId)
+      || null;
+  }, [rawUserId, members]);
+
+  const currentUserId = currentMember?.id || rawUserId;
+
   const roleFromJobTitle = (title: string): Role | null => {
     const t = (title || '').toLowerCase();
     if (t.includes('associate')) return 'associate';
@@ -105,12 +114,11 @@ const LeadsDashboard = () => {
     if (isAssoc && !isMgr) return 'associate';
     if (isMgr) return 'manager';
 
-    const me = members.find((m: any) => m.id === currentUserId);
-    const titleRole = roleFromJobTitle(me?.jobTitle);
+    const titleRole = roleFromJobTitle(currentMember?.jobTitle);
     if (titleRole) return titleRole;
 
     return 'hod';
-  }, [currentUserId, leads, members]);
+  }, [currentUserId, currentMember, leads]);
 
   const getMemberName = (id: string | null) => {
     if (!id) return null;

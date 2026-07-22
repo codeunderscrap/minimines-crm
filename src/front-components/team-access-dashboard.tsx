@@ -74,7 +74,7 @@ const relationId = (record: any, name: string): string | null => {
 };
 
 const TeamAccessDashboard = () => {
-  const currentUserId = useUserId();
+  const rawUserId = useUserId();
   const [tab, setTab] = useState<Tab>('people');
   const [members, setMembers] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
@@ -100,6 +100,15 @@ const TeamAccessDashboard = () => {
 
   useEffect(() => { load(); }, [load]);
 
+  const currentMember = useMemo(() => {
+    if (!rawUserId) return null;
+    return members.find((m: any) => m.id === rawUserId)
+      || members.find((m: any) => m.userId === rawUserId)
+      || null;
+  }, [rawUserId, members]);
+
+  const currentUserId = currentMember?.id || rawUserId;
+
   const roleFromJobTitle = (title: string): 'hod' | 'manager' | 'associate' | null => {
     const t = (title || '').toLowerCase();
     if (t.includes('associate')) return 'associate';
@@ -118,12 +127,11 @@ const TeamAccessDashboard = () => {
     );
     if (isMgr || isAssoc) return false;
 
-    const me = members.find((m: any) => m.id === currentUserId);
-    const titleRole = roleFromJobTitle(me?.jobTitle);
+    const titleRole = roleFromJobTitle(currentMember?.jobTitle);
     if (titleRole && titleRole !== 'hod') return false;
 
     return true;
-  }, [currentUserId, leads, members]);
+  }, [currentUserId, currentMember, leads]);
 
   if (!loading && !isHod) {
     return (
