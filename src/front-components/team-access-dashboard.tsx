@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { defineFrontComponent } from 'twenty-sdk/define';
+import { useUserId } from 'twenty-sdk/front-component';
 import { TEAM_ACCESS_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
 
 const BRAND = {
@@ -65,7 +66,15 @@ const StatCard = ({ label, value, color }: { label: string; value: number | stri
   </div>
 );
 
+const relationId = (record: any, name: string): string | null => {
+  const nested = record?.[name];
+  if (nested && typeof nested === 'object' && nested.id) return nested.id;
+  if (typeof nested === 'string') return nested;
+  return record?.[`${name}Id`] ?? null;
+};
+
 const TeamAccessDashboard = () => {
+  const currentUserId = useUserId();
   const [tab, setTab] = useState<Tab>('people');
   const [members, setMembers] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
@@ -90,6 +99,28 @@ const TeamAccessDashboard = () => {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  const isHod = useMemo(() => {
+    if (!currentUserId || leads.length === 0) return true;
+    const isMgr = leads.some((l: any) =>
+      relationId(l, 'assignedManagerPrimary') === currentUserId ||
+      relationId(l, 'assignedManagerSecondary') === currentUserId
+    );
+    const isAssoc = leads.some((l: any) =>
+      relationId(l, 'assignedAssociate') === currentUserId
+    );
+    return !isMgr && !isAssoc;
+  }, [currentUserId, leads]);
+
+  if (!loading && !isHod) {
+    return (
+      <div style={{ fontFamily: "'Barlow', sans-serif", display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh', flexDirection: 'column', gap: '12px', color: BRAND.text }}>
+        <div style={{ fontSize: '18px', fontWeight: 600, color: BRAND.primary }}>Admin Access Only</div>
+        <div style={{ fontSize: '14px' }}>This dashboard is available to HOD / Super Admin only.</div>
+        <a href="/objects/leads" target="_parent" style={{ marginTop: '8px', color: BRAND.accent, fontWeight: 600, fontSize: '14px' }}>Go to Leads</a>
+      </div>
+    );
+  }
 
   const showToast = (msg: string) => {
     setToast(msg);
