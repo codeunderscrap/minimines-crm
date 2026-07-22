@@ -86,8 +86,15 @@ const LeadsDashboard = () => {
 
   useEffect(() => { loadData(); }, []);
 
+  const roleFromJobTitle = (title: string): Role | null => {
+    const t = (title || '').toLowerCase();
+    if (t.includes('associate')) return 'associate';
+    if (t.includes('executive') || t.includes('manager')) return 'manager';
+    if (t.includes('head') || t.includes('hod') || t.includes('director') || t.includes('admin')) return 'hod';
+    return null;
+  };
+
   const role: Role = useMemo(() => {
-    if (!currentUserId || leads.length === 0) return 'hod';
     const isMgr = leads.some(l =>
       relationId(l, 'assignedManagerPrimary') === currentUserId ||
       relationId(l, 'assignedManagerSecondary') === currentUserId
@@ -97,8 +104,13 @@ const LeadsDashboard = () => {
     );
     if (isAssoc && !isMgr) return 'associate';
     if (isMgr) return 'manager';
+
+    const me = members.find((m: any) => m.id === currentUserId);
+    const titleRole = roleFromJobTitle(me?.jobTitle);
+    if (titleRole) return titleRole;
+
     return 'hod';
-  }, [currentUserId, leads]);
+  }, [currentUserId, leads, members]);
 
   const getMemberName = (id: string | null) => {
     if (!id) return null;

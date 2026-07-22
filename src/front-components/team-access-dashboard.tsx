@@ -100,8 +100,15 @@ const TeamAccessDashboard = () => {
 
   useEffect(() => { load(); }, [load]);
 
+  const roleFromJobTitle = (title: string): 'hod' | 'manager' | 'associate' | null => {
+    const t = (title || '').toLowerCase();
+    if (t.includes('associate')) return 'associate';
+    if (t.includes('executive') || t.includes('manager')) return 'manager';
+    if (t.includes('head') || t.includes('hod') || t.includes('director') || t.includes('admin')) return 'hod';
+    return null;
+  };
+
   const isHod = useMemo(() => {
-    if (!currentUserId || leads.length === 0) return true;
     const isMgr = leads.some((l: any) =>
       relationId(l, 'assignedManagerPrimary') === currentUserId ||
       relationId(l, 'assignedManagerSecondary') === currentUserId
@@ -109,8 +116,14 @@ const TeamAccessDashboard = () => {
     const isAssoc = leads.some((l: any) =>
       relationId(l, 'assignedAssociate') === currentUserId
     );
-    return !isMgr && !isAssoc;
-  }, [currentUserId, leads]);
+    if (isMgr || isAssoc) return false;
+
+    const me = members.find((m: any) => m.id === currentUserId);
+    const titleRole = roleFromJobTitle(me?.jobTitle);
+    if (titleRole && titleRole !== 'hod') return false;
+
+    return true;
+  }, [currentUserId, leads, members]);
 
   if (!loading && !isHod) {
     return (
@@ -179,6 +192,11 @@ const TeamAccessDashboard = () => {
     if (isMgr && isAssoc) return 'Multi-role';
     if (isMgr) return 'Manager';
     if (isAssoc) return 'Associate';
+
+    const titleRole = roleFromJobTitle(m?.jobTitle);
+    if (titleRole === 'associate') return 'Associate';
+    if (titleRole === 'manager') return 'Manager';
+
     return 'HOD';
   };
 
@@ -492,9 +510,9 @@ const TeamAccessDashboard = () => {
   };
 
   const renderHierarchy = () => {
-    const hodMembers = members.filter(m => !managerIds.has(m.id) && !associateIds.has(m.id));
-    const mgrMembers = members.filter(m => managerIds.has(m.id) && !associateIds.has(m.id));
-    const assocMembers = members.filter(m => associateIds.has(m.id));
+    const hodMembers = members.filter(m => inferRole(m) === 'HOD');
+    const mgrMembers = members.filter(m => inferRole(m) === 'Manager' || inferRole(m) === 'Multi-role');
+    const assocMembers = members.filter(m => inferRole(m) === 'Associate');
 
     const getAssociatesFor = (mgrId: string) => {
       const ids = new Set<string>();
