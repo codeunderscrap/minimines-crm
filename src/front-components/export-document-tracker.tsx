@@ -41,7 +41,7 @@ const FONTS = `
 `;
 
 const fetchTwenty = async (path: string) => {
-  const url = `http://localhost:3000/rest/${path}`;
+  const url = `https://api.twenty.com/rest/${path}`;
   const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU3MTIwLCJleHAiOjQ5Mzc5NTcxMTksImp0aSI6IjZkODliNmU5LTcwZmYtNGIwZS05MzUyLTk0ZTljMmJiOGQ5MyJ9.al8pc21Lc12mGgMEKu8GaWZDJytK55FjUx5_egt8jd3rAhUa0TpCfq7PAWoCDX5KUeqt2VrLN29QSfXHicnbzQ';
   
   try {
@@ -56,17 +56,26 @@ const fetchTwenty = async (path: string) => {
 
 const ExportDocumentTracker = () => {
   const recordId = useRecordId();
-  const [documents, setDocuments] = useState<any[]>([]);
+  const [allDocuments, setAllDocuments] = useState<any[]>([]);
+  const [shipments, setShipments] = useState<any[]>([]);
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
-      if (!recordId) return;
-      // Fetch documents related to this shipment
-      // We filter manually here since standard REST filter syntax might vary
+      setLoading(true);
+      // Fetch documents related to shipments — filtered client-side since
+      // standard REST filter syntax might vary.
       const allDocs = await fetchTwenty(`exportDocuments?limit=100`);
-      const relatedDocs = (Array.isArray(allDocs) ? allDocs : []).filter(d => d.exportShipmentId === recordId);
-      setDocuments(relatedDocs);
+      setAllDocuments(Array.isArray(allDocs) ? allDocs : []);
+
+      if (!recordId) {
+        // Standalone-page mode: no shipment in context, offer a picker.
+        const allShipments = await fetchTwenty(`exportShipments?limit=100`);
+        const items = Array.isArray(allShipments) ? allShipments : [];
+        setShipments(items);
+        if (items.length > 0) setSelectedShipmentId(items[0].id);
+      }
       setLoading(false);
     };
     loadData();
@@ -76,14 +85,32 @@ const ExportDocumentTracker = () => {
     return <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>Loading compliance checklist...</div>;
   }
 
+  const activeShipmentId = recordId || selectedShipmentId;
+
+  if (!recordId && shipments.length === 0) {
+    return <div style={{ padding: '40px', textAlign: 'center', fontFamily: "'Barlow', sans-serif", color: BRAND.text }}>No export shipments found.</div>;
+  }
+
+  const documents = allDocuments.filter(d => d.exportShipmentId === activeShipmentId);
   const REQUIRED_DOCS = ['EVD', 'FEMA', 'SCOMET', 'HSN', 'PACKING_NOTE', 'SHIPPING_BILL'];
 
   return (
     <>
       <style>{FONTS}</style>
       <div className="compliance-tracker">
-        <h2 className="h2">Compliance Documentation</h2>
-        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <h2 className="h2" style={{ margin: 0 }}>Compliance Documentation</h2>
+          {!recordId && shipments.length > 0 && (
+            <select
+              value={selectedShipmentId || ''}
+              onChange={(e) => setSelectedShipmentId(e.target.value)}
+              style={{ padding: '8px 12px', border: `1px solid ${BRAND.border}`, fontFamily: "'Barlow', sans-serif", fontSize: '14px', outline: 'none' }}
+            >
+              {shipments.map(s => <option key={s.id} value={s.id}>{s.name || s.vesselName || `Shipment ${(s.id || '').substring(0, 6)}`}</option>)}
+            </select>
+          )}
+        </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
           {REQUIRED_DOCS.map(docType => {
             const foundDoc = documents.find(d => d.documentType === docType);

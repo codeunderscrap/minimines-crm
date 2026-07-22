@@ -40,30 +40,54 @@ const FONTS = `
   }
 `;
 
-const fetchTwenty = async (path: string) => {
-  const url = `http://localhost:3000/rest/${path}`;
-  const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU3MTIwLCJleHAiOjQ5Mzc5NTcxMTksImp0aSI6IjZkODliNmU5LTcwZmYtNGIwZS05MzUyLTk0ZTljMmJiOGQ5MyJ9.al8pc21Lc12mGgMEKu8GaWZDJytK55FjUx5_egt8jd3rAhUa0TpCfq7PAWoCDX5KUeqt2VrLN29QSfXHicnbzQ';
-  
+const API_URL = 'https://api.twenty.com/rest';
+const API_HEADERS = {
+  Authorization: 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU3MTIwLCJleHAiOjQ5Mzc5NTcxMTksImp0aSI6IjZkODliNmU5LTcwZmYtNGIwZS05MzUyLTk0ZTljMmJiOGQ5MyJ9.al8pc21Lc12mGgMEKu8GaWZDJytK55FjUx5_egt8jd3rAhUa0TpCfq7PAWoCDX5KUeqt2VrLN29QSfXHicnbzQ',
+  'Content-Type': 'application/json',
+};
+
+const fetchList = async (path: string) => {
   try {
-    const res = await fetch(url, { headers: { Authorization: apiKey, 'Content-Type': 'application/json' } });
+    const res = await fetch(`${API_URL}/${path}`, { headers: API_HEADERS });
     const json = await res.json();
-    return json?.data?.items || json?.data || [];
+    const key = path.split('?')[0];
+    let items = json?.data?.[key] ?? [];
+    if (items && items.edges) items = items.edges.map((e: any) => e.node);
+    return Array.isArray(items) ? items : [];
   } catch (error) {
     console.error('Fetch error:', error);
     return [];
   }
 };
 
+const fetchOne = async (path: string, key: string) => {
+  try {
+    const res = await fetch(`${API_URL}/${path}`, { headers: API_HEADERS });
+    const json = await res.json();
+    return json?.data?.[key] ?? null;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return null;
+  }
+};
+
 const ProductDashboard = () => {
   const recordId = useRecordId();
-  const [product, setProduct] = useState<any>(null);
+  const [recordProduct, setRecordProduct] = useState<any>(null);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
-      if (!recordId) return;
-      const data = await fetchTwenty(`products/${recordId}`);
-      setProduct(data);
+      setLoading(true);
+      if (recordId) {
+        setRecordProduct(await fetchOne(`products/${recordId}`, 'product'));
+      } else {
+        const items = await fetchList('products?limit=100');
+        setAllProducts(items);
+        if (items.length > 0) setSelectedId(items[0].id);
+      }
       setLoading(false);
     };
     loadData();
@@ -73,6 +97,12 @@ const ProductDashboard = () => {
     return <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>Loading product specifications...</div>;
   }
 
+  if (!recordId && allProducts.length === 0) {
+    return <div style={{ padding: '40px', textAlign: 'center', fontFamily: "'Barlow', sans-serif", color: BRAND.text }}>No products found.</div>;
+  }
+
+  const product = recordId ? recordProduct : (allProducts.find(p => p.id === selectedId) || null);
+
   if (!product) {
     return <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>Could not load product details.</div>;
   }
@@ -81,8 +111,19 @@ const ProductDashboard = () => {
     <>
       <style>{FONTS}</style>
       <div className="product-dashboard">
-        <h2 className="h2">Product Specifications</h2>
-        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+          <h2 className="h2" style={{ margin: 0 }}>Product Specifications</h2>
+          {!recordId && allProducts.length > 0 && (
+            <select
+              value={selectedId || ''}
+              onChange={(e) => setSelectedId(e.target.value)}
+              style={{ padding: '8px 12px', border: `1px solid ${BRAND.border}`, fontFamily: "'Barlow', sans-serif", fontSize: '14px', outline: 'none' }}
+            >
+              {allProducts.map(p => <option key={p.id} value={p.id}>{p.materialName || p.sku || `Product ${(p.id || '').substring(0, 6)}`}</option>)}
+            </select>
+          )}
+        </div>
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginTop: '16px' }}>
            <div style={{ padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: `1px solid ${BRAND.border}` }}>
               <div style={{ fontSize: '12px', textTransform: 'uppercase', color: BRAND.text }}>Material SKU</div>

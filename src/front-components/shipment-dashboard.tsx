@@ -14,31 +14,48 @@ const BRAND = {
   bg: '#F9F9F9',
 };
 
+const API_HEADERS = {
+  'Authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU3MTIwLCJleHAiOjQ5Mzc5NTcxMTksImp0aSI6IjZkODliNmU5LTcwZmYtNGIwZS05MzUyLTk0ZTljMmJiOGQ5MyJ9.al8pc21Lc12mGgMEKu8GaWZDJytK55FjUx5_egt8jd3rAhUa0TpCfq7PAWoCDX5KUeqt2VrLN29QSfXHicnbzQ'
+};
+
 const ShipmentDashboard = () => {
   const recordId = useRecordId();
-  const [shipment, setShipment] = useState<any>(null);
+  const [recordShipment, setRecordShipment] = useState<any>(null);
+  const [allShipments, setAllShipments] = useState<any[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!recordId) return;
-    
-    const fetchShipment = async () => {
-      try {
-        const response = await fetch(`https://api.twenty.com/rest/exportShipments/${recordId}`, {
-          headers: {
-            'Authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU3MTIwLCJleHAiOjQ5Mzc5NTcxMTksImp0aSI6IjZkODliNmU5LTcwZmYtNGIwZS05MzUyLTk0ZTljMmJiOGQ5MyJ9.al8pc21Lc12mGgMEKu8GaWZDJytK55FjUx5_egt8jd3rAhUa0TpCfq7PAWoCDX5KUeqt2VrLN29QSfXHicnbzQ'
-          }
-        });
-        const json = await response.json();
-        if (json.data && json.data.exportShipment) {
-          setShipment(json.data.exportShipment);
+    const load = async () => {
+      if (recordId) {
+        try {
+          const response = await fetch(`https://api.twenty.com/rest/exportShipments/${recordId}`, { headers: API_HEADERS });
+          const json = await response.json();
+          if (json.data && json.data.exportShipment) setRecordShipment(json.data.exportShipment);
+        } catch (err) {
+          console.error('Failed to load shipment', err);
         }
-      } catch (err) {
-        console.error('Failed to load shipment', err);
+      } else {
+        try {
+          const response = await fetch('https://api.twenty.com/rest/exportShipments?orderBy=createdAt,desc&limit=100', { headers: API_HEADERS });
+          const json = await response.json();
+          let items = json.data?.exportShipments || [];
+          if (items && items.edges) items = items.edges.map((e: any) => e.node);
+          if (!Array.isArray(items)) items = [];
+          setAllShipments(items);
+          if (items.length > 0) setSelectedId(items[0].id);
+        } catch (err) {
+          console.error('Failed to load shipments', err);
+        }
       }
     };
-    fetchShipment();
+    load();
   }, [recordId]);
 
+  const shipment = recordId ? recordShipment : (allShipments.find(s => s.id === selectedId) || null);
+
+  if (!recordId && allShipments.length === 0) {
+    return <div style={{ padding: '40px', textAlign: 'center', fontFamily: "'Barlow', sans-serif", color: BRAND.text }}>No export shipments found.</div>;
+  }
   if (!shipment) return null;
 
   const steps = [
@@ -59,8 +76,19 @@ const ShipmentDashboard = () => {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=Barlow:wght@400;500;600&family=Roboto+Slab:wght@400;500&display=swap');
       `}</style>
-      <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '24px', color: BRAND.primary, textTransform: 'uppercase', margin: '0 0 16px 0' }}>Logistics Tracker</h2>
-      
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+        <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '24px', color: BRAND.primary, textTransform: 'uppercase', margin: 0 }}>Logistics Tracker</h2>
+        {!recordId && allShipments.length > 0 && (
+          <select
+            value={selectedId || ''}
+            onChange={(e) => setSelectedId(e.target.value)}
+            style={{ padding: '8px 12px', border: `1px solid ${BRAND.border}`, fontFamily: "'Barlow', sans-serif", fontSize: '14px', outline: 'none' }}
+          >
+            {allShipments.map(s => <option key={s.id} value={s.id}>{s.name || s.vesselName || `Shipment ${(s.id || '').substring(0, 6)}`}</option>)}
+          </select>
+        )}
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
         {/* Info Card */}
         <div style={{ backgroundColor: BRAND.bg, padding: '16px', border: `1px solid ${BRAND.border}` }}>
