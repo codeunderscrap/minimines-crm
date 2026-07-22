@@ -1,6 +1,18 @@
 import { defineFrontComponent } from 'twenty-sdk/define';
+import { useUserId } from 'twenty-sdk/front-component';
 import React, { useState, useEffect } from 'react';
 import { LEADS_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+
+// Reads a relation field defensively: the REST API may return either the
+// flat join-column id (e.g. `assignedAssociateId`) or a nested object
+// (e.g. `assignedAssociate: { id, name }`) depending on requested depth —
+// this hasn't been verified live yet, see the "My Leads / My Team" filter.
+const relationId = (lead: any, relationName: string): string | null => {
+  const nested = lead?.[relationName];
+  if (nested && typeof nested === 'object' && nested.id) return nested.id;
+  if (typeof nested === 'string') return nested;
+  return lead?.[`${relationName}Id`] ?? null;
+};
 
 const BRAND = {
   primary: '#001B2E',
@@ -66,12 +78,18 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
 };
 
 const LeadsDashboard = () => {
+  const currentUserId = useUserId();
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
   const [selectedExecutive, setSelectedExecutive] = useState('UNASSIGNED');
   const [isUpdating, setIsUpdating] = useState(false);
   const [successMsg, setSuccessMsg] = useState<React.ReactNode>(null);
+  // Convenience view only — not a security boundary. Custom dashboards
+  // authenticate as the app itself, not the viewer, so this can't rely on
+  // Twenty's row-level rules the way native object pages do; it just hides
+  // rows client-side for a tidier view.
+  const [viewMode, setViewMode] = useState<'all' | 'mine' | 'team'>('all');
 
   const loadData = async () => {
     setLoading(true);
@@ -84,6 +102,18 @@ const LeadsDashboard = () => {
     loadData();
   }, []);
 
+  const visibleLeads = leads.filter(lead => {
+    if (viewMode === 'all' || !currentUserId) return true;
+    if (viewMode === 'mine') return relationId(lead, 'assignedAssociate') === currentUserId;
+    if (viewMode === 'team') {
+      return (
+        relationId(lead, 'assignedManagerPrimary') === currentUserId ||
+        relationId(lead, 'assignedManagerSecondary') === currentUserId
+      );
+    }
+    return true;
+  });
+
   const toggleLeadSelection = (id: string) => {
     const newSelection = new Set(selectedLeadIds);
     if (newSelection.has(id)) {
@@ -95,10 +125,10 @@ const LeadsDashboard = () => {
   };
 
   const selectAll = () => {
-    if (selectedLeadIds.size === leads.length) {
+    if (selectedLeadIds.size === visibleLeads.length) {
       setSelectedLeadIds(new Set());
     } else {
-      setSelectedLeadIds(new Set(leads.map(l => l.id)));
+      setSelectedLeadIds(new Set(visibleLeads.map(l => l.id)));
     }
   };
 
@@ -248,10 +278,26 @@ const LeadsDashboard = () => {
             </div>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <select
+                value={viewMode}
+                onChange={e => { setViewMode(e.target.value as 'all' | 'mine' | 'team'); setSelectedLeadIds(new Set()); }}
+                title="Convenience view only — filters this list client-side, not a security restriction"
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: '4px',
+                  border: `1px solid ${BRAND.border}`,
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: '14px'
+                }}
+              >
+                <option value="all">View: All Leads</option>
+                <option value="mine">View: My Leads</option>
+                <option value="team">View: My Team</option>
+              </select>
               <div style={{ color: BRAND.primary, fontWeight: 600 }}>
                 {selectedLeadIds.size} Leads Selected
               </div>
-              <select 
+              <select
                 value={selectedExecutive}
                 onChange={e => setSelectedExecutive(e.target.value)}
                 style={{ 
@@ -313,9 +359,9 @@ const LeadsDashboard = () => {
             {/* Table Header */}
             <div style={{ display: 'grid', gridTemplateColumns: '40px 2fr 1.5fr 1fr 1fr 1fr 2fr', gap: '16px', padding: '16px 24px', backgroundColor: BRAND.bg, borderBottom: `1px solid ${BRAND.border}`, fontWeight: 600, color: BRAND.primary }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <input 
-                  type="checkbox" 
-                  checked={leads.length > 0 && selectedLeadIds.size === leads.length}
+                <input
+                  type="checkbox"
+                  checked={visibleLeads.length > 0 && selectedLeadIds.size === visibleLeads.length}
                   onChange={selectAll}
                   style={{ cursor: 'pointer', width: '16px', height: '16px' }}
                 />
@@ -329,7 +375,7 @@ const LeadsDashboard = () => {
             </div>
 
             {/* Table Body */}
-            {leads.map(lead => {
+            {visibleLeads.map(lead => {
               const isSelected = selectedLeadIds.has(lead.id);
               
               return (
@@ -418,11 +464,17 @@ const LeadsDashboard = () => {
               );
             })}
 
-            {leads.length === 0 && (
+            {visibleLeads.length === 0 && (
               <div style={{ padding: '60px', textAlign: 'center', color: BRAND.text }}>
                 <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>📬</div>
-                <div style={{ fontSize: '18px', fontWeight: 500 }}>No leads available.</div>
-                <div style={{ marginTop: '8px' }}>Once leads are transferred here from SalesHub (or added directly), they'll appear here for allocation!</div>
+                <div style={{ fontSize: '18px', fontWeight: 500 }}>
+                  {leads.length === 0 ? 'No leads available.' : 'No leads match this view.'}
+                </div>
+                <div style={{ marginTop: '8px' }}>
+                  {leads.length === 0
+                    ? "Once leads are transferred here from SalesHub (or added directly), they'll appear here for allocation!"
+                    : 'Try switching the view filter above.'}
+                </div>
               </div>
             )}
             
