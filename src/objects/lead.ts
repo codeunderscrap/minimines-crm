@@ -1,8 +1,22 @@
-import { defineObject, FieldType } from 'twenty-sdk/define';
+import {
+  defineObject,
+  FieldType,
+  RelationType,
+  OnDeleteAction,
+  STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS,
+} from 'twenty-sdk/define';
 import {
   LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
   LEAD_DEPARTMENT_FIELD_UNIVERSAL_IDENTIFIER,
+  LEAD_ASSIGNED_ASSOCIATE_FIELD_UNIVERSAL_IDENTIFIER,
+  LEAD_ASSIGNED_ASSOCIATE_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+  LEAD_ASSIGNED_MANAGER_PRIMARY_FIELD_UNIVERSAL_IDENTIFIER,
+  LEAD_ASSIGNED_MANAGER_PRIMARY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+  LEAD_ASSIGNED_MANAGER_SECONDARY_FIELD_UNIVERSAL_IDENTIFIER,
+  LEAD_ASSIGNED_MANAGER_SECONDARY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
 } from '../constants/universal-identifiers';
+
+const WORKSPACE_MEMBER = STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.workspaceMember;
 
 export default defineObject({
   nameSingular: 'lead',
@@ -114,6 +128,50 @@ export default defineObject({
         { label: 'Sales', value: 'SALES', position: 0, color: 'blue' },
         { label: 'BD', value: 'BD', position: 1, color: 'green' },
       ],
+    },
+    // Relation fields backing the HOD -> Manager -> Associate row-level
+    // scoping (see src/roles/associate-role.ts, src/roles/manager-role.ts).
+    // onDelete SET_NULL so removing a workspace member never deletes leads.
+    {
+      universalIdentifier: LEAD_ASSIGNED_ASSOCIATE_FIELD_UNIVERSAL_IDENTIFIER,
+      name: 'assignedAssociate',
+      type: FieldType.RELATION,
+      label: 'Assigned Associate',
+      relationTargetObjectMetadataUniversalIdentifier: WORKSPACE_MEMBER.universalIdentifier,
+      relationTargetFieldMetadataUniversalIdentifier: LEAD_ASSIGNED_ASSOCIATE_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'assignedAssociateId',
+      },
+    },
+    {
+      universalIdentifier: LEAD_ASSIGNED_MANAGER_PRIMARY_FIELD_UNIVERSAL_IDENTIFIER,
+      name: 'assignedManagerPrimary',
+      type: FieldType.RELATION,
+      label: 'Assigned Manager',
+      relationTargetObjectMetadataUniversalIdentifier: WORKSPACE_MEMBER.universalIdentifier,
+      relationTargetFieldMetadataUniversalIdentifier: LEAD_ASSIGNED_MANAGER_PRIMARY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'assignedManagerPrimaryId',
+      },
+    },
+    {
+      // Only set when the Associate reports to a second Manager at the same
+      // time (e.g. Aditya, who reports to both Manish Chauhan and Hanuman).
+      universalIdentifier: LEAD_ASSIGNED_MANAGER_SECONDARY_FIELD_UNIVERSAL_IDENTIFIER,
+      name: 'assignedManagerSecondary',
+      type: FieldType.RELATION,
+      label: 'Assigned Manager (secondary)',
+      relationTargetObjectMetadataUniversalIdentifier: WORKSPACE_MEMBER.universalIdentifier,
+      relationTargetFieldMetadataUniversalIdentifier: LEAD_ASSIGNED_MANAGER_SECONDARY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'assignedManagerSecondaryId',
+      },
     },
   ],
 });

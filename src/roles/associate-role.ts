@@ -1,18 +1,22 @@
-import { defineRole } from 'twenty-sdk/define';
+import { defineRole, RowLevelPermissionPredicateOperand, STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from 'twenty-sdk/define';
 import {
   ASSOCIATE_ROLE_UNIVERSAL_IDENTIFIER,
   LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
+  LEAD_ASSIGNED_ASSOCIATE_FIELD_UNIVERSAL_IDENTIFIER,
+  ASSOCIATE_ROLE_OWNERSHIP_PREDICATE_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
+
+const WORKSPACE_MEMBER = STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.workspaceMember;
 
 /**
  * Associate — bottom tier of HOD -> Manager -> Associate. Least-privilege
  * by default: no blanket access, just Lead (their working object) with
- * read/update, no delete. Ownership scoping ("only leads assigned to me")
- * and the department dashboard restriction are added once
- * Lead.assignedAssociate and the Department field exist (next stages) —
- * a row-level predicate can't reference a field that isn't defined yet.
- * Per-named-person field masking (§6 of the proposal) is a later, custom
- * addition on top of this, not a native role permission.
+ * read/update, no delete, and row-level-scoped to leads assigned to them
+ * specifically. The department-dashboard restriction is a sidebar/UI
+ * concern, not a permission — handled by which nav items an Associate's
+ * account has, not by this role. Per-named-person field masking (§6 of
+ * the proposal) is a later, custom addition on top of this, not a native
+ * role permission.
  */
 export default defineRole({
   universalIdentifier: ASSOCIATE_ROLE_UNIVERSAL_IDENTIFIER,
@@ -33,4 +37,15 @@ export default defineRole({
     },
   ],
   fieldPermissions: [],
+  // "Only leads assigned to me" — Lead.assignedAssociate IS the
+  // current workspace member.
+  rowLevelPermissionPredicates: [
+    {
+      universalIdentifier: ASSOCIATE_ROLE_OWNERSHIP_PREDICATE_UNIVERSAL_IDENTIFIER,
+      objectUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
+      fieldUniversalIdentifier: LEAD_ASSIGNED_ASSOCIATE_FIELD_UNIVERSAL_IDENTIFIER,
+      operand: RowLevelPermissionPredicateOperand.IS,
+      workspaceMemberFieldUniversalIdentifier: WORKSPACE_MEMBER.fields.id.universalIdentifier,
+    },
+  ],
 });
