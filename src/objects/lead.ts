@@ -1,5 +1,8 @@
 import { defineObject, FieldType } from 'twenty-sdk/define';
-import { LEAD_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+import {
+  LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
+  LEAD_DEPARTMENT_FIELD_UNIVERSAL_IDENTIFIER,
+} from '../constants/universal-identifiers';
 
 export default defineObject({
   nameSingular: 'lead',
@@ -101,6 +104,16 @@ export default defineObject({
       name: 'acknowledgmentSent',
       type: FieldType.BOOLEAN,
       label: 'Acknowledgment Sent',
+    },
+    {
+      universalIdentifier: LEAD_DEPARTMENT_FIELD_UNIVERSAL_IDENTIFIER,
+      name: 'department',
+      type: FieldType.SELECT,
+      label: 'Department',
+      options: [
+        { label: 'Sales', value: 'SALES', position: 0, color: 'blue' },
+        { label: 'BD', value: 'BD', position: 1, color: 'green' },
+      ],
     },
   ],
 });

@@ -1,6 +1,5 @@
 import { defineFrontComponent } from 'twenty-sdk/define';
 import React, { useEffect, useState } from 'react';
-import { LME_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
 
 const BRAND = {
   primary: '#001B2E',
@@ -28,7 +27,7 @@ interface Rate {
 }
 
 export default defineFrontComponent({
-  universalIdentifier: LME_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '8c9c7f1a-b620-4a8f-b98a-12e9b038c11f',
   name: 'LmeDashboardWidget',
   description: 'A beautiful dashboard widget displaying LME rates',
   component: () => {
