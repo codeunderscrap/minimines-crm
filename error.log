@@ -1,0 +1,5 @@
+Sync failed with 2 errors
+fieldMetadata: 2 errors
+  1. FIELD_METADATA_NOT_FOUND: Relation field target metadata not found in both existing and about to be created field metadatas (universalIdentifier: c4d8a2f6-1b5e-4c7d-b9f3-2e7a4c8d2f1b)
+  2. FIELD_METADATA_NOT_FOUND: Relation field target metadata not found in both existing and about to be created field metadatas (universalIdentifier: a3c7f1b9-5e2d-4a8c-b6f4-7d1e3c9f5a2b)
+@codeunderscrap ➜ /workspaces/minimines-crm (main) $ 
