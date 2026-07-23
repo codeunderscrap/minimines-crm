@@ -1,5 +1,6 @@
 import { defineFrontComponent } from 'twenty-sdk/define';
 import React, { useEffect, useState } from 'react';
+import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
 const BRAND = {
   primary: '#001B2E',
@@ -31,10 +32,10 @@ export default defineFrontComponent({
   name: 'LmeDashboardWidget',
   description: 'A beautiful dashboard widget displaying LME rates',
   component: () => {
+    const userRole = useUserRole();
     const [rates, setRates] = useState<Rate[]>([]);
-    
+
     useEffect(() => {
-      // Fetch realistic mock data if DB is empty
       setRates([
         { id: 1, metal: 'Aluminium', date: new Date().toLocaleDateString(), rate: '$2,450.50', trend: '+1.2%' },
         { id: 2, metal: 'Copper', date: new Date().toLocaleDateString(), rate: '$9,840.00', trend: '-0.5%' },
@@ -44,6 +45,9 @@ export default defineFrontComponent({
         { id: 6, metal: 'Tin', date: new Date().toLocaleDateString(), rate: '$32,100.00', trend: '+2.5%' }
       ]);
     }, []);
+
+    if (userRole === null) return <RoleLoading />;
+    if (userRole === 'associate') return <AccessDenied minRole="manager" />;
 
     return (
       <div style={{

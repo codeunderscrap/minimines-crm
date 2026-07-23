@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { useRecordId } from 'twenty-sdk/front-component';
 import { QUOTATION_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
 const BRAND = {
   primary: '#001B2E',
@@ -12,37 +13,21 @@ const BRAND = {
   white: '#FFFFFF',
   border: '#EAEAEA',
   bg: '#F9F9F9',
-  green: '#2E8B57',
-  red: '#D32F2F',
-  orange: '#F57C00',
-  gray: '#9E9E9E'
+  green: '#10b981',
+  red: '#ef4444',
+  yellow: '#f59e0b',
+  blue: '#3b82f6',
+  gray: '#9CA3AF',
 };
 
 const FONTS = `
   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=Roboto+Slab:wght@400&family=Barlow:wght@400;500;600&display=swap');
-  
-  .quotation-dashboard {
-    font-family: 'Barlow', sans-serif;
-    color: ${BRAND.text};
-    background: ${BRAND.white};
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 27, 46, 0.04);
-    border: 1px solid ${BRAND.border};
-  }
-
-  .h2 {
-    font-family: 'Barlow Condensed', sans-serif;
-    color: ${BRAND.primary};
-    text-transform: uppercase;
-    font-size: 24px;
-    margin: 0 0 16px 0;
-  }
 `;
 
 const API_URL = 'https://api.twenty.com/rest';
 const API_HEADERS = {
-  Authorization: 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU3MTIwLCJleHAiOjQ5Mzc5NTcxMTksImp0aSI6IjZkODliNmU5LTcwZmYtNGIwZS05MzUyLTk0ZTljMmJiOGQ5MyJ9.al8pc21Lc12mGgMEKu8GaWZDJytK55FjUx5_egt8jd3rAhUa0TpCfq7PAWoCDX5KUeqt2VrLN29QSfXHicnbzQ',
+  Authorization:
+    'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU3MTIwLCJleHAiOjQ5Mzc5NTcxMTksImp0aSI6IjZkODliNmU5LTcwZmYtNGIwZS05MzUyLTk0ZTljMmJiOGQ5MyJ9.al8pc21Lc12mGgMEKu8GaWZDJytK55FjUx5_egt8jd3rAhUa0TpCfq7PAWoCDX5KUeqt2VrLN29QSfXHicnbzQ',
   'Content-Type': 'application/json',
 };
 
@@ -54,144 +39,243 @@ const fetchList = async (path: string) => {
     let items = json?.data?.[key] ?? [];
     if (items && items.edges) items = items.edges.map((e: any) => e.node);
     return Array.isArray(items) ? items : [];
-  } catch (error) {
-    console.error('Fetch error:', error);
+  } catch {
     return [];
   }
 };
 
-const fetchOne = async (path: string, key: string) => {
-  try {
-    const res = await fetch(`${API_URL}/${path}`, { headers: API_HEADERS });
-    const json = await res.json();
-    return json?.data?.[key] ?? null;
-  } catch (error) {
-    console.error('Fetch error:', error);
-    return null;
+const STEPS = [
+  { id: 'DRAFT', label: 'Draft', color: '#9CA3AF' },
+  { id: 'HOD_REVIEW', label: 'HOD Review', color: '#f59e0b' },
+  { id: 'CEO_APPROVED', label: 'CEO Approved', color: '#3b82f6' },
+  { id: 'CONVERTED_TO_ORDER', label: 'Converted', color: '#10b981' },
+];
+
+const getStepIndex = (status: string) => {
+  const idx = STEPS.findIndex((s) => s.id === status);
+  return idx >= 0 ? idx : 0;
+};
+
+const getStatusColor = (status: string) => {
+  if (status === 'REJECTED') return BRAND.red;
+  const step = STEPS.find((s) => s.id === status);
+  return step?.color || BRAND.gray;
+};
+
+const StatCard = ({ title, value, color }: { title: string; value: string | number; color: string }) => (
+  <div style={{ backgroundColor: BRAND.white, padding: '16px 20px', borderRadius: '8px', border: `1px solid ${BRAND.border}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: `${color}18`, color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 700 }}>
+      {typeof value === 'number' ? value : '#'}
+    </div>
+    <div>
+      <div style={{ fontSize: '11px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600, letterSpacing: '0.5px' }}>{title}</div>
+      <div style={{ fontSize: '22px', fontWeight: 700, color: BRAND.primary, fontFamily: "'Barlow Condensed', sans-serif" }}>{value}</div>
+    </div>
+  </div>
+);
+
+const ApprovalStepper = ({ status }: { status: string }) => {
+  const currentIdx = getStepIndex(status);
+  const isRejected = status === 'REJECTED';
+  if (isRejected) {
+    return (
+      <div style={{ backgroundColor: '#fef2f2', border: `1px solid ${BRAND.red}`, padding: '12px 16px', borderRadius: '6px', color: BRAND.red, fontWeight: 600, fontSize: '13px' }}>
+        REJECTED
+      </div>
+    );
   }
+  const progressPercent = (currentIdx / Math.max(STEPS.length - 1, 1)) * 100;
+  return (
+    <div style={{ position: 'relative', padding: '8px 0 0' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
+        <div style={{ position: 'absolute', top: '11px', left: 0, right: 0, height: '3px', backgroundColor: '#E0E0E0', zIndex: 0 }}>
+          <div style={{ width: `${progressPercent}%`, height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.4s' }}></div>
+        </div>
+        {STEPS.map((step, i) => {
+          const isActive = i <= currentIdx;
+          return (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1, gap: '6px' }}>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: isActive ? BRAND.accent : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF', fontSize: '11px', fontWeight: 700 }}>
+                {i + 1}
+              </div>
+              <div style={{ fontSize: '10px', fontWeight: isActive ? 600 : 400, color: isActive ? BRAND.primary : BRAND.text, textAlign: 'center', width: '60px' }}>
+                {step.label}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
 
 const QuotationDashboard = () => {
+  const userRole = useUserRole();
   const recordId = useRecordId();
-  const [recordQuotation, setRecordQuotation] = useState<any>(null);
   const [allQuotations, setAllQuotations] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (recordId) {
+      setSelectedId(recordId);
+    }
     const loadData = async () => {
       setLoading(true);
-      if (recordId) {
-        setRecordQuotation(await fetchOne(`quotations/${recordId}`, 'quotation'));
-      } else {
-        const items = await fetchList('quotations?limit=100');
-        setAllQuotations(items);
-        if (items.length > 0) setSelectedId(items[0].id);
-      }
+      const items = await fetchList('quotations?limit=200');
+      setAllQuotations(items);
       setLoading(false);
     };
     loadData();
   }, [recordId]);
 
+  if (!recordId && userRole === null) return <RoleLoading />;
+  if (!recordId && userRole === 'associate') return <AccessDenied minRole="manager" />;
+
   if (loading) {
-    return <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>Loading quotation workflow...</div>;
+    return <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>Loading quotations...</div>;
   }
 
-  if (!recordId && allQuotations.length === 0) {
-    return <div style={{ padding: '40px', textAlign: 'center', fontFamily: "'Barlow', sans-serif", color: BRAND.text }}>No quotations found.</div>;
-  }
+  const selected = selectedId ? allQuotations.find((q) => q.id === selectedId) : null;
 
-  const quotation = recordId ? recordQuotation : (allQuotations.find(q => q.id === selectedId) || null);
+  const totalCount = allQuotations.length;
+  const pendingReview = allQuotations.filter((q) => q.approvalStatus === 'HOD_REVIEW').length;
+  const approved = allQuotations.filter((q) => q.approvalStatus === 'CEO_APPROVED').length;
+  const converted = allQuotations.filter((q) => q.approvalStatus === 'CONVERTED_TO_ORDER').length;
+  const rejected = allQuotations.filter((q) => q.approvalStatus === 'REJECTED').length;
 
-  if (!quotation) {
-    return <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>Could not load quotation details.</div>;
-  }
-
-  const status = quotation.approvalStatus || 'DRAFT';
-  const steps = [
-    { id: 'DRAFT', label: 'Draft' },
-    { id: 'HOD_REVIEW', label: 'HOD Review' },
-    { id: 'CEO_APPROVED', label: 'CEO Approved' },
-    { id: 'CONVERTED_TO_ORDER', label: 'Converted to Order' },
-  ];
-
-  let currentStepIndex = steps.findIndex(s => s.id === status);
-  if (currentStepIndex === -1 && status === 'REJECTED') {
-    currentStepIndex = steps.length; // Max out progress but color red
-  } else if (currentStepIndex === -1) {
-    currentStepIndex = 0;
-  }
-
-  const isRejected = status === 'REJECTED';
-  const progressPercent = (currentStepIndex / (steps.length - 1)) * 100;
+  const gridCols = '1.2fr 1fr 0.7fr 0.8fr 1fr 1.2fr';
 
   return (
     <>
       <style>{FONTS}</style>
-      <div className="quotation-dashboard">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <h2 className="h2" style={{ margin: 0 }}>Approval Workflow</h2>
-          {!recordId && allQuotations.length > 0 && (
-            <select
-              value={selectedId || ''}
-              onChange={(e) => setSelectedId(e.target.value)}
-              style={{ padding: '8px 12px', border: `1px solid ${BRAND.border}`, fontFamily: "'Barlow', sans-serif", fontSize: '14px', outline: 'none' }}
-            >
-              {allQuotations.map(q => <option key={q.id} value={q.id}>{q.quoteNumber || `Quotation ${(q.id || '').substring(0, 6)}`}</option>)}
-            </select>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', fontFamily: "'Barlow', sans-serif", backgroundColor: BRAND.bg }}>
+
+        {/* Header */}
+        <div style={{ padding: '20px 24px 16px', borderBottom: `1px solid ${BRAND.border}`, backgroundColor: BRAND.white, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '26px', color: BRAND.primary, margin: 0, textTransform: 'uppercase' }}>
+              Quotation Dashboard
+            </h1>
+            <div style={{ fontSize: '13px', color: BRAND.text, marginTop: '2px' }}>
+              Domestic quotation approval workflow &amp; tracking
+            </div>
+          </div>
+          <a href="/objects/quotations" target="_parent" style={{ display: 'inline-block', textDecoration: 'none', backgroundColor: BRAND.primary, color: BRAND.white, padding: '8px 16px', borderRadius: '4px', fontWeight: 600, fontSize: '13px' }}>
+            View All Records
+          </a>
+        </div>
+
+        {/* Detail / Summary Panel — top 30% */}
+        <div style={{ flex: '0 0 auto', padding: '16px 24px', backgroundColor: BRAND.white, borderBottom: `1px solid ${BRAND.border}` }}>
+          {selected ? (
+            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px', alignItems: 'start' }}>
+              {/* Left: Approval stepper */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: BRAND.primary }}>
+                    {selected.quoteNumber || `Quote ${(selected.id || '').substring(0, 8)}`}
+                  </div>
+                  <button onClick={() => setSelectedId(null)} style={{ background: 'none', border: `1px solid ${BRAND.border}`, padding: '4px 10px', borderRadius: '4px', fontSize: '11px', color: BRAND.text, cursor: 'pointer' }}>
+                    Back to Summary
+                  </button>
+                </div>
+                <ApprovalStepper status={selected.approvalStatus || 'DRAFT'} />
+              </div>
+              {/* Right: Key details */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
+                  <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Quote #</div>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{selected.quoteNumber || 'N/A'}</div>
+                </div>
+                <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
+                  <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Buyer</div>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{selected.buyerCompanyId ? (selected.buyerCompanyId).substring(0, 8) + '...' : 'N/A'}</div>
+                </div>
+                <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
+                  <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Quantity</div>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{selected.quantity || 0} MT</div>
+                </div>
+                <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
+                  <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Rate (INR)</div>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{'₹'}{Number(selected.proposedRate || 0).toLocaleString()}</div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
+              <StatCard title="Total Quotations" value={totalCount} color={BRAND.accent} />
+              <StatCard title="Pending HOD Review" value={pendingReview} color={BRAND.yellow} />
+              <StatCard title="CEO Approved" value={approved} color={BRAND.blue} />
+              <StatCard title="Converted to Order" value={converted} color={BRAND.green} />
+              <StatCard title="Rejected" value={rejected} color={BRAND.red} />
+            </div>
           )}
         </div>
 
-        {isRejected ? (
-          <div style={{ backgroundColor: '#ffebee', border: `1px solid ${BRAND.red}`, padding: '16px', borderRadius: '4px', color: BRAND.red, fontWeight: 600 }}>
-            This Quotation was REJECTED.
+        {/* Table — bottom 70% */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '0 24px 16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: '12px', padding: '12px 16px', backgroundColor: BRAND.primary, color: BRAND.white, fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', borderRadius: '6px 6px 0 0', marginTop: '16px' }}>
+            <div>Quote #</div>
+            <div>Product ID</div>
+            <div>Qty (MT)</div>
+            <div>Rate (INR)</div>
+            <div>Status</div>
+            <div>Approval Progress</div>
           </div>
-        ) : (
-          <div style={{ position: 'relative', padding: '20px 0 40px 0', marginTop: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
-              <div style={{ position: 'absolute', top: '14px', left: '0', right: '0', height: '4px', backgroundColor: '#E0E0E0', zIndex: 0 }}>
-                <div style={{ width: `${progressPercent}%`, height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.5s ease-out' }}></div>
-              </div>
-              {steps.map((step, i) => {
-                const isActive = i <= currentStepIndex;
-                const isCurrent = i === currentStepIndex;
-                return (
-                  <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1, gap: '10px' }}>
-                    <div style={{ 
-                      width: isCurrent ? '32px' : '28px', 
-                      height: isCurrent ? '32px' : '28px', 
-                      borderRadius: '50%', 
-                      backgroundColor: isActive ? BRAND.accent : '#E0E0E0', 
-                      border: isCurrent ? `3px solid ${BRAND.lightAccent}` : 'none',
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center', 
-                      color: '#FFF', 
-                      fontSize: '13px', 
-                      fontWeight: 'bold', 
-                      transition: 'all 0.3s' 
-                    }}>
-                      {i + 1}
-                    </div>
-                    <div style={{ fontSize: '13px', fontWeight: isActive ? 600 : 400, color: isActive ? BRAND.primary : BRAND.text, textAlign: 'center' }}>
-                      {step.label}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
-        <div style={{ marginTop: '24px', display: 'flex', gap: '24px' }}>
-           <div style={{ flex: 1, padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: `1px solid ${BRAND.border}` }}>
-              <div style={{ fontSize: '12px', textTransform: 'uppercase', color: BRAND.text }}>Requested Quantity</div>
-              <div style={{ fontSize: '24px', fontWeight: 600, color: BRAND.primary }}>{quotation.quantity || 0} MT</div>
-           </div>
-           <div style={{ flex: 1, padding: '16px', backgroundColor: BRAND.bg, borderRadius: '4px', border: `1px solid ${BRAND.border}` }}>
-              <div style={{ fontSize: '12px', textTransform: 'uppercase', color: BRAND.text }}>Proposed Rate</div>
-              <div style={{ fontSize: '24px', fontWeight: 600, color: BRAND.primary }}>₹{Number(quotation.proposedRate || 0).toLocaleString()}</div>
-           </div>
+          <div style={{ flex: 1, overflowY: 'auto', backgroundColor: BRAND.white, border: `1px solid ${BRAND.border}`, borderTop: 'none', borderRadius: '0 0 6px 6px' }}>
+            {allQuotations.map((q) => {
+              const isSelected = q.id === selectedId;
+              const statusColor = getStatusColor(q.approvalStatus || 'DRAFT');
+              const stepIdx = getStepIndex(q.approvalStatus || 'DRAFT');
+              const progressPct = q.approvalStatus === 'REJECTED' ? 100 : (stepIdx / Math.max(STEPS.length - 1, 1)) * 100;
+
+              return (
+                <div
+                  key={q.id}
+                  onClick={() => setSelectedId(isSelected ? null : q.id)}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: gridCols,
+                    gap: '12px',
+                    padding: '12px 16px',
+                    borderBottom: `1px solid ${BRAND.border}`,
+                    alignItems: 'center',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    backgroundColor: isSelected ? '#EBF5FF' : 'transparent',
+                    borderLeft: isSelected ? `3px solid ${BRAND.accent}` : '3px solid transparent',
+                    transition: 'background-color 0.15s',
+                  }}
+                >
+                  <div style={{ fontWeight: 600, color: BRAND.primary }}>{q.quoteNumber || (q.id || '').substring(0, 8)}</div>
+                  <div style={{ color: BRAND.secondary, fontSize: '12px' }}>{q.productId ? (q.productId).substring(0, 10) + '...' : 'N/A'}</div>
+                  <div style={{ color: BRAND.primary }}>{q.quantity || 0}</div>
+                  <div style={{ color: BRAND.primary }}>{'₹'}{Number(q.proposedRate || 0).toLocaleString()}</div>
+                  <div>
+                    <span style={{ fontSize: '11px', backgroundColor: `${statusColor}18`, color: statusColor, padding: '3px 8px', borderRadius: '4px', fontWeight: 600 }}>
+                      {(q.approvalStatus || 'DRAFT').replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ flex: 1, height: '6px', backgroundColor: '#E0E0E0', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ width: `${progressPct}%`, height: '100%', backgroundColor: q.approvalStatus === 'REJECTED' ? BRAND.red : BRAND.accent, transition: 'width 0.3s' }}></div>
+                    </div>
+                    <span style={{ fontSize: '10px', color: BRAND.text, fontWeight: 600, minWidth: '24px' }}>
+                      {q.approvalStatus === 'REJECTED' ? 'REJ' : `${stepIdx + 1}/4`}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+
+            {allQuotations.length === 0 && (
+              <div style={{ padding: '40px', textAlign: 'center', color: BRAND.text, fontSize: '14px' }}>
+                No quotations found. Create one from the Quotation records view.
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>
@@ -200,7 +284,6 @@ const QuotationDashboard = () => {
 
 export default defineFrontComponent({
   universalIdentifier: QUOTATION_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
-  name: 'Quotation Workflow',
+  name: 'Quotation Dashboard',
   component: QuotationDashboard,
 });
-

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { useRecordId } from 'twenty-sdk/front-component';
 import { PRODUCT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
 const BRAND = {
   primary: '#001B2E',
@@ -72,6 +73,7 @@ const fetchOne = async (path: string, key: string) => {
 };
 
 const ProductDashboard = () => {
+  const userRole = useUserRole();
   const recordId = useRecordId();
   const [recordProduct, setRecordProduct] = useState<any>(null);
   const [allProducts, setAllProducts] = useState<any[]>([]);
@@ -92,6 +94,9 @@ const ProductDashboard = () => {
     };
     loadData();
   }, [recordId]);
+
+  if (!recordId && userRole === null) return <RoleLoading />;
+  if (!recordId && userRole === 'associate') return <AccessDenied minRole="manager" />;
 
   if (loading) {
     return <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>Loading product specifications...</div>;

@@ -6,7 +6,7 @@ import {
 
 export default defineNavigationMenuItem({
   universalIdentifier: INTERN_ANALYTICS_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
-  name: 'Intern Analytics',
+  name: 'Associate Analytics',
   icon: 'IconPhoneCall',
   position: 16,
   type: NavigationMenuItemType.PAGE_LAYOUT,

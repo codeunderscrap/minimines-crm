@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { SALES_ORDER_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
 const BRAND = {
   primary: '#001B2E',
@@ -55,6 +56,7 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
 };
 
 const SalesOrderDashboard = () => {
+  const userRole = useUserRole();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -101,6 +103,9 @@ const SalesOrderDashboard = () => {
       setIsUpdating(false);
     }
   };
+
+  if (userRole === null) return <RoleLoading />;
+  if (userRole === 'associate') return <AccessDenied minRole="manager" />;
 
   if (loading && orders.length === 0) {
     return <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif" }}>Loading Confirmed Orders...</div>;

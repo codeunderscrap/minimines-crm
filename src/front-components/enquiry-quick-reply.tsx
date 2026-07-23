@@ -10,6 +10,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { ENQUIRY_QUICK_REPLY_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
 // ─── Config — set your own values ────────────────────────────────────────────
 const TWENTY_API_BASE = 'https://api.twenty.com/rest';
@@ -275,6 +276,7 @@ const Toast = ({ message, type }: { message: string; type: 'success' | 'error' |
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const CommunicationsHub = () => {
+  const userRole = useUserRole();
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -401,6 +403,9 @@ export const CommunicationsHub = () => {
       threadRef.current.scrollTop = threadRef.current.scrollHeight;
     }
   }, [messages]);
+
+  if (userRole === null) return <RoleLoading />;
+  if (userRole === 'associate') return <AccessDenied minRole="manager" />;
 
   // ── Send reply ────────────────────────────────────────────────────────────
   const handleSend = async () => {

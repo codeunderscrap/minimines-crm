@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { useRecordId } from 'twenty-sdk/front-component';
 import { EXPORT_DOCUMENT_TRACKER_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
 const BRAND = {
   primary: '#001B2E',
@@ -55,6 +56,7 @@ const fetchTwenty = async (path: string) => {
 };
 
 const ExportDocumentTracker = () => {
+  const userRole = useUserRole();
   const recordId = useRecordId();
   const [allDocuments, setAllDocuments] = useState<any[]>([]);
   const [shipments, setShipments] = useState<any[]>([]);
@@ -64,13 +66,10 @@ const ExportDocumentTracker = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      // Fetch documents related to shipments — filtered client-side since
-      // standard REST filter syntax might vary.
       const allDocs = await fetchTwenty(`exportDocuments?limit=100`);
       setAllDocuments(Array.isArray(allDocs) ? allDocs : []);
 
       if (!recordId) {
-        // Standalone-page mode: no shipment in context, offer a picker.
         const allShipments = await fetchTwenty(`exportShipments?limit=100`);
         const items = Array.isArray(allShipments) ? allShipments : [];
         setShipments(items);
@@ -80,6 +79,9 @@ const ExportDocumentTracker = () => {
     };
     loadData();
   }, [recordId]);
+
+  if (!recordId && userRole === null) return <RoleLoading />;
+  if (!recordId && userRole !== 'hod') return <AccessDenied minRole="hod" />;
 
   if (loading) {
     return <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>Loading compliance checklist...</div>;
@@ -92,7 +94,7 @@ const ExportDocumentTracker = () => {
   }
 
   const documents = allDocuments.filter(d => d.exportShipmentId === activeShipmentId);
-  const REQUIRED_DOCS = ['EVD', 'FEMA', 'SCOMET', 'HSN', 'PACKING_NOTE', 'SHIPPING_BILL'];
+  const REQUIRED_DOCS = ['EVD', 'FEMA', 'SCOMET', 'HSN', 'PACKING_NOTE', 'E_WAY_BILL', 'SHIPPING_BILL', 'OTHER'];
 
   return (
     <>

@@ -9,7 +9,7 @@ import {
 
 export default definePageLayout({
   universalIdentifier: INTERN_ANALYTICS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  name: 'Intern Analytics',
+  name: 'Associate Analytics',
   type: 'STANDALONE_PAGE',
   tabs: [
     {
