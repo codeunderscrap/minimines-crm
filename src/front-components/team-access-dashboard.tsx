@@ -46,11 +46,10 @@ const fetchApi = async (path: string, method = 'GET', body: any = null) => {
   }
 };
 
-type Tab = 'people' | 'departments' | 'roles' | 'hierarchy';
+type Tab = 'people' | 'roles' | 'hierarchy';
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'people', label: 'People' },
-  { key: 'departments', label: 'Departments' },
   { key: 'roles', label: 'Roles & Access' },
   { key: 'hierarchy', label: 'Org Chart' },
 ];
@@ -77,23 +76,16 @@ const TeamAccessDashboard = () => {
   const rawUserId = useUserId();
   const [tab, setTab] = useState<Tab>('people');
   const [members, setMembers] = useState<any[]>([]);
-  const [departments, setDepartments] = useState<any[]>([]);
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newDeptName, setNewDeptName] = useState('');
-  const [editingDept, setEditingDept] = useState<{ id: string; name: string } | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [m, d, l] = await Promise.all([
+    const [m, l] = await Promise.all([
       fetchApi('workspaceMembers?limit=100'),
-      fetchApi('departments?limit=100'),
       fetchApi('leads?limit=500'),
     ]);
     setMembers(m);
-    setDepartments(d);
     setLeads(l);
     setLoading(false);
   }, []);
@@ -142,46 +134,6 @@ const TeamAccessDashboard = () => {
       </div>
     );
   }
-
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  const addDept = async () => {
-    if (!newDeptName.trim() || saving) return;
-    setSaving(true);
-    await fetchApi('departments', 'POST', { name: newDeptName.trim() });
-    showToast(`Department "${newDeptName.trim()}" created`);
-    setNewDeptName('');
-    await load();
-    setSaving(false);
-  };
-
-  const saveDeptEdit = async () => {
-    if (!editingDept || !editingDept.name.trim() || saving) return;
-    setSaving(true);
-    await fetchApi(`departments/${editingDept.id}`, 'PATCH', { name: editingDept.name.trim() });
-    setEditingDept(null);
-    await load();
-    setSaving(false);
-    showToast('Department updated');
-  };
-
-  const deleteDept = async (id: string, name: string) => {
-    if (saving) return;
-    setSaving(true);
-    await fetchApi(`departments/${id}`, 'DELETE');
-    await load();
-    setSaving(false);
-    showToast(`"${name}" removed`);
-  };
-
-  const leadsByDept = leads.reduce((acc: Record<string, number>, l: any) => {
-    const d = l.department || 'Unset';
-    acc[d] = (acc[d] || 0) + 1;
-    return acc;
-  }, {});
 
   const managerIds = new Set<string>();
   const associateIds = new Set<string>();
@@ -297,109 +249,6 @@ const TeamAccessDashboard = () => {
             </div>
           );
         })}
-      </div>
-    </>
-  );
-
-  const renderDepartments = () => (
-    <>
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ margin: '0 0 4px', fontFamily: "'Barlow Condensed', sans-serif", fontSize: '24px', color: BRAND.primary, textTransform: 'uppercase' }}>Departments</h2>
-        <p style={{ margin: 0, fontSize: '13px', color: BRAND.text }}>Add, rename, or remove departments. These appear as options on Lead records.</p>
-      </div>
-
-      <div style={{ display: 'flex', gap: '14px', marginBottom: '24px', flexWrap: 'wrap' }}>
-        <StatCard label="Total Depts" value={departments.length} color={BRAND.primary} />
-        {Object.entries(leadsByDept).map(([dept, count]) => (
-          <StatCard key={dept} label={dept} value={count as number} color={BRAND.accent} />
-        ))}
-      </div>
-
-      <div style={{
-        backgroundColor: BRAND.white, border: `1px solid ${BRAND.border}`, borderRadius: '8px',
-        padding: '16px 20px', marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center',
-      }}>
-        <input
-          type="text"
-          value={newDeptName}
-          onChange={e => setNewDeptName(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && addDept()}
-          placeholder="New department name (e.g. Procurement)"
-          style={{
-            flex: 1, padding: '10px 14px', border: `1px solid ${BRAND.border}`, borderRadius: '6px',
-            fontSize: '14px', fontFamily: "'Barlow', sans-serif", outline: 'none',
-          }}
-        />
-        <button
-          onClick={addDept}
-          disabled={!newDeptName.trim() || saving}
-          style={{
-            backgroundColor: newDeptName.trim() ? BRAND.primary : BRAND.border,
-            color: newDeptName.trim() ? BRAND.white : BRAND.text,
-            border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 600,
-            cursor: newDeptName.trim() ? 'pointer' : 'not-allowed', fontSize: '14px',
-            fontFamily: "'Barlow', sans-serif", whiteSpace: 'nowrap',
-          }}
-        >
-          {saving ? 'Saving...' : '+ Add'}
-        </button>
-      </div>
-
-      <div style={{ backgroundColor: BRAND.white, border: `1px solid ${BRAND.border}`, borderRadius: '8px', overflow: 'hidden' }}>
-        {departments.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: BRAND.text, fontSize: '14px' }}>
-            No departments yet. Add one above.
-          </div>
-        ) : departments.map((d: any) => (
-          <div key={d.id} style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '14px 20px', borderBottom: `1px solid ${BRAND.border}`,
-          }}>
-            {editingDept?.id === d.id ? (
-              <div style={{ display: 'flex', gap: '8px', flex: 1, alignItems: 'center' }}>
-                <input
-                  type="text"
-                  value={editingDept.name}
-                  onChange={e => setEditingDept({ ...editingDept, name: e.target.value })}
-                  onKeyDown={e => { if (e.key === 'Enter') saveDeptEdit(); if (e.key === 'Escape') setEditingDept(null); }}
-                  style={{ flex: 1, padding: '8px 12px', border: `1px solid ${BRAND.accent}`, borderRadius: '4px', fontSize: '14px', fontFamily: "'Barlow', sans-serif", outline: 'none' }}
-                  autoFocus
-                />
-                <button onClick={saveDeptEdit} disabled={saving} style={{ padding: '7px 14px', backgroundColor: BRAND.green, color: BRAND.white, border: 'none', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', fontSize: '13px' }}>Save</button>
-                <button onClick={() => setEditingDept(null)} style={{ padding: '7px 14px', backgroundColor: BRAND.bg, color: BRAND.secondary, border: `1px solid ${BRAND.border}`, borderRadius: '4px', cursor: 'pointer', fontSize: '13px' }}>Cancel</button>
-              </div>
-            ) : (
-              <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontWeight: 600, color: BRAND.primary, fontSize: '15px' }}>{d.name}</span>
-                  <span style={{ fontSize: '11px', color: BRAND.text, backgroundColor: BRAND.bg, padding: '2px 8px', borderRadius: '999px', fontWeight: 500 }}>
-                    {leadsByDept[d.name] || 0} leads
-                  </span>
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    onClick={() => setEditingDept({ id: d.id, name: d.name })}
-                    style={{ padding: '6px 12px', backgroundColor: BRAND.bg, color: BRAND.secondary, border: `1px solid ${BRAND.border}`, borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 600, fontFamily: "'Barlow', sans-serif" }}
-                  >
-                    Rename
-                  </button>
-                  <button
-                    onClick={() => deleteDept(d.id, d.name)}
-                    disabled={saving}
-                    style={{ padding: '6px 12px', backgroundColor: '#fef2f2', color: BRAND.red, border: '1px solid #fecaca', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 600, fontFamily: "'Barlow', sans-serif" }}
-                  >
-                    Remove
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div style={{ marginTop: '16px', fontSize: '12px', color: BRAND.text, lineHeight: 1.6 }}>
-        Departments are stored as records. You can also manage them from the{' '}
-        <a href="/objects/departments" target="_parent" style={{ color: BRAND.accent, fontWeight: 600 }}>Departments table</a> in the sidebar.
       </div>
     </>
   );
@@ -676,28 +525,10 @@ const TeamAccessDashboard = () => {
             }}>
               Open Settings
             </a>
-            <a href="/objects/departments" target="_parent" style={{
-              display: 'block', textAlign: 'center', textDecoration: 'none',
-              backgroundColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)',
-              padding: '8px', borderRadius: '5px', fontSize: '12px', fontWeight: 500,
-            }}>
-              Departments Table
-            </a>
           </div>
         </div>
 
         <div style={{ flex: 1, backgroundColor: BRAND.bg, padding: '28px 32px', overflowY: 'auto', overflowX: 'hidden', position: 'relative' }}>
-          {toast && (
-            <div style={{
-              position: 'fixed', top: '16px', right: '24px', zIndex: 1000,
-              backgroundColor: '#065f46', color: BRAND.white, padding: '10px 18px',
-              borderRadius: '6px', fontSize: '13px', fontWeight: 600,
-              boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-            }}>
-              {toast}
-            </div>
-          )}
-
           {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px', color: BRAND.text, fontSize: '14px' }}>
               Loading...
@@ -705,7 +536,6 @@ const TeamAccessDashboard = () => {
           ) : (
             <div style={{ maxWidth: '960px' }}>
               {tab === 'people' && renderPeople()}
-              {tab === 'departments' && renderDepartments()}
               {tab === 'roles' && renderRoles()}
               {tab === 'hierarchy' && renderHierarchy()}
             </div>
