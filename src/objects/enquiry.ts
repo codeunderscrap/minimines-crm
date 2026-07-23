@@ -16,6 +16,9 @@ import {
   ENQUIRY_EXTERNAL_ID_FIELD_UNIVERSAL_IDENTIFIER,
   ENQUIRY_ASSIGNED_TO_FIELD_UNIVERSAL_IDENTIFIER,
   ENQUIRY_ASSIGNED_TO_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+  CONVERSATION_MESSAGE_OBJECT_UNIVERSAL_IDENTIFIER,
+  CONVERSATION_MESSAGE_ENQUIRY_FIELD_UNIVERSAL_IDENTIFIER,
+  CONVERSATION_MESSAGE_ENQUIRY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
 
 const WORKSPACE_MEMBER = STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.workspaceMember;
@@ -135,6 +138,19 @@ export default defineObject({
       name: 'resolvedAt',
       type: FieldType.DATE_TIME,
       label: 'Resolved At',
+    },
+
+    // ── Reverse relation: conversation messages in this thread ──────────────
+    {
+      universalIdentifier: CONVERSATION_MESSAGE_ENQUIRY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+      name: 'conversationMessages',
+      type: FieldType.RELATION,
+      label: 'Conversation Messages',
+      relationTargetObjectMetadataUniversalIdentifier: CONVERSATION_MESSAGE_OBJECT_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier: CONVERSATION_MESSAGE_ENQUIRY_FIELD_UNIVERSAL_IDENTIFIER,
+      universalSettings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
     },
 
     // ── Assignment ──────────────────────────────────────────────────────────
