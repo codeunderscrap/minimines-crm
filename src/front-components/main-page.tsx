@@ -531,6 +531,9 @@ const EnquiryQuickReply = () => {
   );
 };
 
+const OPPORTUNITY_PAGE_UID = '4f324362-46e8-45fd-b81a-f1b2e3b17e6b';
+const LEADS_PAGE_UID = '210c2f1a-6ef4-4599-9027-60c70a118cef';
+
 const MainPage = () => {
   const [data, setData] = useState({
     contracts: [],
@@ -540,6 +543,7 @@ const MainPage = () => {
     leads: []
   });
   const [loading, setLoading] = useState(true);
+  const [pageLinks, setPageLinks] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const loadData = async () => {
@@ -554,7 +558,28 @@ const MainPage = () => {
       setData({ contracts, salesOrders, exportShipments, opportunities, leads });
       setLoading(false);
     };
+
+    const resolvePageLinks = async () => {
+      try {
+        const res = await fetch('https://api.twenty.com/rest/metadata/pageLayouts', {
+          headers: {
+            Authorization: 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU3MTIwLCJleHAiOjQ5Mzc5NTcxMTksImp0aSI6IjZkODliNmU5LTcwZmYtNGIwZS05MzUyLTk0ZTljMmJiOGQ5MyJ9.al8pc21Lc12mGgMEKu8GaWZDJytK55FjUx5_egt8jd3rAhUa0TpCfq7PAWoCDX5KUeqt2VrLN29QSfXHicnbzQ',
+            'Content-Type': 'application/json',
+          },
+        });
+        const layouts: any[] = await res.json();
+        const map: Record<string, string> = {};
+        for (const layout of layouts) {
+          if (layout.universalIdentifier) {
+            map[layout.universalIdentifier] = `/page/${layout.id}`;
+          }
+        }
+        setPageLinks(map);
+      } catch {}
+    };
+
     loadData();
+    resolvePageLinks();
   }, []);
 
   const safeContracts = Array.isArray(data.contracts) ? data.contracts : [];
@@ -601,8 +626,8 @@ const MainPage = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '40px' }}>
             <StatCard label="Active Contracts" value={activeContracts.toString()} sub="Total Active" link="/objects/contracts" />
             <StatCard label="Active Shipments" value={data.exportShipments.length.toString()} sub="Total shipments recorded" link="/objects/exportShipments" />
-            <StatCard label="Open Opportunities" value={openOpportunities.toString()} sub="In Pipeline" link="/page/275fc99b-e0bc-42b7-a949-ad0480c2d797" />
-            <StatCard label="Total Leads" value={totalLeadsCount.toString()} sub="New Prospects" link="/page/41530a63-a8a1-4219-9809-d0e93dc16970" />
+            <StatCard label="Open Opportunities" value={openOpportunities.toString()} sub="In Pipeline" link={pageLinks[OPPORTUNITY_PAGE_UID] || '/objects/opportunities'} />
+            <StatCard label="Total Leads" value={totalLeadsCount.toString()} sub="New Prospects" link={pageLinks[LEADS_PAGE_UID] || '/objects/leads'} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px', alignItems: 'stretch' }}>
