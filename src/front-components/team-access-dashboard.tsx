@@ -196,7 +196,7 @@ const TeamAccessDashboard = () => {
           <h2 style={{ margin: '0 0 4px', fontFamily: "'Barlow Condensed', sans-serif", fontSize: '24px', color: BRAND.primary, textTransform: 'uppercase' }}>Team Members</h2>
           <p style={{ margin: 0, fontSize: '13px', color: BRAND.text }}>Everyone in your workspace. Invite new people or manage roles from Settings.</p>
         </div>
-        <a href="/settings" target="_parent" style={{
+        <a href="/settings/members" target="_parent" style={{
           textDecoration: 'none', backgroundColor: BRAND.primary, color: BRAND.white,
           padding: '10px 20px', borderRadius: '6px', fontWeight: 600, fontSize: '14px',
         }}>
