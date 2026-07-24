@@ -7,7 +7,7 @@ import {
 export default defineView({
   universalIdentifier: LEAD_ALL_VIEW_UNIVERSAL_IDENTIFIER,
   name: 'All Leads',
-  objectMetadataUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
+  objectUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
   type: ViewType.TABLE,
   position: 0,
   isCompact: false,
