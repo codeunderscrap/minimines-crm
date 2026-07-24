@@ -43,6 +43,19 @@ const fetchList = async (path: string) => {
   }
 };
 
+const patchRecord = async (path: string, body: any) => {
+  try {
+    const res = await fetch(`${API_URL}/${path}`, {
+      method: 'PATCH',
+      headers: API_HEADERS,
+      body: JSON.stringify(body),
+    });
+    return await res.json();
+  } catch {
+    return null;
+  }
+};
+
 const TRANSIT_STEPS = [
   { id: 'DOCUMENTATION', label: 'Documentation' },
   { id: 'CUSTOMS', label: 'Customs' },
@@ -60,7 +73,6 @@ const getTransitIndex = (status: string) => {
 const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A');
 
 const QA_COLORS: Record<string, string> = { PASSED: '#10b981', FAILED: '#ef4444', PENDING: '#f59e0b' };
-const DOC_STATUS_COLORS: Record<string, string> = { INCOMPLETE: '#f59e0b', READY: '#10b981' };
 
 const ShipmentLogisticsDashboard = () => {
   const userRole = useUserRole();
@@ -69,21 +81,65 @@ const ShipmentLogisticsDashboard = () => {
   const [allDocuments, setAllDocuments] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3500);
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    const [shipments, docs] = await Promise.all([
+      fetchList('exportShipments?limit=200'),
+      fetchList('exportDocuments?limit=500'),
+    ]);
+    setAllShipments(shipments);
+    setAllDocuments(docs);
+    setLoading(false);
+  };
 
   useEffect(() => {
     if (recordId) setSelectedId(recordId);
-    const loadData = async () => {
-      setLoading(true);
-      const [shipments, docs] = await Promise.all([
-        fetchList('exportShipments?limit=200'),
-        fetchList('exportDocuments?limit=500'),
-      ]);
-      setAllShipments(shipments);
-      setAllDocuments(docs);
-      setLoading(false);
-    };
     loadData();
   }, [recordId]);
+
+  const handleUpdateTransit = async (shipmentId: string, newStatus: string) => {
+    setUpdating(true);
+    const result = await patchRecord(`exportShipments/${shipmentId}`, { transitExport: newStatus });
+    if (result) {
+      showToast(`Transit updated to ${newStatus.replace(/_/g, ' ')}`);
+      await loadData();
+    } else {
+      showToast('Failed to update transit status', 'error');
+    }
+    setUpdating(false);
+  };
+
+  const handleUpdateQA = async (shipmentId: string, newStatus: string) => {
+    setUpdating(true);
+    const result = await patchRecord(`exportShipments/${shipmentId}`, { qaStatus: newStatus });
+    if (result) {
+      showToast(`QA status updated to ${newStatus}`);
+      await loadData();
+    } else {
+      showToast('Failed to update QA status', 'error');
+    }
+    setUpdating(false);
+  };
+
+  const handleUpdateDocStatus = async (shipmentId: string, newStatus: string) => {
+    setUpdating(true);
+    const result = await patchRecord(`exportShipments/${shipmentId}`, { documentationStatus: newStatus });
+    if (result) {
+      showToast(`Documentation status updated to ${newStatus}`);
+      await loadData();
+    } else {
+      showToast('Failed to update doc status', 'error');
+    }
+    setUpdating(false);
+  };
 
   if (!recordId && userRole === null) return <RoleLoading />;
   if (!recordId && userRole === 'associate') return <AccessDenied minRole="manager" />;
@@ -101,11 +157,7 @@ const ShipmentLogisticsDashboard = () => {
     const docs = getDocsForShipment(shipmentId);
     return REQUIRED_DOCS.map((type) => {
       const found = docs.find((d) => d.documentType === type);
-      return {
-        type,
-        status: found?.status || 'PENDING',
-        targetDate: found?.targetDate || null,
-      };
+      return { type, status: found?.status || 'PENDING', targetDate: found?.targetDate || null };
     });
   };
 
@@ -120,6 +172,13 @@ const ShipmentLogisticsDashboard = () => {
     <>
       <style>{FONTS}</style>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', fontFamily: "'Barlow', sans-serif", backgroundColor: BRAND.bg }}>
+
+        {/* Toast */}
+        {toast && (
+          <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, padding: '12px 20px', borderRadius: '6px', fontWeight: 600, fontSize: '13px', color: BRAND.white, backgroundColor: toast.type === 'success' ? BRAND.green : BRAND.red, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+            {toast.msg}
+          </div>
+        )}
 
         {/* Header */}
         <div style={{ padding: '20px 24px 16px', borderBottom: `1px solid ${BRAND.border}`, backgroundColor: BRAND.white, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -151,15 +210,31 @@ const ShipmentLogisticsDashboard = () => {
                   <div style={{ fontSize: '15px', fontWeight: 600, color: BRAND.primary }}>
                     {selected.name || selected.vesselName || (selected.id || '').substring(0, 8)}
                   </div>
-                  <button onClick={() => setSelectedId(null)} style={{ background: 'none', border: `1px solid ${BRAND.border}`, padding: '4px 10px', borderRadius: '4px', fontSize: '11px', color: BRAND.text, cursor: 'pointer' }}>
-                    Back to Summary
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <a href={`/object/exportShipment/${selected.id}`} target="_parent" style={{ padding: '5px 10px', backgroundColor: BRAND.bg, color: BRAND.primary, borderRadius: '4px', fontWeight: 600, fontSize: '12px', textDecoration: 'none', border: `1px solid ${BRAND.border}` }}>
+                      Edit Record
+                    </a>
+                    <button onClick={() => setSelectedId(null)} style={{ background: 'none', border: `1px solid ${BRAND.border}`, padding: '4px 10px', borderRadius: '4px', fontSize: '11px', color: BRAND.text, cursor: 'pointer' }}>
+                      Back to Summary
+                    </button>
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
-                  {/* Transit Progress Stepper */}
+                  {/* Transit Progress Stepper with inline update */}
                   <div style={{ backgroundColor: BRAND.bg, padding: '16px', borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
-                    <div style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 600, color: BRAND.secondary, marginBottom: '16px' }}>Transit Progress</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <div style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 600, color: BRAND.secondary }}>Transit Progress</div>
+                      <select
+                        value={selected.transitExport || 'DOCUMENTATION'}
+                        onChange={(e) => handleUpdateTransit(selected.id, e.target.value)}
+                        disabled={updating}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ padding: '4px 8px', fontSize: '11px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontWeight: 600, backgroundColor: BRAND.white }}
+                      >
+                        {TRANSIT_STEPS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+                      </select>
+                    </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
                       <div style={{ position: 'absolute', top: '11px', left: '8%', right: '8%', height: '3px', backgroundColor: '#E0E0E0', zIndex: 0 }}>
                         <div style={{ width: `${(transitIdx / Math.max(TRANSIT_STEPS.length - 1, 1)) * 100}%`, height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.4s' }}></div>
@@ -180,7 +255,7 @@ const ShipmentLogisticsDashboard = () => {
                     </div>
                   </div>
 
-                  {/* Shipment Details */}
+                  {/* Shipment Details with inline QA update */}
                   <div style={{ backgroundColor: BRAND.bg, padding: '16px', borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
                     <div style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 600, color: BRAND.secondary, marginBottom: '10px' }}>Vessel &amp; Cargo</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
@@ -193,14 +268,31 @@ const ShipmentLogisticsDashboard = () => {
                         <div style={{ fontSize: '14px', fontWeight: 600, color: BRAND.primary }}>{selected.containerNumber || 'TBD'}</div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>QA Status</div>
-                        <span style={{ fontSize: '12px', fontWeight: 600, color: QA_COLORS[selected.qaStatus] || BRAND.yellow, backgroundColor: `${QA_COLORS[selected.qaStatus] || BRAND.yellow}18`, padding: '2px 6px', borderRadius: '3px' }}>
-                          {selected.qaStatus || 'PENDING'}
-                        </span>
+                        <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600, marginBottom: '4px' }}>QA Status</div>
+                        <select
+                          value={selected.qaStatus || 'PENDING'}
+                          onChange={(e) => handleUpdateQA(selected.id, e.target.value)}
+                          disabled={updating}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ padding: '3px 6px', fontSize: '11px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontWeight: 600, color: QA_COLORS[selected.qaStatus] || BRAND.yellow }}
+                        >
+                          <option value="PENDING">Pending</option>
+                          <option value="PASSED">Passed</option>
+                          <option value="FAILED">Failed</option>
+                        </select>
                       </div>
                       <div>
-                        <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Ship Date</div>
-                        <div style={{ fontSize: '14px', fontWeight: 600, color: BRAND.primary }}>{fmtDate(selected.shipmentDate)}</div>
+                        <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600, marginBottom: '4px' }}>Doc Status</div>
+                        <select
+                          value={selected.documentationStatus || 'INCOMPLETE'}
+                          onChange={(e) => handleUpdateDocStatus(selected.id, e.target.value)}
+                          disabled={updating}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ padding: '3px 6px', fontSize: '11px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontWeight: 600 }}
+                        >
+                          <option value="INCOMPLETE">Incomplete</option>
+                          <option value="READY">Ready</option>
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -331,7 +423,7 @@ const ShipmentLogisticsDashboard = () => {
 
             {allShipments.length === 0 && (
               <div style={{ padding: '40px', textAlign: 'center', color: BRAND.text, fontSize: '14px' }}>
-                No export shipments found. Create one from the Export Shipments records view.
+                No export shipments found. Create one from the Sales Order Dashboard.
               </div>
             )}
           </div>

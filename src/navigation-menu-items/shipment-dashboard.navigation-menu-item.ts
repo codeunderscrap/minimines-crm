@@ -8,7 +8,7 @@ export default defineNavigationMenuItem({
   universalIdentifier: SHIPMENT_DASHBOARD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
   name: 'Shipment Dashboard',
   icon: 'IconShip',
-  position: 21,
+  position: 6,
   type: NavigationMenuItemType.PAGE_LAYOUT,
   pageLayoutUniversalIdentifier: SHIPMENT_DASHBOARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });

@@ -10,5 +10,5 @@ export default defineNavigationMenuItem({
   icon: 'IconBuildingSkyscraper',
   type: NavigationMenuItemType.OBJECT,
   targetObjectUniversalIdentifier: DEPARTMENT_OBJECT_UNIVERSAL_IDENTIFIER,
-  position: 22,
+  position: 16,
 });

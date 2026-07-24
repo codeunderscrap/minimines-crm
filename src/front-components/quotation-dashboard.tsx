@@ -44,6 +44,19 @@ const fetchList = async (path: string) => {
   }
 };
 
+const patchRecord = async (path: string, body: any) => {
+  try {
+    const res = await fetch(`${API_URL}/${path}`, {
+      method: 'PATCH',
+      headers: API_HEADERS,
+      body: JSON.stringify(body),
+    });
+    return await res.json();
+  } catch {
+    return null;
+  }
+};
+
 const STEPS = [
   { id: 'DRAFT', label: 'Draft', color: '#9CA3AF' },
   { id: 'HOD_REVIEW', label: 'HOD Review', color: '#f59e0b' },
@@ -115,19 +128,37 @@ const QuotationDashboard = () => {
   const [allQuotations, setAllQuotations] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3500);
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    const items = await fetchList('quotations?limit=200');
+    setAllQuotations(items);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    if (recordId) {
-      setSelectedId(recordId);
-    }
-    const loadData = async () => {
-      setLoading(true);
-      const items = await fetchList('quotations?limit=200');
-      setAllQuotations(items);
-      setLoading(false);
-    };
+    if (recordId) setSelectedId(recordId);
     loadData();
   }, [recordId]);
+
+  const handleStatusChange = async (quotId: string, newStatus: string) => {
+    setUpdating(true);
+    const result = await patchRecord(`quotations/${quotId}`, { approvalStatus: newStatus });
+    if (result) {
+      showToast(`Status updated to ${newStatus.replace(/_/g, ' ')}`);
+      await loadData();
+    } else {
+      showToast('Failed to update status', 'error');
+    }
+    setUpdating(false);
+  };
 
   if (!recordId && userRole === null) return <RoleLoading />;
   if (!recordId && userRole === 'associate') return <AccessDenied minRole="manager" />;
@@ -146,10 +177,39 @@ const QuotationDashboard = () => {
 
   const gridCols = '1.2fr 1fr 0.7fr 0.8fr 1fr 1.2fr';
 
+  const getActionButtons = (q: any) => {
+    const status = q.approvalStatus || 'DRAFT';
+    const btns: { label: string; newStatus: string; color: string; bg: string }[] = [];
+
+    if (status === 'DRAFT') {
+      btns.push({ label: 'Submit for Review', newStatus: 'HOD_REVIEW', color: BRAND.white, bg: BRAND.yellow });
+    }
+    if (status === 'HOD_REVIEW' && (userRole === 'hod' || userRole === 'manager')) {
+      btns.push({ label: 'Approve', newStatus: 'CEO_APPROVED', color: BRAND.white, bg: BRAND.green });
+      btns.push({ label: 'Reject', newStatus: 'REJECTED', color: BRAND.white, bg: BRAND.red });
+      btns.push({ label: 'Back to Draft (Revise)', newStatus: 'DRAFT', color: BRAND.primary, bg: '#E0E0E0' });
+    }
+    if (status === 'CEO_APPROVED' && userRole === 'hod') {
+      btns.push({ label: 'Convert to Order', newStatus: 'CONVERTED_TO_ORDER', color: BRAND.white, bg: BRAND.accent });
+      btns.push({ label: 'Revise (Back to Draft)', newStatus: 'DRAFT', color: BRAND.primary, bg: '#E0E0E0' });
+    }
+    if (status === 'REJECTED') {
+      btns.push({ label: 'Revise (Back to Draft)', newStatus: 'DRAFT', color: BRAND.primary, bg: '#E0E0E0' });
+    }
+    return btns;
+  };
+
   return (
     <>
       <style>{FONTS}</style>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', fontFamily: "'Barlow', sans-serif", backgroundColor: BRAND.bg }}>
+
+        {/* Toast */}
+        {toast && (
+          <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, padding: '12px 20px', borderRadius: '6px', fontWeight: 600, fontSize: '13px', color: BRAND.white, backgroundColor: toast.type === 'success' ? BRAND.green : BRAND.red, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+            {toast.msg}
+          </div>
+        )}
 
         {/* Header */}
         <div style={{ padding: '20px 24px 16px', borderBottom: `1px solid ${BRAND.border}`, backgroundColor: BRAND.white, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -158,7 +218,7 @@ const QuotationDashboard = () => {
               Quotation Dashboard
             </h1>
             <div style={{ fontSize: '13px', color: BRAND.text, marginTop: '2px' }}>
-              Domestic quotation approval workflow &amp; tracking
+              Quotation approval workflow &amp; tracking — linked from Opportunity Pipeline
             </div>
           </div>
           <a href="/objects/quotations" target="_parent" style={{ display: 'inline-block', textDecoration: 'none', backgroundColor: BRAND.primary, color: BRAND.white, padding: '8px 16px', borderRadius: '4px', fontWeight: 600, fontSize: '13px' }}>
@@ -169,36 +229,59 @@ const QuotationDashboard = () => {
         {/* Detail / Summary Panel — top 30% */}
         <div style={{ flex: '0 0 auto', padding: '16px 24px', backgroundColor: BRAND.white, borderBottom: `1px solid ${BRAND.border}` }}>
           {selected ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px', alignItems: 'start' }}>
-              {/* Left: Approval stepper */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: BRAND.primary }}>
-                    {selected.quoteNumber || `Quote ${(selected.id || '').substring(0, 8)}`}
-                  </div>
-                  <button onClick={() => setSelectedId(null)} style={{ background: 'none', border: `1px solid ${BRAND.border}`, padding: '4px 10px', borderRadius: '4px', fontSize: '11px', color: BRAND.text, cursor: 'pointer' }}>
-                    Back to Summary
-                  </button>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: BRAND.primary }}>
+                  {selected.quoteNumber || `Quote ${(selected.id || '').substring(0, 8)}`}
+                  {selected.linkedOpportunityId && (
+                    <a href={`/object/bdOpportunity/${selected.linkedOpportunityId}`} target="_parent" style={{ marginLeft: '10px', fontSize: '11px', color: BRAND.blue, textDecoration: 'underline' }}>
+                      View Linked Opportunity
+                    </a>
+                  )}
                 </div>
-                <ApprovalStepper status={selected.approvalStatus || 'DRAFT'} />
+                <button onClick={() => setSelectedId(null)} style={{ background: 'none', border: `1px solid ${BRAND.border}`, padding: '4px 10px', borderRadius: '4px', fontSize: '11px', color: BRAND.text, cursor: 'pointer' }}>
+                  Back to Summary
+                </button>
               </div>
-              {/* Right: Key details */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
-                  <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Quote #</div>
-                  <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{selected.quoteNumber || 'N/A'}</div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px', alignItems: 'start' }}>
+                {/* Left: Approval stepper + actions */}
+                <div>
+                  <ApprovalStepper status={selected.approvalStatus || 'DRAFT'} />
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '14px', flexWrap: 'wrap' }}>
+                    {getActionButtons(selected).map((btn, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleStatusChange(selected.id, btn.newStatus)}
+                        disabled={updating}
+                        style={{ padding: '7px 14px', backgroundColor: btn.bg, color: btn.color, border: 'none', borderRadius: '4px', fontWeight: 600, fontSize: '12px', cursor: updating ? 'not-allowed' : 'pointer', opacity: updating ? 0.6 : 1 }}
+                      >
+                        {btn.label}
+                      </button>
+                    ))}
+                    <a href={`/object/quotation/${selected.id}`} target="_parent" style={{ padding: '7px 14px', backgroundColor: BRAND.bg, color: BRAND.primary, borderRadius: '4px', fontWeight: 600, fontSize: '12px', textDecoration: 'none', border: `1px solid ${BRAND.border}` }}>
+                      Edit Record
+                    </a>
+                  </div>
                 </div>
-                <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
-                  <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Buyer</div>
-                  <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{selected.buyerCompanyId ? (selected.buyerCompanyId).substring(0, 8) + '...' : 'N/A'}</div>
-                </div>
-                <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
-                  <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Quantity</div>
-                  <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{selected.quantity || 0} MT</div>
-                </div>
-                <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
-                  <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Rate (INR)</div>
-                  <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{'₹'}{Number(selected.proposedRate || 0).toLocaleString()}</div>
+                {/* Right: Key details */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
+                    <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Quote #</div>
+                    <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{selected.quoteNumber || 'N/A'}</div>
+                  </div>
+                  <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
+                    <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Buyer</div>
+                    <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{selected.buyerCompanyId || 'N/A'}</div>
+                  </div>
+                  <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
+                    <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Quantity</div>
+                    <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{selected.quantity || 0} MT</div>
+                  </div>
+                  <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
+                    <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Rate (INR)</div>
+                    <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{'₹'}{Number(selected.proposedRate || 0).toLocaleString()}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -217,7 +300,7 @@ const QuotationDashboard = () => {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '0 24px 16px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: '12px', padding: '12px 16px', backgroundColor: BRAND.primary, color: BRAND.white, fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', borderRadius: '6px 6px 0 0', marginTop: '16px' }}>
             <div>Quote #</div>
-            <div>Product ID</div>
+            <div>Product / Buyer</div>
             <div>Qty (MT)</div>
             <div>Rate (INR)</div>
             <div>Status</div>
@@ -249,8 +332,11 @@ const QuotationDashboard = () => {
                     transition: 'background-color 0.15s',
                   }}
                 >
-                  <div style={{ fontWeight: 600, color: BRAND.primary }}>{q.quoteNumber || (q.id || '').substring(0, 8)}</div>
-                  <div style={{ color: BRAND.secondary, fontSize: '12px' }}>{q.productId ? (q.productId).substring(0, 10) + '...' : 'N/A'}</div>
+                  <div style={{ fontWeight: 600, color: BRAND.primary }}>
+                    {q.quoteNumber || (q.id || '').substring(0, 8)}
+                    {q.linkedOpportunityId && <span style={{ display: 'block', fontSize: '10px', color: BRAND.blue }}>Linked to Opp</span>}
+                  </div>
+                  <div style={{ color: BRAND.secondary, fontSize: '12px' }}>{q.buyerCompanyId || q.productId || 'N/A'}</div>
                   <div style={{ color: BRAND.primary }}>{q.quantity || 0}</div>
                   <div style={{ color: BRAND.primary }}>{'₹'}{Number(q.proposedRate || 0).toLocaleString()}</div>
                   <div>
@@ -272,7 +358,7 @@ const QuotationDashboard = () => {
 
             {allQuotations.length === 0 && (
               <div style={{ padding: '40px', textAlign: 'center', color: BRAND.text, fontSize: '14px' }}>
-                No quotations found. Create one from the Quotation records view.
+                No quotations found. Create one from the Opportunity Pipeline (Negotiation stage).
               </div>
             )}
           </div>

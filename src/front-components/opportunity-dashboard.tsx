@@ -88,6 +88,49 @@ const OpportunityDashboard = () => {
     setIsUpdating(false);
   };
 
+  const handleCreateQuotation = async (opp: any) => {
+    setIsUpdating(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    try {
+      const quot = await fetchTwenty('quotations', 'POST', {
+        quoteNumber: `QT-${Date.now().toString(36).toUpperCase()}`,
+        buyerCompanyId: opp.companyName || '',
+        productId: '',
+        quantity: 0,
+        proposedRate: 0,
+        approvalStatus: 'DRAFT',
+        linkedOpportunityId: opp.id,
+      });
+
+      let newId = quot?.data?.id || quot?.data?.createQuotation?.id || quot?.id || null;
+
+      if (newId) {
+        setSuccessMsg(
+          <div style={{ padding: '16px', backgroundColor: '#EBF5FF', color: '#1E40AF', border: '1px solid #3B82F6', borderRadius: '4px', marginBottom: '24px' }}>
+            Quotation created!{' '}
+            <a href={`/object/quotation/${newId}`} target="_parent" style={{ color: '#1D4ED8', fontWeight: 'bold', textDecoration: 'underline' }}>
+              Open Quotation to fill in details
+            </a>{' '}
+            — it will appear on the Quotation Dashboard.
+          </div>
+        );
+      } else {
+        setSuccessMsg(
+          <div style={{ padding: '16px', backgroundColor: '#EBF5FF', color: '#1E40AF', border: '1px solid #3B82F6', borderRadius: '4px', marginBottom: '24px' }}>
+            Quotation created! View it on the Quotation Dashboard.
+          </div>
+        );
+      }
+      await loadData();
+    } catch (e) {
+      console.error(e);
+      setErrorMsg('Failed to create quotation.');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const handleGenerateSalesOrder = async (opp: any) => {
     setIsUpdating(true);
     setErrorMsg(null);
@@ -187,6 +230,16 @@ const OpportunityDashboard = () => {
                           >
                             {STAGES.map(s => <option key={s.id} value={s.id}>Move to: {s.label}</option>)}
                           </select>
+
+                          {opp.stage === 'NEGOTIATION' && (
+                            <button
+                              onClick={() => handleCreateQuotation(opp)}
+                              disabled={isUpdating}
+                              style={{ width: '100%', padding: '8px', backgroundColor: '#3B82F6', color: BRAND.white, border: 'none', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}
+                            >
+                              + Create Quotation
+                            </button>
+                          )}
 
                           {opp.stage === 'WON' && (
                             <button 

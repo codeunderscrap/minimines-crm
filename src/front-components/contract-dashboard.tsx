@@ -43,6 +43,19 @@ const fetchList = async (path: string) => {
   }
 };
 
+const patchRecord = async (path: string, body: any) => {
+  try {
+    const res = await fetch(`${API_URL}/${path}`, {
+      method: 'PATCH',
+      headers: API_HEADERS,
+      body: JSON.stringify(body),
+    });
+    return await res.json();
+  } catch {
+    return null;
+  }
+};
+
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: '#9CA3AF',
   ACTIVE: '#10b981',
@@ -51,14 +64,6 @@ const STATUS_COLORS: Record<string, string> = {
 
 const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A');
 
-const StatCard = ({ title, value, color, sub }: { title: string; value: string | number; color: string; sub?: string }) => (
-  <div style={{ backgroundColor: BRAND.white, padding: '14px 18px', borderRadius: '8px', border: `1px solid ${BRAND.border}` }}>
-    <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600, letterSpacing: '0.5px', marginBottom: '4px' }}>{title}</div>
-    <div style={{ fontSize: '22px', fontWeight: 700, color, fontFamily: "'Barlow Condensed', sans-serif" }}>{value}</div>
-    {sub && <div style={{ fontSize: '11px', color: BRAND.text, marginTop: '2px' }}>{sub}</div>}
-  </div>
-);
-
 const ContractDashboard = () => {
   const userRole = useUserRole();
   const recordId = useRecordId();
@@ -66,21 +71,41 @@ const ContractDashboard = () => {
   const [salesOrders, setSalesOrders] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3500);
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    const [contracts, orders] = await Promise.all([
+      fetchList('contracts?limit=200'),
+      fetchList('salesOrders?limit=500'),
+    ]);
+    setAllContracts(contracts);
+    setSalesOrders(orders);
+    setLoading(false);
+  };
 
   useEffect(() => {
     if (recordId) setSelectedId(recordId);
-    const loadData = async () => {
-      setLoading(true);
-      const [contracts, orders] = await Promise.all([
-        fetchList('contracts?limit=200'),
-        fetchList('salesOrders?limit=500'),
-      ]);
-      setAllContracts(contracts);
-      setSalesOrders(orders);
-      setLoading(false);
-    };
     loadData();
   }, [recordId]);
+
+  const handleStatusChange = async (contractId: string, newStatus: string) => {
+    setUpdating(true);
+    const result = await patchRecord(`contracts/${contractId}`, { status: newStatus });
+    if (result) {
+      showToast(`Contract status updated to ${newStatus}`);
+      await loadData();
+    } else {
+      showToast('Failed to update status', 'error');
+    }
+    setUpdating(false);
+  };
 
   if (!recordId && userRole === null) return <RoleLoading />;
   if (!recordId && userRole === 'associate') return <AccessDenied minRole="manager" />;
@@ -92,20 +117,13 @@ const ContractDashboard = () => {
   const selected = selectedId ? allContracts.find((c) => c.id === selectedId) : null;
 
   const getLinkedOrders = (contractId: string) =>
-    salesOrders.filter((o) => {
-      const cId = o.contractId || o.contract?.id;
-      return cId === contractId;
-    });
+    salesOrders.filter((o) => (o.contractId || o.contract?.id) === contractId);
 
   const getFulfillment = (contract: any) => {
     const orders = getLinkedOrders(contract.id);
     const totalQty = contract.totalQuantity || 0;
-    const shippedQty = orders
-      .filter((o: any) => o.fulfillmentStatus === 'SHIPPED')
-      .reduce((sum: number, o: any) => sum + (o.quantity || 0), 0);
-    const inProgressQty = orders
-      .filter((o: any) => o.fulfillmentStatus === 'IN_PROGRESS')
-      .reduce((sum: number, o: any) => sum + (o.quantity || 0), 0);
+    const shippedQty = orders.filter((o: any) => o.fulfillmentStatus === 'SHIPPED').reduce((sum: number, o: any) => sum + (o.quantity || 0), 0);
+    const inProgressQty = orders.filter((o: any) => o.fulfillmentStatus === 'IN_PROGRESS').reduce((sum: number, o: any) => sum + (o.quantity || 0), 0);
     const pct = totalQty > 0 ? Math.min(100, Math.round(((shippedQty + inProgressQty) / totalQty) * 100)) : 0;
     return { totalQty, shippedQty, inProgressQty, pct, orderCount: orders.length };
   };
@@ -132,6 +150,13 @@ const ContractDashboard = () => {
       <style>{FONTS}</style>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', fontFamily: "'Barlow', sans-serif", backgroundColor: BRAND.bg }}>
 
+        {/* Toast */}
+        {toast && (
+          <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, padding: '12px 20px', borderRadius: '6px', fontWeight: 600, fontSize: '13px', color: BRAND.white, backgroundColor: toast.type === 'success' ? BRAND.green : BRAND.red, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+            {toast.msg}
+          </div>
+        )}
+
         {/* Header */}
         <div style={{ padding: '20px 24px 16px', borderBottom: `1px solid ${BRAND.border}`, backgroundColor: BRAND.white, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -152,7 +177,7 @@ const ContractDashboard = () => {
           </div>
         </div>
 
-        {/* Detail / Summary Panel — top 50% */}
+        {/* Detail / Summary Panel */}
         <div style={{ flex: '0 0 auto', padding: '16px 24px', backgroundColor: BRAND.white, borderBottom: `1px solid ${BRAND.border}` }}>
           {selected ? (() => {
             const ff = getFulfillment(selected);
@@ -166,9 +191,25 @@ const ContractDashboard = () => {
                       {selected.status || 'DRAFT'}
                     </span>
                   </div>
-                  <button onClick={() => setSelectedId(null)} style={{ background: 'none', border: `1px solid ${BRAND.border}`, padding: '4px 10px', borderRadius: '4px', fontSize: '11px', color: BRAND.text, cursor: 'pointer' }}>
-                    Back to Summary
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {/* Inline status change */}
+                    <select
+                      value={selected.status || 'DRAFT'}
+                      onChange={(e) => handleStatusChange(selected.id, e.target.value)}
+                      disabled={updating}
+                      style={{ padding: '5px 8px', fontSize: '12px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontWeight: 600 }}
+                    >
+                      <option value="DRAFT">Draft</option>
+                      <option value="ACTIVE">Active</option>
+                      <option value="EXPIRED">Expired</option>
+                    </select>
+                    <a href={`/object/contract/${selected.id}`} target="_parent" style={{ padding: '5px 10px', backgroundColor: BRAND.bg, color: BRAND.primary, borderRadius: '4px', fontWeight: 600, fontSize: '12px', textDecoration: 'none', border: `1px solid ${BRAND.border}` }}>
+                      Edit Record
+                    </a>
+                    <button onClick={() => setSelectedId(null)} style={{ background: 'none', border: `1px solid ${BRAND.border}`, padding: '4px 10px', borderRadius: '4px', fontSize: '11px', color: BRAND.text, cursor: 'pointer' }}>
+                      Back to Summary
+                    </button>
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -176,9 +217,7 @@ const ContractDashboard = () => {
                   <div style={{ backgroundColor: BRAND.bg, padding: '16px', borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
                     <div style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 600, color: BRAND.secondary, marginBottom: '10px' }}>Volume Fulfillment</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '24px', fontWeight: 700, color: BRAND.primary, fontFamily: "'Barlow Condensed', sans-serif" }}>
-                        {ff.shippedQty + ff.inProgressQty} MT
-                      </span>
+                      <span style={{ fontSize: '24px', fontWeight: 700, color: BRAND.primary, fontFamily: "'Barlow Condensed', sans-serif" }}>{ff.shippedQty + ff.inProgressQty} MT</span>
                       <span style={{ fontSize: '13px', color: BRAND.text }}>of {ff.totalQty} MT ({ff.pct}%)</span>
                     </div>
                     <div style={{ width: '100%', height: '10px', backgroundColor: '#E0E0E0', borderRadius: '5px', overflow: 'hidden', display: 'flex' }}>
@@ -238,15 +277,27 @@ const ContractDashboard = () => {
             );
           })() : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-              <StatCard title="Total Contracts" value={totalCount} color={BRAND.accent} />
-              <StatCard title="Active" value={active} color={BRAND.green} />
-              <StatCard title="Draft" value={draft} color={BRAND.text} />
-              <StatCard title="Expired" value={expired} color={BRAND.red} />
+              <div style={{ backgroundColor: BRAND.white, padding: '14px 18px', borderRadius: '8px', border: `1px solid ${BRAND.border}` }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600, letterSpacing: '0.5px', marginBottom: '4px' }}>Total Contracts</div>
+                <div style={{ fontSize: '22px', fontWeight: 700, color: BRAND.accent, fontFamily: "'Barlow Condensed', sans-serif" }}>{totalCount}</div>
+              </div>
+              <div style={{ backgroundColor: BRAND.white, padding: '14px 18px', borderRadius: '8px', border: `1px solid ${BRAND.border}` }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600, letterSpacing: '0.5px', marginBottom: '4px' }}>Active</div>
+                <div style={{ fontSize: '22px', fontWeight: 700, color: BRAND.green, fontFamily: "'Barlow Condensed', sans-serif" }}>{active}</div>
+              </div>
+              <div style={{ backgroundColor: BRAND.white, padding: '14px 18px', borderRadius: '8px', border: `1px solid ${BRAND.border}` }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600, letterSpacing: '0.5px', marginBottom: '4px' }}>Draft</div>
+                <div style={{ fontSize: '22px', fontWeight: 700, color: BRAND.text, fontFamily: "'Barlow Condensed', sans-serif" }}>{draft}</div>
+              </div>
+              <div style={{ backgroundColor: BRAND.white, padding: '14px 18px', borderRadius: '8px', border: `1px solid ${BRAND.border}` }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600, letterSpacing: '0.5px', marginBottom: '4px' }}>Expired</div>
+                <div style={{ fontSize: '22px', fontWeight: 700, color: BRAND.red, fontFamily: "'Barlow Condensed', sans-serif" }}>{expired}</div>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Table — bottom 50% */}
+        {/* Table */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '0 24px 16px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: '12px', padding: '12px 16px', backgroundColor: BRAND.primary, color: BRAND.white, fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', borderRadius: '6px 6px 0 0', marginTop: '16px' }}>
             <div>Contract Name</div>
@@ -296,9 +347,7 @@ const ContractDashboard = () => {
                     <div style={{ flex: 1, height: '6px', backgroundColor: '#E0E0E0', borderRadius: '3px', overflow: 'hidden' }}>
                       <div style={{ width: `${ff.pct}%`, height: '100%', backgroundColor: BRAND.green, transition: 'width 0.3s' }}></div>
                     </div>
-                    <span style={{ fontSize: '10px', color: BRAND.text, fontWeight: 600, minWidth: '28px' }}>
-                      {ff.pct}%
-                    </span>
+                    <span style={{ fontSize: '10px', color: BRAND.text, fontWeight: 600, minWidth: '28px' }}>{ff.pct}%</span>
                   </div>
                 </div>
               );

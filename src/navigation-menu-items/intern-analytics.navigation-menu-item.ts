@@ -8,7 +8,7 @@ export default defineNavigationMenuItem({
   universalIdentifier: INTERN_ANALYTICS_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
   name: 'Associate Analytics',
   icon: 'IconPhoneCall',
-  position: 16,
+  position: 9,
   type: NavigationMenuItemType.PAGE_LAYOUT,
   pageLayoutUniversalIdentifier: INTERN_ANALYTICS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });
