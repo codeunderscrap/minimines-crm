@@ -50,8 +50,11 @@ const patchRecord = async (path: string, body: any) => {
       headers: API_HEADERS,
       body: JSON.stringify(body),
     });
-    return await res.json();
-  } catch {
+    const json = await res.json();
+    if (!res.ok) { console.error('PATCH error:', path, json); return null; }
+    return json;
+  } catch (e) {
+    console.error('PATCH exception:', path, e);
     return null;
   }
 };

@@ -43,6 +43,22 @@ const fetchList = async (path: string) => {
   }
 };
 
+const postRecord = async (path: string, body: any) => {
+  try {
+    const res = await fetch(`${API_URL}/${path}`, {
+      method: 'POST',
+      headers: API_HEADERS,
+      body: JSON.stringify(body),
+    });
+    const json = await res.json();
+    if (!res.ok) { console.error('POST error:', path, json); return null; }
+    return json;
+  } catch (e) {
+    console.error('POST exception:', path, e);
+    return null;
+  }
+};
+
 const patchRecord = async (path: string, body: any) => {
   try {
     const res = await fetch(`${API_URL}/${path}`, {
@@ -50,8 +66,11 @@ const patchRecord = async (path: string, body: any) => {
       headers: API_HEADERS,
       body: JSON.stringify(body),
     });
-    return await res.json();
-  } catch {
+    const json = await res.json();
+    if (!res.ok) { console.error('PATCH error:', path, json); return null; }
+    return json;
+  } catch (e) {
+    console.error('PATCH exception:', path, e);
     return null;
   }
 };
@@ -141,6 +160,25 @@ const ShipmentLogisticsDashboard = () => {
     setUpdating(false);
   };
 
+  const handleCreateShipment = async () => {
+    setUpdating(true);
+    const result = await postRecord('exportShipments', {
+      name: `Shipment-${Date.now().toString(36).toUpperCase()}`,
+      vesselName: '',
+      containerNumber: '',
+      transitExport: 'DOCUMENTATION',
+      qaStatus: 'PENDING',
+      documentationStatus: 'INCOMPLETE',
+    });
+    if (result) {
+      showToast('Shipment created');
+      await loadData();
+    } else {
+      showToast('Failed to create shipment', 'error');
+    }
+    setUpdating(false);
+  };
+
   if (!recordId && userRole === null) return <RoleLoading />;
   if (!recordId && userRole === 'associate') return <AccessDenied minRole="manager" />;
 
@@ -190,9 +228,14 @@ const ShipmentLogisticsDashboard = () => {
               Export shipments, documentation compliance &amp; transit tracking
             </div>
           </div>
-          <a href="/objects/exportShipments" target="_parent" style={{ display: 'inline-block', textDecoration: 'none', backgroundColor: BRAND.primary, color: BRAND.white, padding: '8px 16px', borderRadius: '4px', fontWeight: 600, fontSize: '13px' }}>
-            View All Records
-          </a>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={handleCreateShipment} disabled={updating} style={{ padding: '8px 16px', backgroundColor: BRAND.green, color: BRAND.white, border: 'none', borderRadius: '4px', fontWeight: 600, fontSize: '13px', cursor: updating ? 'not-allowed' : 'pointer' }}>
+              + New Shipment
+            </button>
+            <a href="/objects/exportShipments" target="_parent" style={{ display: 'inline-block', textDecoration: 'none', backgroundColor: BRAND.primary, color: BRAND.white, padding: '8px 16px', borderRadius: '4px', fontWeight: 600, fontSize: '13px' }}>
+              View All Records
+            </a>
+          </div>
         </div>
 
         {/* Detail / Summary Panel */}

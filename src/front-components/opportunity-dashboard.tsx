@@ -93,17 +93,31 @@ const OpportunityDashboard = () => {
     setErrorMsg(null);
     setSuccessMsg(null);
     try {
-      const quot = await fetchTwenty('quotations', 'POST', {
-        quoteNumber: `QT-${Date.now().toString(36).toUpperCase()}`,
-        buyerCompanyId: opp.companyName || '',
-        productId: '',
-        quantity: 0,
-        proposedRate: 0,
-        approvalStatus: 'DRAFT',
-        linkedOpportunityId: opp.id,
+      const url = `https://api.twenty.com/rest/quotations`;
+      const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU3MTIwLCJleHAiOjQ5Mzc5NTcxMTksImp0aSI6IjZkODliNmU5LTcwZmYtNGIwZS05MzUyLTk0ZTljMmJiOGQ5MyJ9.al8pc21Lc12mGgMEKu8GaWZDJytK55FjUx5_egt8jd3rAhUa0TpCfq7PAWoCDX5KUeqt2VrLN29QSfXHicnbzQ';
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Authorization': apiKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quoteNumber: `QT-${Date.now().toString(36).toUpperCase()}`,
+          buyerCompanyId: opp.companyName || '',
+          productId: '',
+          quantity: 0,
+          proposedRate: { amountMicros: 0, currencyCode: 'INR' },
+          approvalStatus: 'DRAFT',
+          linkedOpportunityId: opp.id,
+        }),
       });
+      const quot = await res.json();
+      console.log('Quotation POST response:', JSON.stringify(quot));
 
-      let newId = quot?.data?.id || quot?.data?.createQuotation?.id || quot?.id || null;
+      if (!res.ok) {
+        const errMsg = quot?.error?.message || quot?.message || JSON.stringify(quot);
+        setErrorMsg(`Failed to create quotation: ${errMsg}`);
+        return;
+      }
+
+      const newId = quot?.data?.id || quot?.data?.createQuotation?.id || quot?.id || null;
 
       if (newId) {
         setSuccessMsg(

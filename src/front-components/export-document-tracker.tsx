@@ -43,11 +43,26 @@ const fetchList = async (path: string) => {
   }
 };
 
+const postRecord = async (path: string, body: any) => {
+  try {
+    const res = await fetch(`${API_URL}/${path}`, { method: 'POST', headers: API_HEADERS, body: JSON.stringify(body) });
+    const json = await res.json();
+    if (!res.ok) { console.error('POST error:', path, json); return null; }
+    return json;
+  } catch (e) {
+    console.error('POST exception:', path, e);
+    return null;
+  }
+};
+
 const patchRecord = async (path: string, body: any) => {
   try {
     const res = await fetch(`${API_URL}/${path}`, { method: 'PATCH', headers: API_HEADERS, body: JSON.stringify(body) });
-    return await res.json();
-  } catch {
+    const json = await res.json();
+    if (!res.ok) { console.error('PATCH error:', path, json); return null; }
+    return json;
+  } catch (e) {
+    console.error('PATCH exception:', path, e);
     return null;
   }
 };
@@ -104,6 +119,26 @@ const ExportDocumentTracker = () => {
     if (result) {
       showToast(`Document status updated to ${newStatus}`);
       await loadData();
+    } else {
+      showToast('Failed to update status');
+    }
+    setUpdating(false);
+  };
+
+  const handleCreateDocument = async (docType: string) => {
+    if (!activeShipmentId) return;
+    setUpdating(true);
+    const result = await postRecord('exportDocuments', {
+      documentName: `${docType.replace(/_/g, ' ')} - ${activeShipment?.name || 'Shipment'}`,
+      documentType: docType,
+      exportShipmentId: activeShipmentId,
+      status: 'PENDING',
+    });
+    if (result) {
+      showToast(`${docType.replace(/_/g, ' ')} document created`);
+      await loadData();
+    } else {
+      showToast('Failed to create document');
     }
     setUpdating(false);
   };
@@ -238,9 +273,13 @@ const ExportDocumentTracker = () => {
                       </select>
                     )}
                     {!foundDoc && (
-                      <span style={{ fontSize: '11px', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase' }}>
-                        Not Created
-                      </span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleCreateDocument(docType); }}
+                        disabled={updating}
+                        style={{ padding: '4px 10px', fontSize: '11px', fontWeight: 600, backgroundColor: BRAND.blue, color: BRAND.white, border: 'none', borderRadius: '4px', cursor: updating ? 'not-allowed' : 'pointer' }}
+                      >
+                        + Create
+                      </button>
                     )}
                     {isSubmitted && (
                       <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: BRAND.green, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700 }}>

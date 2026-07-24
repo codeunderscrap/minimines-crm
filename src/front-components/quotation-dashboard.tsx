@@ -51,8 +51,11 @@ const patchRecord = async (path: string, body: any) => {
       headers: API_HEADERS,
       body: JSON.stringify(body),
     });
-    return await res.json();
-  } catch {
+    const json = await res.json();
+    if (!res.ok) { console.error('PATCH error:', path, json); return null; }
+    return json;
+  } catch (e) {
+    console.error('PATCH exception:', path, e);
     return null;
   }
 };
@@ -73,6 +76,19 @@ const getStatusColor = (status: string) => {
   if (status === 'REJECTED') return BRAND.red;
   const step = STEPS.find((s) => s.id === status);
   return step?.color || BRAND.gray;
+};
+
+const getCurrencyValue = (field: any): number => {
+  if (field == null) return 0;
+  if (typeof field === 'number') return field;
+  if (typeof field === 'object' && field.amountMicros != null) return field.amountMicros / 1_000_000;
+  const n = Number(field);
+  return isNaN(n) ? 0 : n;
+};
+
+const fmtCurrency = (field: any): string => {
+  const val = getCurrencyValue(field);
+  return `₹${val.toLocaleString('en-IN')}`;
 };
 
 const StatCard = ({ title, value, color }: { title: string; value: string | number; color: string }) => (
@@ -280,7 +296,7 @@ const QuotationDashboard = () => {
                   </div>
                   <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
                     <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Rate (INR)</div>
-                    <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{'₹'}{Number(selected.proposedRate || 0).toLocaleString()}</div>
+                    <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{fmtCurrency(selected.proposedRate)}</div>
                   </div>
                 </div>
               </div>
@@ -338,7 +354,7 @@ const QuotationDashboard = () => {
                   </div>
                   <div style={{ color: BRAND.secondary, fontSize: '12px' }}>{q.buyerCompanyId || q.productId || 'N/A'}</div>
                   <div style={{ color: BRAND.primary }}>{q.quantity || 0}</div>
-                  <div style={{ color: BRAND.primary }}>{'₹'}{Number(q.proposedRate || 0).toLocaleString()}</div>
+                  <div style={{ color: BRAND.primary }}>{fmtCurrency(q.proposedRate)}</div>
                   <div>
                     <span style={{ fontSize: '11px', backgroundColor: `${statusColor}18`, color: statusColor, padding: '3px 8px', borderRadius: '4px', fontWeight: 600 }}>
                       {(q.approvalStatus || 'DRAFT').replace(/_/g, ' ')}

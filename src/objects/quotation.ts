@@ -16,6 +16,7 @@ export default defineObject({
     { universalIdentifier: 'b9cd4ab3-d101-473e-a621-a999f268b00f', name: 'productId', type: FieldType.TEXT, label: 'Product ID' },
     { universalIdentifier: 'a93ea01d-63c2-4a98-9dc6-368b903ff6bc', name: 'quantity', type: FieldType.NUMBER, label: 'Quantity (MT)' },
     { universalIdentifier: '310a84ba-5e4a-48a9-964d-432d55829457', name: 'proposedRate', type: FieldType.CURRENCY, label: 'Proposed Rate (INR)' },
+    { universalIdentifier: 'f2a164c9-b75d-4680-8525-0a19f04ec0e5', name: 'linkedOpportunityId', type: FieldType.TEXT, label: 'Linked Opportunity ID' },
     {
       universalIdentifier: '51178cdf-3bd7-4fab-b52f-2144e95ac502',
       name: 'approvalStatus',
