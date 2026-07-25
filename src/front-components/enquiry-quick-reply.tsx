@@ -15,7 +15,7 @@ import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 // ─── Config — set your own values ────────────────────────────────────────────
 const TWENTY_API_BASE = 'https://api.twenty.com/rest';
 const TWENTY_API_KEY =
-  'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwMjNlNTZkLTQ2NmMtNDQxOC1iMjE4LWZjOWFmMGU3ODU5MiJ9.eyJzdWIiOiI0MzQ4MGMxNi01ZjA1LTQ5OGUtYjdjZC1mOTFmMjdkMGUxMjUiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiNDM0ODBjMTYtNWYwNS00OThlLWI3Y2QtZjkxZjI3ZDBlMTI1IiwiaWF0IjoxNzg0MzU3MTIwLCJleHAiOjQ5Mzc5NTcxMTksImp0aSI6IjZkODliNmU5LTcwZmYtNGIwZS05MzUyLTk0ZTljMmJiOGQ5MyJ9.al8pc21Lc12mGgMEKu8GaWZDJytK55FjUx5_egt8jd3rAhUa0TpCfq7PAWoCDX5KUeqt2VrLN29QSfXHicnbzQ';
+  'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjgwNGZmMTA2LWM2YjQtNDUwZC04OThjLWYxZDUxMDc5MTNmMyJ9.eyJzdWIiOiI5NzljY2YxMy04ZDU2LTRjNjEtOTk5Ni0wMjE4MjY5MTI1ZGQiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiOTc5Y2NmMTMtOGQ1Ni00YzYxLTk5OTYtMDIxODI2OTEyNWRkIiwiaWF0IjoxNzg0OTY2NDAwLCJleHAiOjQ5Mzg1NjYzOTksImp0aSI6ImU1NzY4YTIyLWViODctNDc3MC04M2ZlLThhOGU3MjA4Y2VjMyJ9.3SnTbSOioIatsslSwMoWs1yVqGfL71Vw8QeyuPN8zUH9fVj9thl5Ohx3KyKngZG9_SPA0O0qJz2HZ4QAjaFzow';
 
 /** ⚠️  Replace with your Resend API key from https://resend.com/api-keys */
 const RESEND_API_KEY = 're_REPLACE_WITH_YOUR_RESEND_API_KEY';
