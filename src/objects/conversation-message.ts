@@ -75,9 +75,8 @@ export default defineObject({
         { label: 'Website', value: 'WEBSITE', position: 0, color: 'blue' },
         { label: 'Email', value: 'EMAIL', position: 1, color: 'gray' },
         { label: 'LinkedIn', value: 'LINKEDIN', position: 2, color: 'sky' },
-        { label: 'Phone', value: 'PHONE', position: 3, color: 'green' },
-        { label: 'WhatsApp', value: 'WHATSAPP', position: 4, color: 'turquoise' },
-        { label: 'Internal Note', value: 'INTERNAL', position: 5, color: 'yellow' },
+        { label: 'WhatsApp', value: 'WHATSAPP', position: 3, color: 'turquoise' },
+        { label: 'Internal Note', value: 'INTERNAL', position: 4, color: 'yellow' },
       ],
     },
 

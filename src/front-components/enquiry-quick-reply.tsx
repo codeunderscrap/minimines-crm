@@ -55,7 +55,6 @@ const SOURCES: Record<string, { label: string; icon: string; color: string; badg
   WEBSITE: { label: 'Website', icon: '🌐', color: '#2980B9', badgeColor: '#EBF5FB' },
   EMAIL: { label: 'Email', icon: '📧', color: '#7F8C8D', badgeColor: '#F2F3F4' },
   LINKEDIN: { label: 'LinkedIn', icon: '🔗', color: '#2867B2', badgeColor: '#EAF2FF' },
-  PHONE: { label: 'Phone', icon: '📞', color: '#27AE60', badgeColor: '#EAFAF1' },
   WHATSAPP: { label: 'WhatsApp', icon: '📱', color: '#25D366', badgeColor: '#E9FBF0' },
   OTHER: { label: 'Other', icon: '📨', color: '#E67E22', badgeColor: '#FEF9E7' },
 };
@@ -178,8 +177,7 @@ const MOCK_ENQUIRIES = [
     id: 'mock-4',
     customerName: 'Priya Sharma',
     company: 'Bharati Minerals',
-    contactEmail: { primaryEmail: 'priya@bharatiminerals.in' },
-    source: 'PHONE',
+    source: 'WHATSAPP',
     status: 'NEW',
     priority: 'NORMAL',
     message: 'Interested in Aluminium Scrap — 100MT monthly. Please share product catalogue and pricing.',
@@ -201,7 +199,7 @@ const MOCK_MESSAGES: Record<string, any[]> = {
     { id: 'm3-1', direction: 'INBOUND', senderName: 'Ahmed Al-Rashid', senderType: 'CUSTOMER', channel: 'EMAIL', body: 'Hello, I sent an enquiry 3 days ago regarding Zinc Ingots (LME Grade). Still awaiting your response. Please advise on current availability and pricing.', sentAt: new Date(Date.now() - 86400000).toISOString(), isRead: true },
   ],
   'mock-4': [
-    { id: 'm4-1', direction: 'INBOUND', senderName: 'Priya Sharma', senderType: 'CUSTOMER', channel: 'PHONE', body: 'Interested in Aluminium Scrap — 100MT monthly. Please share product catalogue and pricing. Our company imports regularly.', sentAt: new Date(Date.now() - 3600000).toISOString(), isRead: false },
+    { id: 'm4-1', direction: 'INBOUND', senderName: 'Priya Sharma', senderType: 'CUSTOMER', channel: 'WHATSAPP', body: 'Interested in Aluminium Scrap — 100MT monthly. Please share product catalogue and pricing. Our company imports regularly.', sentAt: new Date(Date.now() - 3600000).toISOString(), isRead: false },
   ],
 };
 
