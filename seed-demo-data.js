@@ -5,12 +5,12 @@
 const API = 'https://api.twenty.com/rest';
 const TOKEN = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjgwNGZmMTA2LWM2YjQtNDUwZC04OThjLWYxZDUxMDc5MTNmMyJ9.eyJzdWIiOiI5NzljY2YxMy04ZDU2LTRjNjEtOTk5Ni0wMjE4MjY5MTI1ZGQiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiOTc5Y2NmMTMtOGQ1Ni00YzYxLTk5OTYtMDIxODI2OTEyNWRkIiwiaWF0IjoxNzg0OTY2NDAwLCJleHAiOjQ5Mzg1NjYzOTksImp0aSI6ImU1NzY4YTIyLWViODctNDc3MC04M2ZlLThhOGU3MjA4Y2VjMyJ9.3SnTbSOioIatsslSwMoWs1yVqGfL71Vw8QeyuPN8zUH9fVj9thl5Ohx3KyKngZG9_SPA0O0qJz2HZ4QAjaFzow';
 
-// Workspace member IDs (from actual workspace)
-const MEMBERS = {
-  HOD_MANN:      '4037190d-ef8c-48b6-becf-7b6fd3a9bc74',
-  HOD_ARSALAN:   '4749fcbe-a2b2-4b7e-ac5e-f842e390d46d',
-  ASSOCIATE_S1:  '9d49a342-eb4b-428e-a543-57f109c2477f',
-  MANAGER_EXEC:  'fe7aaccc-cae2-4d06-9cdc-1df46355da55',
+// Dynamic Workspace Members mapping
+let MEMBERS = {
+  HOD_MANN:      null,
+  HOD_ARSALAN:   null,
+  ASSOCIATE_S1:  null,
+  MANAGER_EXEC:  null,
 };
 
 const delay = (ms) => new Promise(r => setTimeout(r, ms));
@@ -37,6 +37,25 @@ async function post(endpoint, body) {
 async function seed() {
   console.log('\n🏭 MiniMines CRM — Seeding Professional Demo Data\n');
 
+  // Fetch active workspace members
+  console.log('👥 Fetching workspace members dynamically...');
+  try {
+    const res = await fetch(`${API}/workspace-members`, {
+      headers: { Authorization: TOKEN }
+    });
+    const json = await res.json();
+    const list = json.data?.workspaceMembers || json.workspaceMembers || [];
+    console.log(`   Found ${list.length} workspace members.`);
+    if (list.length > 0) {
+      MEMBERS.HOD_MANN = list[0]?.id || null;
+      MEMBERS.HOD_ARSALAN = list[1]?.id || list[0]?.id || null;
+      MEMBERS.ASSOCIATE_S1 = list[2]?.id || list[0]?.id || null;
+      MEMBERS.MANAGER_EXEC = list[3]?.id || list[1]?.id || list[0]?.id || null;
+    }
+  } catch (e) {
+    console.log('⚠️ Could not fetch workspace members, skipping owner assignments.', e);
+  }
+
   // ═══════════════════════════════════════════════════════════════
   // 1. PRODUCTS — Material catalog
   // ═══════════════════════════════════════════════════════════════
@@ -58,11 +77,11 @@ async function seed() {
   // ═══════════════════════════════════════════════════════════════
   console.log('🏢 Seeding Companies...');
   const companies = [
-    { name: { firstName: '', lastName: 'Amara Raja Energy & Mobility' }, domainName: { primaryLinkUrl: 'https://amararaja.com', primaryLinkLabel: '', secondaryLinks: [] }, address: { addressCity: 'Tirupati', addressState: 'Andhra Pradesh', addressCountry: 'India', addressStreet1: 'Renigunta', addressStreet2: '', addressPostcode: '517520', addressLat: null, addressLng: null } },
-    { name: { firstName: '', lastName: 'Tata Chemicals Ltd' }, domainName: { primaryLinkUrl: 'https://tatachemicals.com', primaryLinkLabel: '', secondaryLinks: [] }, address: { addressCity: 'Mumbai', addressState: 'Maharashtra', addressCountry: 'India', addressStreet1: 'Bombay House, Homi Mody St', addressStreet2: '', addressPostcode: '400001', addressLat: null, addressLng: null } },
-    { name: { firstName: '', lastName: 'Exide Industries Ltd' }, domainName: { primaryLinkUrl: 'https://exideindustries.com', primaryLinkLabel: '', secondaryLinks: [] }, address: { addressCity: 'Kolkata', addressState: 'West Bengal', addressCountry: 'India', addressStreet1: 'Exide House, 59E Chowringhee Rd', addressStreet2: '', addressPostcode: '700020', addressLat: null, addressLng: null } },
-    { name: { firstName: '', lastName: 'Log9 Materials' }, domainName: { primaryLinkUrl: 'https://log9materials.com', primaryLinkLabel: '', secondaryLinks: [] }, address: { addressCity: 'Bengaluru', addressState: 'Karnataka', addressCountry: 'India', addressStreet1: 'KIADB Industrial Area, Doddaballapur', addressStreet2: '', addressPostcode: '561203', addressLat: null, addressLng: null } },
-    { name: { firstName: '', lastName: 'Hindalco Industries' }, domainName: { primaryLinkUrl: 'https://hindalco.com', primaryLinkLabel: '', secondaryLinks: [] }, address: { addressCity: 'Mumbai', addressState: 'Maharashtra', addressCountry: 'India', addressStreet1: 'Aditya Birla Centre, Worli', addressStreet2: '', addressPostcode: '400030', addressLat: null, addressLng: null } },
+    { name: 'Amara Raja Energy & Mobility', domainName: { primaryLinkUrl: 'https://amararaja.com', primaryLinkLabel: '', secondaryLinks: [] }, address: { addressCity: 'Tirupati', addressState: 'Andhra Pradesh', addressCountry: 'India', addressStreet1: 'Renigunta', addressStreet2: '', addressPostcode: '517520', addressLat: null, addressLng: null } },
+    { name: 'Tata Chemicals Ltd', domainName: { primaryLinkUrl: 'https://tatachemicals.com', primaryLinkLabel: '', secondaryLinks: [] }, address: { addressCity: 'Mumbai', addressState: 'Maharashtra', addressCountry: 'India', addressStreet1: 'Bombay House, Homi Mody St', addressStreet2: '', addressPostcode: '400001', addressLat: null, addressLng: null } },
+    { name: 'Exide Industries Ltd', domainName: { primaryLinkUrl: 'https://exideindustries.com', primaryLinkLabel: '', secondaryLinks: [] }, address: { addressCity: 'Kolkata', addressState: 'West Bengal', addressCountry: 'India', addressStreet1: 'Exide House, 59E Chowringhee Rd', addressStreet2: '', addressPostcode: '700020', addressLat: null, addressLng: null } },
+    { name: 'Log9 Materials', domainName: { primaryLinkUrl: 'https://log9materials.com', primaryLinkLabel: '', secondaryLinks: [] }, address: { addressCity: 'Bengaluru', addressState: 'Karnataka', addressCountry: 'India', addressStreet1: 'KIADB Industrial Area, Doddaballapur', addressStreet2: '', addressPostcode: '561203', addressLat: null, addressLng: null } },
+    { name: 'Hindalco Industries', domainName: { primaryLinkUrl: 'https://hindalco.com', primaryLinkLabel: '', secondaryLinks: [] }, address: { addressCity: 'Mumbai', addressState: 'Maharashtra', addressCountry: 'India', addressStreet1: 'Aditya Birla Centre, Worli', addressStreet2: '', addressPostcode: '400030', addressLat: null, addressLng: null } },
   ];
   const companyIds = [];
   for (const c of companies) {
@@ -89,7 +108,7 @@ async function seed() {
   // 4. LEADS — Prospective clients with role assignments
   // ═══════════════════════════════════════════════════════════════
   console.log('🎯 Seeding Leads...');
-  const leads = [
+  const rawLeads = [
     // Assigned to Associate S1
     { name: 'Greenko Group — Lithium Enquiry', company: 'Greenko Group', email: { primaryEmail: 'procurement@greenko.net', additionalEmails: [] }, phone: { primaryPhoneNumber: '9876501234', primaryPhoneCountryCode: 'IN', primaryPhoneCallingCode: '+91', additionalPhones: [] }, source: 'WEBSITE', status: 'NEW', assignedTo: 'UNASSIGNED', department: 'SALES', followUpStatus: 'NONE', acknowledgmentSent: false, notes: 'Interested in 5MT/month Li₂CO₃ for energy storage', assignedAssociateId: MEMBERS.ASSOCIATE_S1, assignedManagerPrimaryId: MEMBERS.MANAGER_EXEC },
     { name: 'Ather Energy — Cobalt Supply', company: 'Ather Energy Pvt Ltd', email: { primaryEmail: 'supply@atherenergy.com', additionalEmails: [] }, phone: { primaryPhoneNumber: '9845612378', primaryPhoneCountryCode: 'IN', primaryPhoneCallingCode: '+91', additionalPhones: [] }, source: 'LINKEDIN', status: 'CONTACTED', assignedTo: 'UNASSIGNED', department: 'SALES', followUpStatus: 'FOLLOW_UP_1', acknowledgmentSent: true, notes: 'EV scooter battery pack needs CoSO₄ supply', assignedAssociateId: MEMBERS.ASSOCIATE_S1, assignedManagerPrimaryId: MEMBERS.MANAGER_EXEC },
@@ -102,7 +121,13 @@ async function seed() {
     { name: 'BYD India — Manganese Supply', company: 'BYD India Pvt Ltd', email: { primaryEmail: 'sourcing@byd.co.in', additionalEmails: [] }, phone: { primaryPhoneNumber: '9560012345', primaryPhoneCountryCode: 'IN', primaryPhoneCallingCode: '+91', additionalPhones: [] }, source: 'WEBSITE', status: 'NEW', assignedTo: 'UNASSIGNED', department: 'SALES', followUpStatus: 'NONE', acknowledgmentSent: false, notes: 'Need LFP-grade MnSO₄ for EV bus batteries' },
     { name: 'CSIR-CECRI — Research Collaboration', company: 'CSIR-CECRI Karaikudi', email: { primaryEmail: 'director@cecri.res.in', additionalEmails: [] }, phone: { primaryPhoneNumber: '4565241544', primaryPhoneCountryCode: 'IN', primaryPhoneCallingCode: '+91', additionalPhones: [] }, source: 'CALL', status: 'CONTACTED', assignedTo: 'UNASSIGNED', department: 'BD', followUpStatus: 'FOLLOW_UP_1', acknowledgmentSent: true, notes: 'Joint research on next-gen cathode recycling processes' },
   ];
-  for (const l of leads) { await post('leads', l); await delay(1200); }
+  for (const l of rawLeads) {
+    // Scrub undefined/null owners so we don't trigger database FK violations
+    if (!l.assignedAssociateId) delete l.assignedAssociateId;
+    if (!l.assignedManagerPrimaryId) delete l.assignedManagerPrimaryId;
+    await post('leads', l); 
+    await delay(1200); 
+  }
 
   // ═══════════════════════════════════════════════════════════════
   // 5. ENQUIRIES — Incoming questions
