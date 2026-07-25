@@ -111,7 +111,6 @@ const ContractDashboard = () => {
   };
 
   if (!recordId && userRole === null) return <RoleLoading />;
-  if (!recordId && userRole === 'associate') return <AccessDenied minRole="manager" />;
 
   if (loading) {
     return <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>Loading contracts...</div>;

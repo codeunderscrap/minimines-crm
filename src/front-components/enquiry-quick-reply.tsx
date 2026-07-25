@@ -405,7 +405,6 @@ export const CommunicationsHub = () => {
   }, [messages]);
 
   if (userRole === null) return <RoleLoading />;
-  if (userRole === 'associate') return <AccessDenied minRole="manager" />;
 
   // ── Send reply ────────────────────────────────────────────────────────────
   const handleSend = async () => {

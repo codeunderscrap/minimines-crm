@@ -144,7 +144,6 @@ const ExportDocumentTracker = () => {
   };
 
   if (!recordId && userRole === null) return <RoleLoading />;
-  if (!recordId && userRole !== 'hod') return <AccessDenied minRole="hod" />;
 
   if (loading) {
     return <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>Loading compliance checklist...</div>;

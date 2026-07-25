@@ -105,7 +105,6 @@ const SalesOrderDashboard = () => {
   };
 
   if (userRole === null) return <RoleLoading />;
-  if (userRole === 'associate') return <AccessDenied minRole="manager" />;
 
   if (loading && orders.length === 0) {
     return <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif" }}>Loading Confirmed Orders...</div>;
