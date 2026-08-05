@@ -101,11 +101,12 @@ const TeamAccessDashboard = () => {
 
   const currentUserId = currentMember?.id || rawUserId;
 
-  const roleFromJobTitle = (title: string): 'hod' | 'manager' | 'associate' | null => {
+  const roleFromJobTitle = (title: string): 'admin' | 'hod' | 'manager' | 'associate' | null => {
     const t = (title || '').toLowerCase();
+    if (t.includes('admin')) return 'admin';
     if (t.includes('associate')) return 'associate';
     if (t.includes('executive') || t.includes('manager')) return 'manager';
-    if (t.includes('head') || t.includes('hod') || t.includes('director') || t.includes('admin')) return 'hod';
+    if (t.includes('head') || t.includes('hod') || t.includes('director')) return 'hod';
     return null;
   };
 
@@ -120,7 +121,7 @@ const TeamAccessDashboard = () => {
     if (isMgr || isAssoc) return false;
 
     const titleRole = roleFromJobTitle(currentMember?.jobTitle);
-    if (titleRole && titleRole !== 'hod') return false;
+    if (titleRole && titleRole !== 'hod' && titleRole !== 'admin') return false;
 
     return true;
   }, [currentUserId, currentMember, leads]);
@@ -147,13 +148,21 @@ const TeamAccessDashboard = () => {
   });
 
   const inferRole = (m: any): string => {
+    const titleRole = roleFromJobTitle(m?.jobTitle);
+    if (titleRole === 'admin') return 'ADMIN';
+
+    const email = (memberEmail(m) || '').toLowerCase();
+    const nameStr = (memberName(m) || '').toLowerCase();
+    if (email.includes('admin') || nameStr.includes('admin')) {
+      return 'ADMIN';
+    }
+
     const isMgr = managerIds.has(m.id);
     const isAssoc = associateIds.has(m.id);
     if (isMgr && isAssoc) return 'Multi-role';
     if (isMgr) return 'Manager';
     if (isAssoc) return 'Associate';
 
-    const titleRole = roleFromJobTitle(m?.jobTitle);
     if (titleRole === 'associate') return 'Associate';
     if (titleRole === 'manager') return 'Manager';
 
@@ -161,6 +170,7 @@ const TeamAccessDashboard = () => {
   };
 
   const roleColor = (role: string) => {
+    if (role === 'ADMIN') return { bg: '#fee2e2', fg: BRAND.red };
     if (role === 'Manager') return { bg: '#dbeafe', fg: BRAND.blue };
     if (role === 'Associate') return { bg: '#d1fae5', fg: BRAND.green };
     if (role === 'Multi-role') return { bg: '#ede9fe', fg: BRAND.purple };

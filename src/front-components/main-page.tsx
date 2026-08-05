@@ -551,8 +551,8 @@ const MainPage = () => {
         fetchTwenty('contracts?orderBy=createdAt,desc&limit=5'),
         fetchTwenty('salesOrders?orderBy=createdAt,desc&limit=5'),
         fetchTwenty('exportShipments?orderBy=createdAt,desc&limit=5'),
-        fetchTwenty('opportunities?limit=50'),
-        fetchTwenty('leads?limit=50')
+        fetchTwenty('opportunities?limit=1000'),
+        fetchTwenty('leads?limit=1000')
       ]).then(([c, s, e, o, l]) => ({ contracts: c, salesOrders: s, exportShipments: e, opportunities: o, leads: l }));
 
       setData({ contracts, salesOrders, exportShipments, opportunities, leads });
