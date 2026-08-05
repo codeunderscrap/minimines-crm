@@ -84,7 +84,7 @@ export default defineObject({
     },
     {
       universalIdentifier: '62a3d7b1-5f2c-49a0-9c1a-f3b7d5a9c2b4',
-      name: 'type',
+      name: 'leadType',
       type: FieldType.SELECT,
       label: 'Type',
       options: [
