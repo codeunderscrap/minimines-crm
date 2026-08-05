@@ -54,7 +54,6 @@ const SOURCES: Record<string, { label: string; icon: string; color: string; badg
   ALL: { label: 'All Channels', icon: '💬', color: B.accent, badgeColor: '#E8F4F8' },
   WEBSITE: { label: 'Website', icon: '🌐', color: '#2980B9', badgeColor: '#EBF5FB' },
   EMAIL: { label: 'Email', icon: '📧', color: '#7F8C8D', badgeColor: '#F2F3F4' },
-  LINKEDIN: { label: 'LinkedIn', icon: '🔗', color: '#2867B2', badgeColor: '#EAF2FF' },
   WHATSAPP: { label: 'WhatsApp', icon: '📱', color: '#25D366', badgeColor: '#E9FBF0' },
   OTHER: { label: 'Other', icon: '📨', color: '#E67E22', badgeColor: '#FEF9E7' },
 };
@@ -829,6 +828,14 @@ export const CommunicationsHub = () => {
                     <button onClick={() => setNotifNote(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A6FAE', marginLeft: 4 }}>✕</button>
                   </div>
                 )}
+                {/* Reply templates */}
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8, padding: '0 2px' }}>
+                  <span style={{ fontSize: 11, color: B.textMid, alignSelf: 'center', marginRight: 4, fontWeight: 500 }}>Quick Templates:</span>
+                  <button onClick={() => setReplyText(`Dear ${selected.customerName},\n\nWe have received your enquiry regarding battery scrap / black mass sourcing. Please find our latest chemical recycling catalog and pricing framework index attached.\n\nBest regards,\nMiniMines Sourcing Team`)} style={{ background: '#fff', border: `1px solid ${B.border}`, borderRadius: 16, padding: '3px 10px', fontSize: 11, cursor: 'pointer', color: B.textDark, outline: 'none' }}>📄 Sourcing Catalog</button>
+                  <button onClick={() => setReplyText(`Dear ${selected.customerName},\n\nThank you for reaching out. Here is our official corporate presentation highlighting our patented HHM™ hydrometallurgy battery recycling capabilities.\n\nBest regards,\nMiniMines Team`)} style={{ background: '#fff', border: `1px solid ${B.border}`, borderRadius: 16, padding: '3px 10px', fontSize: 11, cursor: 'pointer', color: B.textDark, outline: 'none' }}>📈 Pitch Deck</button>
+                  <button onClick={() => setReplyText(`Dear ${selected.customerName},\n\nWe have drafted a standard Mutual Non-Disclosure Agreement (NDA) for our joint partnership exploration. Please review it and share your feedback.\n\nBest regards,\nMiniMines Team`)} style={{ background: '#fff', border: `1px solid ${B.border}`, borderRadius: 16, padding: '3px 10px', fontSize: 11, cursor: 'pointer', color: B.textDark, outline: 'none' }}>📝 NDA Draft</button>
+                </div>
+
                 <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
                   <div style={{ flex: 1, border: `1px solid ${B.border}`, borderRadius: 12, background: '#fff', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <textarea
@@ -917,10 +924,30 @@ export const CommunicationsHub = () => {
                 </div>
               )}
               {selected.contactPhone && (
-                <div style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 13 }}>
-                  <span>📞</span>
-                  <span style={{ color: B.textMid }}>{typeof selected.contactPhone === 'object' ? selected.contactPhone.primaryPhoneNumber ?? JSON.stringify(selected.contactPhone) : selected.contactPhone}</span>
-                </div>
+                <>
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 13 }}>
+                    <span>📞</span>
+                    <span style={{ color: B.textMid }}>{typeof selected.contactPhone === 'object' ? selected.contactPhone.primaryPhoneNumber ?? JSON.stringify(selected.contactPhone) : selected.contactPhone}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 12, paddingLeft: 22 }}>
+                    <button
+                      onClick={() => {
+                        const num = (typeof selected.contactPhone === 'object' ? selected.contactPhone.primaryPhoneNumber : selected.contactPhone) || '';
+                        const cleanNum = num.replace(/\D/g, '');
+                        const text = encodeURIComponent(`Hi ${selected.customerName},\nThank you for reaching out to MiniMines. We received your enquiry and would love to connect. Please let us know a convenient time to schedule a brief call!`);
+                        window.open(`https://wa.me/${cleanNum}?text=${text}`, '_blank');
+                      }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        background: '#25D366', color: '#fff', border: 'none',
+                        borderRadius: 6, padding: '5px 10px', fontSize: 11,
+                        fontWeight: 600, cursor: 'pointer', outline: 'none',
+                      }}
+                    >
+                      <span>📱</span> Chat on WhatsApp
+                    </button>
+                  </div>
+                </>
               )}
               <div style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 13, alignItems: 'center' }}>
                 <span>📡</span>
