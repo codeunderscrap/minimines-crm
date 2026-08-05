@@ -59,10 +59,9 @@ export default defineObject({
       label: 'Lead Source',
       options: [
         { label: 'Website (WordPress)', value: 'WEBSITE', position: 0, color: 'blue' },
-        { label: 'LinkedIn', value: 'LINKEDIN', position: 1, color: 'sky' },
-        { label: 'Call', value: 'CALL', position: 2, color: 'green' },
-        { label: 'Direct', value: 'DIRECT', position: 3, color: 'gray' },
-        { label: 'SalesHub', value: 'SALESHUB', position: 4, color: 'purple' },
+        { label: 'Call', value: 'CALL', position: 1, color: 'green' },
+        { label: 'Direct', value: 'DIRECT', position: 2, color: 'gray' },
+        { label: 'SalesHub', value: 'SALESHUB', position: 3, color: 'purple' },
       ],
     },
     {
@@ -76,6 +75,59 @@ export default defineObject({
         { label: 'Qualified', value: 'QUALIFIED', position: 2, color: 'green' },
         { label: 'Disqualified', value: 'DISQUALIFIED', position: 3, color: 'red' },
       ],
+    },
+    {
+      universalIdentifier: '78b9a10c-eb4b-4a56-a19c-cb2d8a4f1a23',
+      name: 'segment',
+      type: FieldType.TEXT,
+      label: 'Segment',
+    },
+    {
+      universalIdentifier: '62a3d7b1-5f2c-49a0-9c1a-f3b7d5a9c2b4',
+      name: 'type',
+      type: FieldType.SELECT,
+      label: 'Type',
+      options: [
+        { label: 'Pure EV', value: 'PURE_EV', position: 0, color: 'green' },
+        { label: 'EV', value: 'EV', position: 1, color: 'blue' },
+        { label: 'Electric (BOV)', value: 'ELECTRIC_BOV', position: 2, color: 'purple' },
+      ],
+    },
+    {
+      universalIdentifier: 'c9b3f7e1-8a2d-4b6c-a5d9-2f8a4c2b1b3d',
+      name: 'city',
+      type: FieldType.TEXT,
+      label: 'City',
+    },
+    {
+      universalIdentifier: '1a5d9c2b-4b8c-4f7e-9d6a-3c5b8a4f1e3d',
+      name: 'material',
+      type: FieldType.SELECT,
+      label: 'Material',
+      options: [
+        { label: 'Heavy-truck swap packs', value: 'HEAVY_TRUCK_SWAP', position: 0, color: 'blue' },
+        { label: 'Heavy-truck swap packs (N+1)', value: 'HEAVY_TRUCK_SWAP_N1', position: 1, color: 'sky' },
+        { label: 'Multi-OEM EV packs', value: 'MULTI_OEM_EV', position: 2, color: 'green' },
+        { label: '2W packs (LFP)', value: 'TWO_W_LFP', position: 3, color: 'yellow' },
+        { label: 'Li-ion batteries', value: 'LI_ION_BATTERIES', position: 4, color: 'orange' },
+      ],
+    },
+    {
+      universalIdentifier: 'a8c4e6b2-7f2c-49a0-91c4-2f5c8d4b6e1a',
+      name: 'priority',
+      type: FieldType.SELECT,
+      label: 'Priority',
+      options: [
+        { label: 'High', value: 'HIGH', position: 0, color: 'red' },
+        { label: 'Medium', value: 'MEDIUM', position: 1, color: 'orange' },
+        { label: 'Low', value: 'LOW', position: 2, color: 'green' },
+      ],
+    },
+    {
+      universalIdentifier: 'f4b8e2d6-1c2a-4d9f-a8c2-3d6c2b8f4a1e',
+      name: 'estVolume',
+      type: FieldType.TEXT,
+      label: 'Estimated Volume',
     },
     {
       universalIdentifier: 'd584e26d-46a1-4181-b54d-cfae9849ac8d',
