@@ -90,8 +90,8 @@ const sendEmailViaResend = async (
   subject: string,
   html: string,
 ): Promise<boolean> => {
-  const key = typeof window !== 'undefined' ? localStorage.getItem('MINIMINES_RESEND_API_KEY') || '' : '';
-  const fromEmail = typeof window !== 'undefined' ? localStorage.getItem('MINIMINES_SENDER_EMAIL') || 'inbound@minimines.com' : 'inbound@minimines.com';
+  const key = typeof globalThis !== 'undefined' && globalThis.localStorage ? globalThis.localStorage.getItem('MINIMINES_RESEND_API_KEY') || '' : '';
+  const fromEmail = typeof globalThis !== 'undefined' && globalThis.localStorage ? globalThis.localStorage.getItem('MINIMINES_SENDER_EMAIL') || 'inbound@minimines.com' : 'inbound@minimines.com';
   if (!key.startsWith('re_')) {
     console.warn('[InboundLeads] Resend API key not configured in settings. Email not sent.');
     return false;
@@ -297,8 +297,8 @@ export const InboundLeadsHub = () => {
 
   const [converting, setConverting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [resendKey, setResendKey] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('MINIMINES_RESEND_API_KEY') : null) || '');
-  const [senderEmail, setSenderEmail] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('MINIMINES_SENDER_EMAIL') : null) || 'inbound@minimines.com');
+  const [resendKey, setResendKey] = useState(() => (typeof globalThis !== 'undefined' && globalThis.localStorage ? globalThis.localStorage.getItem('MINIMINES_RESEND_API_KEY') : null) || '');
+  const [senderEmail, setSenderEmail] = useState(() => (typeof globalThis !== 'undefined' && globalThis.localStorage ? globalThis.localStorage.getItem('MINIMINES_SENDER_EMAIL') : null) || 'inbound@minimines.com');
 
   const selected = enquiries.find(e => e.id === selectedId) ?? null;
 
@@ -1130,8 +1130,10 @@ export const InboundLeadsHub = () => {
               </button>
               <button
                 onClick={() => {
-                  localStorage.setItem('MINIMINES_RESEND_API_KEY', resendKey.trim());
-                  localStorage.setItem('MINIMINES_SENDER_EMAIL', senderEmail.trim());
+                  if (typeof globalThis !== 'undefined' && globalThis.localStorage) {
+                    globalThis.localStorage.setItem('MINIMINES_RESEND_API_KEY', resendKey.trim());
+                    globalThis.localStorage.setItem('MINIMINES_SENDER_EMAIL', senderEmail.trim());
+                  }
                   setShowSettings(false);
                   showToast('⚙️ Settings saved securely to localStorage!', 'success');
                 }}
