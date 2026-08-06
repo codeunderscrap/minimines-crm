@@ -6,7 +6,7 @@ import {
 
 export default defineNavigationMenuItem({
   universalIdentifier: ENQUIRY_DASHBOARD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
-  name: 'Communications',
+  name: 'Inbound Leads',
   icon: 'IconMessages',
   position: 8,
   type: NavigationMenuItemType.PAGE_LAYOUT,

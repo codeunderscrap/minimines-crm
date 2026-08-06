@@ -1,5 +1,5 @@
 /**
- * CommunicationsHub — MiniMines CRM
+ * InboundLeadsHub — MiniMines CRM
  * ──────────────────────────────────
  * Slack-style 3-column unified inbox for all inbound enquiries.
  * Sources: Website, Email, LinkedIn, Phone, WhatsApp (future).
@@ -20,7 +20,7 @@ const TWENTY_API_KEY =
 /** ⚠️  Replace with your Resend API key from https://resend.com/api-keys */
 const RESEND_API_KEY = 're_REPLACE_WITH_YOUR_RESEND_API_KEY';
 /** ⚠️  Replace with the verified sender email on your Resend domain */
-const SENDER_EMAIL = 'communications@minimines.com';
+const SENDER_EMAIL = 'inbound@minimines.com';
 const SENDER_NAME = 'MiniMines Team';
 
 const POLL_INTERVAL_MS = 30_000;
@@ -80,7 +80,7 @@ const api = async (path: string, method = 'GET', body: any = null) => {
     if (method === 'GET') return json?.data?.items ?? json?.data ?? [];
     return json;
   } catch (err) {
-    console.error('[CommunicationsHub] API error:', err);
+    console.error('[InboundLeadsHub] API error:', err);
     return method === 'GET' ? [] : null;
   }
 };
@@ -90,8 +90,8 @@ const sendEmailViaResend = async (
   subject: string,
   html: string,
 ): Promise<boolean> => {
-  const key = localStorage.getItem('MINIMINES_RESEND_API_KEY') || '';
-  const fromEmail = localStorage.getItem('MINIMINES_SENDER_EMAIL') || 'communications@minimines.com';
+  const key = typeof window !== 'undefined' ? localStorage.getItem('MINIMINES_RESEND_API_KEY') || '' : '';
+  const fromEmail = typeof window !== 'undefined' ? localStorage.getItem('MINIMINES_SENDER_EMAIL') || 'inbound@minimines.com' : 'inbound@minimines.com';
   if (!key.startsWith('re_')) {
     console.warn('[InboundLeads] Resend API key not configured in settings. Email not sent.');
     return false;
@@ -274,7 +274,7 @@ const Toast = ({ message, type }: { message: string; type: 'success' | 'error' |
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export const CommunicationsHub = () => {
+export const InboundLeadsHub = () => {
   const userRole = useUserRole();
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
@@ -297,8 +297,8 @@ export const CommunicationsHub = () => {
 
   const [converting, setConverting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [resendKey, setResendKey] = useState(() => localStorage.getItem('MINIMINES_RESEND_API_KEY') || '');
-  const [senderEmail, setSenderEmail] = useState(() => localStorage.getItem('MINIMINES_SENDER_EMAIL') || 'communications@minimines.com');
+  const [resendKey, setResendKey] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('MINIMINES_RESEND_API_KEY') : null) || '');
+  const [senderEmail, setSenderEmail] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('MINIMINES_SENDER_EMAIL') : null) || 'inbound@minimines.com');
 
   const selected = enquiries.find(e => e.id === selectedId) ?? null;
 
@@ -371,7 +371,7 @@ export const CommunicationsHub = () => {
       showToast(`🔔 ${diff} new enquiry${diff > 1 ? 's' : ''} arrived!`, 'info');
       if (notifPermission === 'granted') {
         new Notification('MiniMines — New Enquiry', {
-          body: `You have ${diff} new communication${diff > 1 ? 's' : ''} waiting.`,
+          body: `You have ${diff} new enquiry${diff > 1 ? 's' : ''} waiting.`,
           icon: '💬',
         });
       }
@@ -1117,7 +1117,7 @@ export const CommunicationsHub = () => {
                 type="text"
                 value={senderEmail}
                 onChange={e => setSenderEmail(e.target.value)}
-                placeholder="communications@minimines.com"
+                placeholder="inbound@minimines.com"
                 style={{ width: '100%', padding: '10px 12px', border: `1px solid ${B.border}`, borderRadius: 8, fontSize: 13, outline: 'none' }}
               />
             </div>
@@ -1153,5 +1153,5 @@ export const CommunicationsHub = () => {
 export default defineFrontComponent({
   universalIdentifier: ENQUIRY_QUICK_REPLY_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
   name: 'Inbound Leads Hub',
-  component: CommunicationsHub,
+  component: InboundLeadsHub,
 });
