@@ -31,11 +31,11 @@ export default defineObject({
   labelPlural: 'Enquiries',
   description: 'Unified communications inbox — all inbound enquiries from any channel.',
   icon: 'IconMessages',
-  labelIdentifierFieldMetadataUniversalIdentifier: 'ac5f1b0e-f24c-4854-a252-e0500b0055ed',
+  labelIdentifierFieldMetadataUniversalIdentifier: '3abe2719-b218-4f15-8484-4f1fdef483e6',
   fields: [
     // ── Core identity ────────────────────────────────────────────────────────
     {
-      universalIdentifier: 'ac5f1b0e-f24c-4854-a252-e0500b0055ed',
+      universalIdentifier: '3abe2719-b218-4f15-8484-4f1fdef483e6',
       name: 'customerName',
       type: FieldType.TEXT,
       label: 'Customer Name',
@@ -61,7 +61,7 @@ export default defineObject({
 
     // ── Channel & source ────────────────────────────────────────────────────
     {
-      universalIdentifier: 'adfc8bf4-f23a-4b50-9fcc-ed7a9ecd2f30',
+      universalIdentifier: '3118d664-51b5-4452-a69f-f16014cb2923',
       name: 'source',
       type: FieldType.SELECT,
       label: 'Source',
@@ -90,14 +90,14 @@ export default defineObject({
 
     // ── Message content ─────────────────────────────────────────────────────
     {
-      universalIdentifier: '0f3efbf2-5b84-4792-adfa-835f7c4dcbeb',
+      universalIdentifier: 'ee1da41f-ada1-47f9-a1d2-80bb1a2e71f2',
       name: 'message',
       type: FieldType.TEXT,
       label: 'Initial Message',
     },
     // Legacy reply field kept for backward-compatibility
     {
-      universalIdentifier: 'cd6bbdbc-34cd-4e9c-bd3a-c98c367cf802',
+      universalIdentifier: '97527103-743e-42f8-932b-b016a7910518',
       name: 'reply',
       type: FieldType.TEXT,
       label: 'Quick Reply (legacy)',
@@ -105,7 +105,7 @@ export default defineObject({
 
     // ── Status & workflow ───────────────────────────────────────────────────
     {
-      universalIdentifier: 'a0bcd20d-7208-4084-8da1-9dc47a1b95f5',
+      universalIdentifier: '68bd420f-a1a7-43e2-81b1-b3de1e5c5870',
       name: 'status',
       type: FieldType.SELECT,
       label: 'Status',
