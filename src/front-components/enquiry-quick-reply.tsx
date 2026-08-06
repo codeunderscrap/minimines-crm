@@ -15,8 +15,12 @@ import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 // ─── Config — set your own values ────────────────────────────────────────────
 const TWENTY_API_BASE = 'https://api.twenty.com/rest';
 const TWENTY_API_KEY =
-  'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImJmOWVmNmViLTk5M2UtNDMyNi1iNzU1LTU0Zjk2ZmFkNmJhMCJ9.eyJzdWIiOiIyYjI0MDBhNy0xMTUxLTQ0YjMtYmU2Mi00MmIyZDg4ZjM4MmQiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiMmIyNDAwYTctMTE1MS00NGIzLWJlNjItNDJiMmQ4OGYzODJkIiwiaWF0IjoxNzg1OTA2OTQ3LCJleHAiOjQ5Mzk1MDY5NDYsImp0aSI6IjE0ZGMwN2RjLTFkYjYtNDA4Ny1hYjBmLTYyODZjZGRmZWZiZCJ9.V7DVW5gPycqPKvA9FjE6nclpS3EbUkFEY22f_xX22H6Be71zZd3HpilWY6KOAlTIQh6UXLHw-H4zZaFW0I_qWw';
+  'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJiZTliODFjNy0yOTU1LTRkNDQtOWNmYy01YmQ3YTQ4ZWE1ZDAiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiYmU5YjgxYzctMjk1NS00ZDQ0LTljZmMtNWJkN2E0OGVhNWQwIiwiaWF0IjoxNzg2MDAwMjUwLCJleHAiOjQ5Mzk2MDAyNDksImp0aSI6ImQ2ZWZmZjU0LTYxY2MtNGZkZi04MjA5LTE3ZmUwN2IwNDVlYiJ9.tiA4nKtMNiRvf06rFWtCTj657uau7JWlA2fbV_qGIQU68U_Qr2E_dVJeazrhD5sNfVMDiOOLvRfS_LWEPDW5Eg';
 
+/** ⚠️  Replace with your Resend API key from https://resend.com/api-keys */
+const RESEND_API_KEY = 're_REPLACE_WITH_YOUR_RESEND_API_KEY';
+/** ⚠️  Replace with the verified sender email on your Resend domain */
+const SENDER_EMAIL = 'communications@minimines.com';
 const SENDER_NAME = 'MiniMines Team';
 
 const POLL_INTERVAL_MS = 30_000;
@@ -85,24 +89,22 @@ const sendEmailViaResend = async (
   to: string,
   subject: string,
   html: string,
-  key: string,
-  sender: string,
 ): Promise<boolean> => {
-  const activeKey = key || localStorage.getItem('MINIMINES_RESEND_KEY') || '';
-  const activeSender = sender || localStorage.getItem('MINIMINES_SENDER_EMAIL') || 'communications@minimines.com';
-  if (!activeKey.startsWith('re_')) {
-    console.warn('[InboundLeadsHub] Resend API key not configured in settings. Email not sent.');
+  const key = localStorage.getItem('MINIMINES_RESEND_API_KEY') || '';
+  const fromEmail = localStorage.getItem('MINIMINES_SENDER_EMAIL') || 'communications@minimines.com';
+  if (!key.startsWith('re_')) {
+    console.warn('[InboundLeads] Resend API key not configured in settings. Email not sent.');
     return false;
   }
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${activeKey}`,
+        Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: `${SENDER_NAME} <${activeSender}>`,
+        from: `${SENDER_NAME} <${fromEmail}>`,
         to: [to],
         subject,
         html,
@@ -272,7 +274,7 @@ const Toast = ({ message, type }: { message: string; type: 'success' | 'error' |
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export const InboundLeadsHub = () => {
+export const CommunicationsHub = () => {
   const userRole = useUserRole();
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
@@ -290,13 +292,55 @@ export const InboundLeadsHub = () => {
   const [prevCount, setPrevCount] = useState(0);
   const [useMock, setUseMock] = useState(false);
   const [notifNote, setNotifNote] = useState<boolean>(true);
-  const [resendKey, setResendKey] = useState(() => localStorage.getItem('MINIMINES_RESEND_KEY') || '');
-  const [senderEmail, setSenderEmail] = useState(() => localStorage.getItem('MINIMINES_SENDER_EMAIL') || 'communications@minimines.com');
-  const [showSettings, setShowSettings] = useState(false);
   const threadRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const [converting, setConverting] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [resendKey, setResendKey] = useState(() => localStorage.getItem('MINIMINES_RESEND_API_KEY') || '');
+  const [senderEmail, setSenderEmail] = useState(() => localStorage.getItem('MINIMINES_SENDER_EMAIL') || 'communications@minimines.com');
+
   const selected = enquiries.find(e => e.id === selectedId) ?? null;
+
+  const handleConvertToLead = async () => {
+    if (!selected) return;
+    setConverting(true);
+
+    const emailAddr = getEmailPrimary(selected.contactEmail);
+    const phoneNum = typeof selected.contactPhone === 'object' ? selected.contactPhone.primaryPhoneNumber : selected.contactPhone;
+
+    const leadPayload = {
+      name: selected.customerName,
+      company: selected.company || "",
+      emails: emailAddr ? { primaryEmail: emailAddr } : undefined,
+      phones: phoneNum ? { primaryPhoneNumber: phoneNum } : undefined,
+      source: "WEBSITE",
+      status: "NEW",
+      notes: `Converted from Inbound Leads page.\nOriginal Message: ${selected.message || ""}`
+    };
+
+    try {
+      const res = await api('leads', 'POST', leadPayload);
+      if (res) {
+        showToast('👤 Converted to Lead in Twenty CRM successfully!', 'success');
+
+        // Mark enquiry as RESOLVED
+        await api(`enquiries/${selected.id}`, 'PATCH', {
+          status: 'RESOLVED',
+          resolvedAt: new Date().toISOString(),
+        });
+
+        // Refresh list
+        await loadEnquiries(true);
+      } else {
+        showToast('Conversion failed. Check REST API credentials.', 'error');
+      }
+    } catch (e) {
+      showToast('Error converting to Lead.', 'error');
+    } finally {
+      setConverting(false);
+    }
+  };
 
   // ── Show toast ─────────────────────────────────────────────────────────────
   const showToast = (msg: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -406,66 +450,6 @@ export const InboundLeadsHub = () => {
 
   if (userRole === null) return <RoleLoading />;
 
-  // ── Save Outbound Settings ────────────────────────────────────────────────
-  const saveSettings = (key: string, email: string) => {
-    localStorage.setItem('MINIMINES_RESEND_KEY', key);
-    localStorage.setItem('MINIMINES_SENDER_EMAIL', email);
-    setResendKey(key);
-    setSenderEmail(email);
-    setShowSettings(false);
-    showToast('✓ Settings saved successfully', 'success');
-  };
-
-  // ── Convert to Lead via REST API ──────────────────────────────────────────
-  const handleConvertToLead = async () => {
-    if (!selected) return;
-    setSending(true);
-    
-    const emailAddr = getEmailPrimary(selected.contactEmail);
-    const phoneNum = typeof selected.contactPhone === 'object' ? selected.contactPhone.primaryPhoneNumber : selected.contactPhone;
-
-    try {
-      const res = await fetch(`${TWENTY_API_BASE}/leads`, {
-        method: 'POST',
-        headers: {
-          Authorization: TWENTY_API_KEY,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: selected.customerName || 'Inbound Website Lead',
-          company: selected.company || '',
-          email: emailAddr ? { primaryEmail: emailAddr } : null,
-          phone: phoneNum ? { primaryPhoneNumber: phoneNum } : null,
-          source: 'WEBSITE',
-          status: 'NEW',
-          notes: `Converted from Inbound Website Enquiry.\nOriginal Message:\n${selected.message || ''}`
-        }),
-      });
-
-      if (res.ok) {
-        if (!selected.id.startsWith('mock')) {
-          await api(`enquiries/${selected.id}`, 'PATCH', {
-            status: 'RESOLVED',
-            resolvedAt: new Date().toISOString(),
-          });
-          await loadEnquiries(true);
-        } else {
-          setEnquiries(prev => prev.map(e => e.id === selected.id ? { ...e, status: 'RESOLVED' } : e));
-        }
-        showToast('✓ Successfully converted to CRM Lead and Resolved!', 'success');
-      } else {
-        const txt = await res.text();
-        console.error('Convert lead error:', txt);
-        showToast('Failed to convert to lead. Check console logs.', 'error');
-      }
-    } catch (err) {
-      console.error('Request exception:', err);
-      showToast('Convert request failed.', 'error');
-    } finally {
-      setSending(false);
-    }
-  };
-
   // ── Send reply ────────────────────────────────────────────────────────────
   const handleSend = async () => {
     if (!selected || !replyText.trim()) return;
@@ -522,7 +506,7 @@ export const InboundLeadsHub = () => {
           <p style="color: #666; font-size: 12px;">Best regards,<br/>${SENDER_NAME}<br/>MiniMines CRM</p>
         </div>
       `;
-      const emailSent = await sendEmailViaResend(emailAddr, emailSubject, emailHtml, resendKey, senderEmail);
+      const emailSent = await sendEmailViaResend(emailAddr, emailSubject, emailHtml);
       if (emailSent) {
         showToast(`✉️ Email sent to ${emailAddr}`, 'success');
       } else {
@@ -609,13 +593,13 @@ export const InboundLeadsHub = () => {
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
-        
+
         @media (max-width: 900px) {
-          .comm-hub { flex-direction: column !important; height: auto !important; overflow-y: auto !important; }
-          .comm-sidebar { width: 100% !important; min-width: 100% !important; height: auto !important; border-bottom: 1px solid ${B.border}; }
-          .comm-conv-list { width: 100% !important; min-width: 100% !important; height: 400px !important; border-right: none !important; border-bottom: 1px solid ${B.border}; }
-          .comm-chat-window { width: 100% !important; height: 500px !important; }
-          .comm-details-panel { width: 100% !important; min-width: 100% !important; border-left: none !important; border-top: 1px solid ${B.border}; }
+          .comm-hub { flex-direction: column !important; overflow-y: auto !important; height: auto !important; }
+          .comm-sidebar { width: 100% !important; min-width: 100% !important; height: auto !important; }
+          .comm-list-col { width: 100% !important; min-width: 100% !important; height: 400px !important; border-right: none !important; border-bottom: 1px solid ${B.border} !important; }
+          .comm-chat-col { width: 100% !important; min-width: 100% !important; height: 600px !important; border-bottom: 1px solid ${B.border} !important; }
+          .comm-details-col { width: 100% !important; min-width: 100% !important; height: auto !important; border-left: none !important; }
         }
       `}</style>
 
@@ -717,16 +701,22 @@ export const InboundLeadsHub = () => {
           <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: 12, color: 'rgba(255,255,255,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: B.green }} />
-              MiniMines CRM
+              <span>Inbound Leads</span>
             </div>
-            <button onClick={() => setShowSettings(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: 14 }} title="Configure Resend Credentials">⚙️</button>
+            <button
+              onClick={() => setShowSettings(true)}
+              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: 14, padding: 2, display: 'flex', alignItems: 'center', outline: 'none' }}
+              title="Resend Settings"
+            >
+              ⚙️
+            </button>
           </div>
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════════
             COLUMN 2 — Conversation list
         ═══════════════════════════════════════════════════════════════════ */}
-        <div className="comm-conv-list" style={{
+        <div className="comm-list-col" style={{
           width: 290, minWidth: 290, borderRight: `1px solid ${B.border}`,
           background: '#FAFBFC', display: 'flex', flexDirection: 'column', overflow: 'hidden',
         }}>
@@ -810,7 +800,7 @@ export const InboundLeadsHub = () => {
         {/* ═══════════════════════════════════════════════════════════════════
             COLUMN 3 — Thread view
         ═══════════════════════════════════════════════════════════════════ */}
-        <div className="comm-chat-window" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#fff' }}>
+        <div className="comm-chat-col" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#fff' }}>
           {selected ? (
             <>
               {/* Thread header */}
@@ -973,7 +963,7 @@ export const InboundLeadsHub = () => {
             COLUMN 4 — Contact details + quick actions (collapsible)
         ═══════════════════════════════════════════════════════════════════ */}
         {selected && showDetails && (
-          <div className="comm-details-panel" style={{
+          <div className="comm-details-col" style={{
             width: 250, minWidth: 250, borderLeft: `1px solid ${B.border}`,
             background: B.bg, overflowY: 'auto', padding: '0 0 16px',
           }}>
@@ -1046,9 +1036,13 @@ export const InboundLeadsHub = () => {
                 <button
                   className="comm-action-btn"
                   onClick={handleConvertToLead}
-                  disabled={sending}
+                  disabled={converting}
+                  style={{
+                    opacity: converting ? 0.6 : 1,
+                    cursor: converting ? 'not-allowed' : 'pointer'
+                  }}
                 >
-                  <span>👤</span> Convert to Lead
+                  <span>👤</span> {converting ? 'Converting...' : 'Convert to Lead'}
                 </button>
                 <button
                   className="comm-action-btn"
@@ -1092,33 +1086,59 @@ export const InboundLeadsHub = () => {
 
       {/* Settings Modal */}
       {showSettings && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: 380, boxShadow: '0 8px 30px rgba(0,0,0,0.15)', fontFamily: "'Inter', sans-serif" }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: B.textDark }}>Outbound Email Settings</h3>
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,27,46,0.6)', display: 'flex', alignItems: 'center',
+          justifyContent: 'center', zIndex: 9999, fontFamily: "'Inter', sans-serif"
+        }}>
+          <div style={{
+            background: '#fff', padding: '24px 28px', borderRadius: 12,
+            width: 420, maxWidth: '90%', boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+          }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: 18, color: B.textDark, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>⚙️</span> Email Resend Integration Settings
+            </h3>
+            <p style={{ margin: '0 0 20px', fontSize: 13, color: B.text, lineHeight: 1.4 }}>
+              Enter your Resend API credentials below. These settings are saved <b>only in your browser's local storage</b> and never sent or saved to any git repositories or servers.
+            </p>
             <div style={{ marginBottom: 14 }}>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: B.textMid, marginBottom: 6 }}>Resend API Key</label>
               <input
                 type="password"
-                placeholder="re_..."
                 value={resendKey}
                 onChange={e => setResendKey(e.target.value)}
-                style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, outline: 'none' }}
+                placeholder="re_xxxxxxxxxxxxxx"
+                style={{ width: '100%', padding: '10px 12px', border: `1px solid ${B.border}`, borderRadius: 8, fontSize: 13, outline: 'none' }}
               />
-              <span style={{ fontSize: 11, color: B.text, marginTop: 4, display: 'block' }}>Key stays only in your browser localStorage.</span>
             </div>
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: B.textMid, marginBottom: 6 }}>Sender Email</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: B.textMid, marginBottom: 6 }}>Sender Email (must be verified on Resend)</label>
               <input
-                type="email"
-                placeholder="communications@minimines.com"
+                type="text"
                 value={senderEmail}
                 onChange={e => setSenderEmail(e.target.value)}
-                style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, outline: 'none' }}
+                placeholder="communications@minimines.com"
+                style={{ width: '100%', padding: '10px 12px', border: `1px solid ${B.border}`, borderRadius: 8, fontSize: 13, outline: 'none' }}
               />
             </div>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button onClick={() => setShowSettings(false)} style={{ background: '#F3F4F6', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: B.textDark }}>Cancel</button>
-              <button onClick={() => saveSettings(resendKey, senderEmail)} style={{ background: B.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Save</button>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button
+                onClick={() => setShowSettings(false)}
+                style={{ background: '#f5f5f5', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: B.textMid }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  localStorage.setItem('MINIMINES_RESEND_API_KEY', resendKey.trim());
+                  localStorage.setItem('MINIMINES_SENDER_EMAIL', senderEmail.trim());
+                  setShowSettings(false);
+                  showToast('⚙️ Settings saved securely to localStorage!', 'success');
+                }}
+                style={{ background: B.accent, border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#fff' }}
+              >
+                Save Settings
+              </button>
             </div>
           </div>
         </div>
@@ -1132,6 +1152,6 @@ export const InboundLeadsHub = () => {
 
 export default defineFrontComponent({
   universalIdentifier: ENQUIRY_QUICK_REPLY_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
-  name: 'Inbound Leads',
-  component: InboundLeadsHub,
+  name: 'Inbound Leads Hub',
+  component: CommunicationsHub,
 });

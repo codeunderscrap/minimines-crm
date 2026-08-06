@@ -9,7 +9,7 @@ import {
 
 export default definePageLayout({
   universalIdentifier: ENQUIRY_DASHBOARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  name: 'Communications Hub',
+  name: 'Inbound Leads Hub',
   type: 'STANDALONE_PAGE',
   tabs: [
     {
