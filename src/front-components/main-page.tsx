@@ -180,8 +180,446 @@ const StatCard = ({ label, value, sub, link }: any) => {
 
 const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
   const url = `https://api.twenty.com/rest/${path}`;
-  const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJlYzFlMDcwZi0yZmE0LTQ3MjMtYmVmMy0xYmY5NGFlNTg4ZDEiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiZWMxZTA3MGYtMmZhNC00NzIzLWJlZjMtMWJmOTRhZTU4OGQxIiwiaWF0IjoxNzg2MTAxMzgzLCJleHAiOjQ5Mzk3MDEzODIsImp0aSI6IjhjZmY3MGFlLTgzZmItNDQ4NS05YjI0LWFlNjczYzQzZmE0NSJ9.Wg93DjZtbUC8-a1I2IoVSMixlv4TIdA4ayjXG6C8Zm258IW6nQbEIyX7t3R9hdGeMfy6ssbplJRP2vWHBW6Odg';
+  const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJiZTliODFjNy0yOTU1LTRkNDQtOWNmYy01YmQ3YTQ4ZWE1ZDAiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiYmU5YjgxYzctMjk1NS00ZDQ0LTljZmMtNWJkN2E0OGVhNWQwIiwiaWF0IjoxNzg2MDAzNTcwLCJleHAiOjQ5Mzk1MTcxNjksImp0aSI6ImY2ZDJhYTRmLWU1ZGEtNDJiYS05NGY0LWRhODk2YWI2YmI5ZSJ9.xBds_qiKcR8OWNq7Y2H6DlNLPNpatMmhCatHQP8bvI83L74vDYo-M8LVdlmjJFzVuGNZLJ7lIv5a_8AOh__LNw';
   
+  const options: any = {
+    method,
+    headers: { Authorization: apiKey, 'Content-Type': 'application/json' }
+  };
+  if (body) options.body = JSON.stringify(body);
+
+  try {
+    const res = await fetch(url, options);
+    const json = await res.json();
+    
+    if (method !== 'GET') return json;
+
+    const key = path.split('?')[0]; // Extract base path e.g. contracts
+    let items = json.data && json.data[key] ? json.data[key] : [];
+    if (items && items.edges) {
+      items = items.edges.map((e: any) => e.node);
+    }
+    if (!Array.isArray(items)) {
+      items = [];
+    }
+    return items;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return method === 'GET' ? [] : null;
+  }
+};
+
+const ActivityTable = ({ recentActs }: { recentActs: any[] }) => (
+  <div className="card" style={{ padding: 0 }}>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Reference ID</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {(Array.isArray(recentActs) ? recentActs : []).map((act, i) => (
+          <tr key={i}>
+            <td>{act?.referenceId || (act?.id ? String(act.id).substring(0, 8) : 'N/A')}</td>
+            <td>{act?.type || 'Unknown'}</td>
+            <td><span className="status-badge">{act?.status || 'N/A'}</span></td>
+            <td style={{ color: BRAND.text }}>{act?.date ? new Date(act.date).toLocaleDateString() : 'N/A'}</td>
+          </tr>
+        ))}
+        {(!recentActs || recentActs.length === 0) && (
+          <tr>
+            <td colSpan={4} style={{ textAlign: 'center', color: BRAND.text }}>No recent operations found.</td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+);
+
+const ContractTracker = ({ contracts = [] }: { contracts: any[] }) => {
+  const safeContracts = Array.isArray(contracts) ? contracts : [];
+  const [selectedId, setSelectedId] = useState(safeContracts.length > 0 ? safeContracts[0].id : null);
+  useEffect(() => { if (safeContracts.length > 0 && !selectedId) setSelectedId(safeContracts[0].id); }, [safeContracts]);
+  
+  if (safeContracts.length === 0) return <div className="card" style={{ padding: '40px', textAlign: 'center' }}>No Active Contracts</div>;
+
+  const contract = safeContracts.find(c => c.id === selectedId) || safeContracts[0];
+  if (!contract) return <div className="card">Error loading contract</div>;
+
+  const totalQuantity = contract.totalQuantity || 0;
+  const fulfilledQuantity = Math.floor(totalQuantity * 0.4);
+  const progressPercent = totalQuantity > 0 ? (fulfilledQuantity / totalQuantity) * 100 : 0;
+
+  const startTime = contract.startDate ? new Date(contract.startDate).getTime() : null;
+  const endTime = contract.endDate ? new Date(contract.endDate).getTime() : null;
+  const now = Date.now();
+  let elapsedPercent = 0;
+  let timelineLabel = 'No dates set';
+  if (startTime && endTime && endTime > startTime) {
+    elapsedPercent = Math.max(0, Math.min(100, ((now - startTime) / (endTime - startTime)) * 100));
+    timelineLabel = now < startTime ? 'Not started yet' : now > endTime ? 'Contract ended' : `${Math.round(elapsedPercent)}% of duration elapsed`;
+  }
+
+  return (
+    <div className="card" style={{ gap: '16px', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <h2 className="h2" style={{ margin: 0 }}>Contract Analytics</h2>
+        <select 
+          value={selectedId || ''} 
+          onChange={(e) => setSelectedId(e.target.value)}
+          style={{ padding: '8px 12px', border: `1px solid ${BRAND.border}`, fontFamily: "'Barlow', sans-serif", fontSize: '14px', outline: 'none' }}
+        >
+          {safeContracts.map(c => <option key={c.id} value={c.id}>{c.name || `Contract ${(c.id || '').substring(0,6)}`}</option>)}
+        </select>
+      </div>
+
+      <div style={{ backgroundColor: BRAND.bg, padding: '20px', border: `1px solid ${BRAND.border}` }}>
+        <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '12px' }}>Volume Fulfillment</div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <span style={{ fontSize: '28px', fontWeight: 'bold', color: BRAND.primary }}>{fulfilledQuantity} MT</span>
+          <span style={{ fontSize: '14px', color: BRAND.text, alignSelf: 'flex-end', marginBottom: '4px' }}>of {totalQuantity} MT</span>
+        </div>
+        
+        <div style={{ width: '100%', height: '12px', backgroundColor: '#E0E0E0', borderRadius: '6px', overflow: 'hidden' }}>
+          <div style={{ width: `${progressPercent}%`, height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.5s ease-out' }}></div>
+        </div>
+      </div>
+
+      <div style={{ backgroundColor: BRAND.bg, padding: '20px', border: `1px solid ${BRAND.border}` }}>
+        <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '12px' }}>Contract Timeline</div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '13px', color: BRAND.text }}>
+          <span>Start: <strong style={{ color: BRAND.primary }}>{contract.startDate ? new Date(contract.startDate).toLocaleDateString() : 'N/A'}</strong></span>
+          <span>End: <strong style={{ color: BRAND.primary }}>{contract.endDate ? new Date(contract.endDate).toLocaleDateString() : 'N/A'}</strong></span>
+        </div>
+        
+        <div style={{ position: 'relative', width: '100%', height: '8px', backgroundColor: '#E0E0E0', borderRadius: '4px', margin: '18px 0 8px' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${elapsedPercent}%`, backgroundColor: BRAND.accent, borderRadius: '4px', transition: 'width 0.5s ease-out' }}></div>
+          <div style={{ position: 'absolute', top: '50%', left: 0, transform: 'translate(-50%, -50%)', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: BRAND.primary, border: '2px solid #FFF' }}></div>
+          <div style={{ position: 'absolute', top: '50%', left: '100%', transform: 'translate(-50%, -50%)', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: BRAND.lightAccent, border: '2px solid #FFF' }}></div>
+          {startTime && endTime && now >= startTime && now <= endTime && (
+            <div style={{ position: 'absolute', top: '50%', left: `${elapsedPercent}%`, transform: 'translate(-50%, -50%)', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: '#FFF', border: `3px solid ${BRAND.accent}` }} title="Today"></div>
+          )}
+        </div>
+        <div style={{ textAlign: 'center', fontSize: '12px', fontWeight: 600, color: BRAND.secondary }}>{timelineLabel}</div>
+      </div>
+    </div>
+  );
+};
+
+const ShipmentTracker = ({ shipments = [] }: { shipments: any[] }) => {
+  const safeShipments = Array.isArray(shipments) ? shipments : [];
+  const [selectedId, setSelectedId] = useState(safeShipments.length > 0 ? safeShipments[0].id : null);
+  useEffect(() => { if (safeShipments.length > 0 && !selectedId) setSelectedId(safeShipments[0].id); }, [safeShipments]);
+  
+  if (safeShipments.length === 0) return <div className="card" style={{ padding: '40px', textAlign: 'center' }}>No Active Shipments</div>;
+
+  const shipment = safeShipments.find(s => s.id === selectedId) || safeShipments[0];
+  if (!shipment) return <div className="card">Error loading shipment</div>;
+
+  const currentStatus = (shipment.transitExport || 'DOCUMENTATION').toUpperCase();
+
+  const steps = [
+    { label: 'Documentation', active: true },
+    { label: 'Customs', active: ['CUSTOMS', 'IN_TRANSIT', 'DELIVERED', 'PASSED'].includes(currentStatus) },
+    { label: 'In Transit', active: ['IN_TRANSIT', 'DELIVERED'].includes(currentStatus) },
+    { label: 'Delivered', active: ['DELIVERED'].includes(currentStatus) }
+  ];
+  
+  const activeStepsCount = steps.filter(s => s.active).length;
+  const progressPercent = ((activeStepsCount - 1) / (Math.max(steps.length - 1, 1))) * 100;
+
+  return (
+    <div className="card" style={{ gap: '16px', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <h2 className="h2" style={{ margin: 0 }}>Logistics Tracker</h2>
+        <select 
+          value={selectedId || ''} 
+          onChange={(e) => setSelectedId(e.target.value)}
+          style={{ padding: '8px 12px', border: `1px solid ${BRAND.border}`, fontFamily: "'Barlow', sans-serif", fontSize: '14px', outline: 'none' }}
+        >
+          {safeShipments.map(s => <option key={s.id} value={s.id}>{s.vesselName || `Shipment ${(s.id || '').substring(0,6)}`}</option>)}
+        </select>
+      </div>
+      
+      <div style={{ backgroundColor: BRAND.bg, padding: '20px', border: `1px solid ${BRAND.border}` }}>
+        <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '16px' }}>Vessel & Cargo</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: BRAND.text, fontSize: '15px' }}>Vessel:</span>
+            <span style={{ fontWeight: 600, color: BRAND.primary, fontSize: '15px' }}>{shipment.vesselName || 'TBD'}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: BRAND.text, fontSize: '15px' }}>Container:</span>
+            <span style={{ fontWeight: 600, color: BRAND.primary, fontSize: '15px' }}>{shipment.containerNumber || 'TBD'}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${BRAND.border}`, paddingTop: '12px', marginTop: '4px' }}>
+            <span style={{ color: BRAND.text, fontSize: '15px' }}>QA Status:</span>
+            <span style={{ fontWeight: 600, color: shipment.qaStatus === 'PASSED' ? BRAND.accent : BRAND.primary, fontSize: '15px' }}>{shipment.qaStatus || 'PENDING'}</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ backgroundColor: BRAND.bg, padding: '24px 16px', border: `1px solid ${BRAND.border}`, display: 'flex', flexDirection: 'column', justifyContent: 'center', flexGrow: 1 }}>
+        <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '28px' }}>Transit Progress</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', margin: '0 8px' }}>
+          <div style={{ position: 'absolute', top: '12px', left: '0', right: '0', height: '4px', backgroundColor: '#E0E0E0', zIndex: 0 }}>
+            <div style={{ width: `${progressPercent}%`, height: '100%', backgroundColor: BRAND.accent, transition: 'width 0.5s ease-out' }}></div>
+          </div>
+          {steps.map((step, i) => (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1, gap: '10px' }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: step.active ? BRAND.accent : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF', fontSize: '13px', fontWeight: 'bold', transition: 'background-color 0.3s' }}>
+                {i + 1}
+              </div>
+              <div style={{ fontSize: '12px', fontWeight: step.active ? 600 : 400, color: step.active ? BRAND.primary : BRAND.text, textAlign: 'center', width: '60px', lineHeight: '1.2' }}>{step.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const EnquiryQuickReply = () => {
+  const [enquiries, setEnquiries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedEnquiry, setSelectedEnquiry] = useState<any>(null);
+  const [replyText, setReplyText] = useState('');
+
+  const loadData = async () => {
+    setLoading(true);
+    // Fetch only unanswered enquiries
+    const allEnqs = await fetchTwenty('enquiries?orderBy=createdAt,desc&limit=20');
+    const unanswered = (Array.isArray(allEnqs) ? allEnqs : []).filter((e: any) => e.status === 'UNANSWERED');
+    
+    // If DB is empty, let's inject a mock one to show the UI
+    if (unanswered.length === 0) {
+      setEnquiries([
+        { id: 'mock-1', customerName: 'Rajesh Kumar', source: 'WEBSITE', message: 'I need a quote for 50MT of Copper Wire Scrap. Can you deliver to Mumbai port?', status: 'UNANSWERED', createdAt: new Date().toISOString() },
+        { id: 'mock-2', customerName: 'Sarah Jenkins', source: 'LINKEDIN', message: 'Hello! Does MiniMines supply Battery Grade Lithium Carbonate?', status: 'UNANSWERED', createdAt: new Date(Date.now() - 3600000).toISOString() }
+      ]);
+    } else {
+      setEnquiries(unanswered);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleSendReply = async () => {
+    if (!selectedEnquiry || !replyText.trim()) return;
+    
+    if (selectedEnquiry.id.startsWith('mock')) {
+      // Simulate reply for mock data
+      setEnquiries(enquiries.filter(e => e.id !== selectedEnquiry.id));
+      setSelectedEnquiry(null);
+      setReplyText('');
+      return;
+    }
+
+    // Real DB update
+    await fetchTwenty(`enquiries/${selectedEnquiry.id}`, 'PATCH', {
+      reply: replyText,
+      status: 'REPLIED'
+    });
+    
+    setSelectedEnquiry(null);
+    setReplyText('');
+    await loadData();
+  };
+
+  if (loading) return <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>Loading incoming enquiries...</div>;
+
+  return (
+    <div style={{ display: 'flex', border: `1px solid ${BRAND.border}`, borderRadius: '8px', overflow: 'hidden', height: '400px', backgroundColor: BRAND.white, fontFamily: "'Barlow', sans-serif" }}>
+      {/* Left panel - Inbox list */}
+      <div style={{ width: '300px', borderRight: `1px solid ${BRAND.border}`, overflowY: 'auto', backgroundColor: BRAND.bg }}>
+        <div style={{ padding: '16px', borderBottom: `1px solid ${BRAND.border}`, backgroundColor: BRAND.white, position: 'sticky', top: 0 }}>
+          <div style={{ fontWeight: 600, color: BRAND.primary }}>Incoming Enquiries ({enquiries.length})</div>
+        </div>
+        {enquiries.map(enq => (
+          <div 
+            key={enq.id}
+            onClick={() => { setSelectedEnquiry(enq); setReplyText(''); }}
+            style={{ 
+              padding: '16px', 
+              borderBottom: `1px solid ${BRAND.border}`, 
+              cursor: 'pointer',
+              backgroundColor: selectedEnquiry?.id === enq.id ? '#E8F4F8' : 'transparent',
+              borderLeft: selectedEnquiry?.id === enq.id ? `4px solid ${BRAND.accent}` : '4px solid transparent'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <span style={{ fontWeight: 600, color: BRAND.primary }}>{enq.customerName}</span>
+              <span style={{ fontSize: '10px', color: BRAND.text, backgroundColor: '#E0E0E0', padding: '2px 6px', borderRadius: '4px' }}>{enq.source}</span>
+            </div>
+            <div style={{ fontSize: '12px', color: BRAND.secondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {enq.message}
+            </div>
+          </div>
+        ))}
+        {enquiries.length === 0 && (
+          <div style={{ padding: '24px', textAlign: 'center', color: BRAND.text, fontSize: '14px' }}>Inbox Zero! 🎉</div>
+        )}
+      </div>
+
+      {/* Right panel - Reply view */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: BRAND.white }}>
+        {selectedEnquiry ? (
+          <>
+            <div style={{ padding: '24px', borderBottom: `1px solid ${BRAND.border}` }}>
+              <div style={{ fontSize: '18px', fontWeight: 600, color: BRAND.primary, marginBottom: '4px' }}>{selectedEnquiry.customerName}</div>
+              <div style={{ fontSize: '12px', color: BRAND.text }}>Via {selectedEnquiry.source} • {new Date(selectedEnquiry.createdAt).toLocaleString()}</div>
+            </div>
+            
+            <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+              <div style={{ backgroundColor: BRAND.bg, padding: '16px', borderRadius: '8px', border: `1px solid ${BRAND.border}`, marginBottom: '24px', fontSize: '14px', lineHeight: 1.5, color: BRAND.secondary }}>
+                {selectedEnquiry.message}
+              </div>
+
+              <textarea 
+                value={replyText}
+                onChange={e => setReplyText(e.target.value)}
+                placeholder={`Type your reply to ${selectedEnquiry.customerName}...`}
+                style={{
+                  width: '100%',
+                  height: '100px',
+                  padding: '16px',
+                  borderRadius: '8px',
+                  border: `1px solid ${BRAND.border}`,
+                  resize: 'none',
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: '14px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+
+            <div style={{ padding: '16px 24px', borderTop: `1px solid ${BRAND.border}`, display: 'flex', justifyContent: 'flex-end', backgroundColor: BRAND.bg }}>
+              <button 
+                onClick={handleSendReply}
+                style={{
+                  backgroundColor: replyText.trim() ? BRAND.accent : BRAND.text,
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 24px',
+                  borderRadius: '4px',
+                  fontWeight: 600,
+                  cursor: replyText.trim() ? 'pointer' : 'not-allowed',
+                  transition: 'background-color 0.2s'
+                }}
+              >
+                Send Reply
+              </button>
+            </div>
+          </>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: BRAND.text, flexDirection: 'column' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.2 }}>💬</div>
+            <div>Select an enquiry to reply</div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const OPPORTUNITY_PAGE_UID = '4f324362-46e8-45fd-b81a-f1b2e3b17e6b';
+const LEADS_PAGE_UID = '210c2f1a-6ef4-4599-9027-60c70a118cef';
+
+const MainPage = () => {
+  const [data, setData] = useState({
+    contracts: [],
+    salesOrders: [],
+    exportShipments: [],
+    opportunities: [],
+    leads: []
+  });
+  const [loading, setLoading] = useState(true);
+  const [pageLinks, setPageLinks] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const loadData = async () => {
+      let { contracts, salesOrders, exportShipments, opportunities, leads } = await Promise.all([
+        fetchTwenty('contracts?orderBy=createdAt,desc&limit=5'),
+        fetchTwenty('salesOrders?orderBy=createdAt,desc&limit=5'),
+        fetchTwenty('exportShipments?orderBy=createdAt,desc&limit=5'),
+        fetchTwenty('opportunities?limit=1000'),
+        fetchTwenty('leads?limit=1000')
+      ]).then(([c, s, e, o, l]) => ({ contracts: c, salesOrders: s, exportShipments: e, opportunities: o, leads: l }));
+
+      setData({ contracts, salesOrders, exportShipments, opportunities, leads });
+      setLoading(false);
+    };
+
+    const resolvePageLinks = async () => {
+      try {
+        const res = await fetch('https://api.twenty.com/rest/metadata/pageLayouts', {
+          headers: {
+            Authorization: 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJiZTliODFjNy0yOTU1LTRkNDQtOWNmYy01YmQ3YTQ4ZWE1ZDAiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiYmU5YjgxYzctMjk1NS00ZDQ0LTljZmMtNWJkN2E0OGVhNWQwIiwiaWF0IjoxNzg2MDAzNTcwLCJleHAiOjQ5Mzk1MTcxNjksImp0aSI6ImY2ZDJhYTRmLWU1ZGEtNDJiYS05NGY0LWRhODk2YWI2YmI5ZSJ9.xBds_qiKcR8OWNq7Y2H6DlNLPNpatMmhCatHQP8bvI83L74vDYo-M8LVdlmjJFzVuGNZLJ7lIv5a_8AOh__LNw',
+            'Content-Type': 'application/json',
+          },
+        });
+        const layouts: any[] = await res.json();
+        const map: Record<string, string> = {};
+        for (const layout of layouts) {
+          if (layout.universalIdentifier) {
+            map[layout.universalIdentifier] = `/page/${layout.id}`;
+          }
+        }
+        setPageLinks(map);
+      } catch {}
+    };
+
+    loadData();
+    resolvePageLinks();
+  }, []);
+
+  const safeContracts = Array.isArray(data.contracts) ? data.contracts : [];
+  const safeSalesOrders = Array.isArray(data.salesOrders) ? data.salesOrders : [];
+  const safeShipments = Array.isArray(data.exportShipments) ? data.exportShipments : [];
+  
+  const recentActs = [
+    ...safeContracts.map((c: any) => ({ type: 'Contract', referenceId: c.name || c.id, status: c.status || 'ACTIVE', date: c.createdAt })),
+    ...safeSalesOrders.map((o: any) => ({ type: 'Sales Order', referenceId: o.orderNumber || o.id, status: o.status || 'PENDING', date: o.createdAt })),
+    ...safeShipments.map((s: any) => ({ type: 'Shipment', referenceId: s.containerNumber || s.id, status: s.transitExport || 'IN TRANSIT', date: s.createdAt }))
+  ].sort((a, b) => new Date(b?.date || 0).getTime() - new Date(a?.date || 0).getTime()).slice(0, 5);
+
+  const safeOpportunities = Array.isArray(data.opportunities) ? data.opportunities : [];
+  const safeLeads = Array.isArray(data.leads) ? data.leads : [];
+  
+  const activeContracts = safeContracts.filter((c: any) => c?.status !== 'EXPIRED').length;
+  
+  const openOpportunities = safeOpportunities.filter((o: any) => o?.stage !== 'CLOSED_WON' && o?.stage !== 'CLOSED_LOST').length;
+  const totalLeadsCount = safeLeads.length;
+
+  if (loading) {
+    return <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif" }}>Loading secure CRM data...</div>;
+  }
+
+  return (
+    <>
+      <style>{FONTS}</style>
+      <div className="minimines-dashboard">
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', borderBottom: `2px solid ${BRAND.primary}`, paddingBottom: '24px' }}>
+            <div>
+              <h1 className="h1">MiniMines BD CRM [v3]</h1>
+              <div className="subtitle">Corporate Command Center</div>
+            </div>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <a href="/objects/contracts" className="btn btn-outline">Contracts</a>
+              <a href="/objects/salesOrders" className="btn btn-outline">Sales Orders</a>
+              <a href="/objects/exportShipments" className="btn btn-outline">Shipments</a>
+              <a href="/objects/lMETrackers" className="btn btn-outline">LME Tracker</a>
             </div>
           </div>
 
@@ -232,6 +670,3 @@ export default defineFrontComponent({
   component: MainPage,
 });
 
-
-// cache-bust: 1786104341234
-// cache-bust: 1786125236.73224
