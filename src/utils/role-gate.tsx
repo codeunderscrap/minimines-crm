@@ -4,7 +4,7 @@ import { useUserId } from 'twenty-sdk/front-component';
 export type UserRole = 'hod' | 'manager' | 'associate';
 
 const API_KEY =
-  'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJiZTliODFjNy0yOTU1LTRkNDQtOWNmYy01YmQ3YTQ4ZWE1ZDAiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiYmU5YjgxYzctMjk1NS00ZDQ0LTljZmMtNWJkN2E0OGVhNWQwIiwiaWF0IjoxNzg2MDAzNTcwLCJleHAiOjQ5Mzk1MTcxNjksImp0aSI6ImY2ZDJhYTRmLWU1ZGEtNDJiYS05NGY0LWRhODk2YWI2YmI5ZSJ9.xBds_qiKcR8OWNq7Y2H6DlNLPNpatMmhCatHQP8bvI83L74vDYo-M8LVdlmjJFzVuGNZLJ7lIv5a_8AOh__LNw';
+  'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJlYzFlMDcwZi0yZmE0LTQ3MjMtYmVmMy0xYmY5NGFlNTg4ZDEiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiZWMxZTA3MGYtMmZhNC00NzIzLWJlZjMtMWJmOTRhZTU4OGQxIiwiaWF0IjoxNzg2MTAxMzgzLCJleHAiOjQ5Mzk3MDEzODIsImp0aSI6IjhjZmY3MGFlLTgzZmItNDQ4NS05YjI0LWFlNjczYzQzZmE0NSJ9.Wg93DjZtbUC8-a1I2IoVSMixlv4TIdA4ayjXG6C8Zm258IW6nQbEIyX7t3R9hdGeMfy6ssbplJRP2vWHBW6Odg';
 
 export const useUserRole = (): UserRole | null => {
   const rawUserId = useUserId();
@@ -79,3 +79,5 @@ export const RoleLoading = () => (
     Loading...
   </div>
 );
+
+// cache-bust: 1786104341255
