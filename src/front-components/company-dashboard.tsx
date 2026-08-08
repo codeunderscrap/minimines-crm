@@ -274,7 +274,7 @@ const CompanyDashboard = () => {
             </h2>
             <div style={{ color: BRAND.text, fontSize: '12px', marginTop: '4px' }}>Select a client to manage their interactions</div>
             
-            <a href="/object/companies/new" className="add-btn" style={{ marginTop: '16px', justifyContent: 'center' }}>
+            <a href="/objects/companies/new" className="add-btn" style={{ marginTop: '16px', justifyContent: 'center' }}>
               + Add New Company
             </a>
           </div>
@@ -326,7 +326,7 @@ const CompanyDashboard = () => {
                       {selectedCompany.name}
                     </h1>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                      <a href={`/object/companies/${selectedCompany.id}`} className="action-btn action-btn-primary">
+                      <a href={`/objects/companies/${selectedCompany.id}`} className="action-btn action-btn-primary">
                         ✎ Edit Profile
                       </a>
                     </div>
@@ -353,7 +353,7 @@ const CompanyDashboard = () => {
                       <span style={{ color: BRAND.accent }}>📄</span> Contracts
                       <span className="badge" style={{ backgroundColor: '#F1F5F9', color: BRAND.secondary }}>{data.contracts.length}</span>
                     </h3>
-                    <a href="/object/contracts/new" className="add-btn">+ Create</a>
+                    <a href="/objects/contracts/new" className="add-btn">+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.contracts.length === 0 ? (
@@ -369,7 +369,7 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/object/contracts/${c.id}`} className="action-btn action-btn-outline">View</a>
+                            <a href={`/objects/contracts/${c.id}`} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))
@@ -387,7 +387,7 @@ const CompanyDashboard = () => {
                       <span style={{ color: BRAND.yellow }}>🎯</span> Pipeline
                       <span className="badge" style={{ backgroundColor: '#FFFBEB', color: BRAND.yellow }}>{data.opportunities.length}</span>
                     </h3>
-                    <a href="/object/opportunities/new" className="add-btn" style={{ backgroundColor: BRAND.yellow }}>+ Create</a>
+                    <a href="/objects/opportunities/new" className="add-btn" style={{ backgroundColor: BRAND.yellow }}>+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.opportunities.length === 0 ? (
@@ -403,7 +403,7 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/object/opportunities/${o.id}`} className="action-btn action-btn-outline">View</a>
+                            <a href={`/objects/opportunities/${o.id}`} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))
@@ -421,7 +421,7 @@ const CompanyDashboard = () => {
                       <span style={{ color: BRAND.purple }}>👤</span> Leads
                       <span className="badge" style={{ backgroundColor: '#F3E8FF', color: BRAND.purple }}>{data.leads.length}</span>
                     </h3>
-                    <a href="/object/leads/new" className="add-btn" style={{ backgroundColor: BRAND.purple }}>+ Create</a>
+                    <a href="/objects/leads/new" className="add-btn" style={{ backgroundColor: BRAND.purple }}>+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.leads.length === 0 ? (
@@ -437,7 +437,7 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/object/leads/${l.id}`} className="action-btn action-btn-outline">View</a>
+                            <a href={`/objects/leads/${l.id}`} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))
@@ -455,7 +455,7 @@ const CompanyDashboard = () => {
                       <span style={{ color: BRAND.green }}>🚢</span> Shipments
                       <span className="badge" style={{ backgroundColor: '#ECFDF5', color: BRAND.green }}>{data.shipments.length}</span>
                     </h3>
-                    <a href="/object/exportShipments/new" className="add-btn" style={{ backgroundColor: BRAND.green }}>+ Create</a>
+                    <a href="/objects/exportShipments/new" className="add-btn" style={{ backgroundColor: BRAND.green }}>+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.shipments.length === 0 ? (
@@ -471,7 +471,7 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/object/exportShipments/${s.id}`} className="action-btn action-btn-outline">View</a>
+                            <a href={`/objects/exportShipments/${s.id}`} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))
