@@ -274,7 +274,8 @@ const CompanyDashboard = () => {
             </h2>
             <div style={{ color: BRAND.text, fontSize: '12px', marginTop: '4px' }}>Select a client to manage their interactions</div>
             
-            <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?companyId=${selectedCompany.id}`} className="add-btn" style={{ marginTop: '16px', justifyContent: 'center' }}>
+            <a href="/page/a1cd845e-046a-4147-a04f-895290bf6b73"
+            className="add-btn" style={{ marginTop: \'16px\', justifyContent: \'center\' }}>
               + Add New Company
             </a>
           </div>
