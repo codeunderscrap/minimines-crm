@@ -37,7 +37,14 @@ export default defineObject({
     {
       universalIdentifier: '3c5dbbb2-5915-4e16-bb7c-61cdab1a628d',
       name: 'company',
-      type: FieldType.TEXT,
+      type: FieldType.RELATION,
+      relationTargetObjectMetadataUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company.universalIdentifier,
+      relationTargetFieldMetadataUniversalIdentifier: '1996379b-049c-48e6-a52c-d499e2340381',
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'companyId',
+      },
       label: 'Company / Organization',
     },
     {

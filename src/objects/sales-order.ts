@@ -1,4 +1,4 @@
-import { defineObject, FieldType } from 'twenty-sdk/define';
+import { defineObject, FieldType , RelationType , OnDeleteAction , STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from 'twenty-sdk/define';
 
 export default defineObject({
   universalIdentifier: '6eb74c1e-bb61-4a12-ba76-849c9db2c3d0',
@@ -27,6 +27,19 @@ export default defineObject({
         { position: 2, color: 'green', label: 'Shipped', value: 'SHIPPED' }
       ]
     }
+    {
+      universalIdentifier: '14209faf-2ee2-4830-8713-c562769ed597',
+      name: 'company',
+      type: FieldType.RELATION,
+      label: 'Company',
+      relationTargetObjectMetadataUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company.universalIdentifier,
+      relationTargetFieldMetadataUniversalIdentifier: 'fc53ec71-6649-498e-a9a9-5884cf567a89',
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'companyId',
+      },
+    },
   ]
 });
 

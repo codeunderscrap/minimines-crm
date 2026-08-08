@@ -1,4 +1,4 @@
-import { defineObject, FieldType } from 'twenty-sdk/define';
+import { defineObject, FieldType , RelationType , OnDeleteAction , STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from 'twenty-sdk/define';
 import { OPPORTUNITY_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
 
 export default defineObject({
@@ -26,7 +26,14 @@ export default defineObject({
     {
       universalIdentifier: 'b2a164c9-b75d-4680-8525-0a19f04ec0e4',
       name: 'companyName',
-      type: FieldType.TEXT,
+      type: FieldType.RELATION,
+      relationTargetObjectMetadataUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company.universalIdentifier,
+      relationTargetFieldMetadataUniversalIdentifier: 'd5c5cf87-47d8-4499-8014-58e4786c2be2',
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'companyNameId',
+      },
       label: 'Company Name',
     },
     {

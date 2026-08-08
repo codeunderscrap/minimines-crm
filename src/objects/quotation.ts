@@ -1,4 +1,4 @@
-import { defineObject, FieldType } from 'twenty-sdk/define';
+import { defineObject, FieldType , RelationType , OnDeleteAction , STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from 'twenty-sdk/define';
 import { QUOTATION_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
 
 export default defineObject({
@@ -12,7 +12,15 @@ export default defineObject({
   labelIdentifierFieldMetadataUniversalIdentifier: '0c0fe0ec-93aa-4c3c-aeaf-d891d8a03981',
   fields: [
     { universalIdentifier: '0c0fe0ec-93aa-4c3c-aeaf-d891d8a03981', name: 'quoteNumber', type: FieldType.TEXT, label: 'Quote Number' },
-    { universalIdentifier: '79b1cf3d-60df-4cd9-9fa7-9d96922569cb', name: 'buyerCompanyId', type: FieldType.TEXT, label: 'Buyer Company ID' },
+    { universalIdentifier: '79b1cf3d-60df-4cd9-9fa7-9d96922569cb', name: 'buyerCompanyId',
+      type: FieldType.RELATION,
+      relationTargetObjectMetadataUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company.universalIdentifier,
+      relationTargetFieldMetadataUniversalIdentifier: '598c1d70-24e2-494b-8db7-5aa206168270',
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'buyerCompanyId',
+      }, label: 'Buyer Company ID' },
     { universalIdentifier: 'b9cd4ab3-d101-473e-a621-a999f268b00f', name: 'productId', type: FieldType.TEXT, label: 'Product ID' },
     { universalIdentifier: 'a93ea01d-63c2-4a98-9dc6-368b903ff6bc', name: 'quantity', type: FieldType.NUMBER, label: 'Quantity (MT)' },
     { universalIdentifier: '310a84ba-5e4a-48a9-964d-432d55829457', name: 'proposedRate', type: FieldType.CURRENCY, label: 'Proposed Rate (INR)' },
