@@ -84,7 +84,7 @@ const LeadsDashboard = () => {
     setLoading(false);
   };
 
-  useEffect(() => { loadData(); }, []);\n
+  useEffect(() => { loadData(); }, []);
   // Auto-filtering based on query parameters from Company Dashboard
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
