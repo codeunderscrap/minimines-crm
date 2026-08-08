@@ -15,6 +15,7 @@ const BRAND = {
   yellow: '#F59E0B',
   red: '#EF4444',
   purple: '#8B5CF6',
+  grayHover: '#F1F5F9'
 };
 
 const FONTS = `
@@ -57,32 +58,73 @@ const FONTS = `
     box-shadow: 0 10px 25px rgba(0,0,0,0.06);
   }
   .record-item {
-    display: block;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     text-decoration: none;
-    padding: 12px 16px;
+    padding: 14px 16px;
     border-radius: 8px;
     background-color: #F8FAFC;
     border: 1px solid transparent;
     transition: all 0.2s;
     margin-bottom: 8px;
+    color: inherit;
   }
   .record-item:hover {
     background-color: ${BRAND.white};
     border-color: ${BRAND.accent};
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
   }
+  .record-item-main {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
   .record-item-title {
     font-size: 14px;
     font-weight: 600;
     color: ${BRAND.primary};
-    margin-bottom: 4px;
   }
   .record-item-meta {
     font-size: 12px;
     color: ${BRAND.text};
     display: flex;
-    justify-content: space-between;
+    gap: 12px;
     align-items: center;
+  }
+  .record-actions {
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex;
+    gap: 8px;
+  }
+  .record-item:hover .record-actions {
+    opacity: 1;
+  }
+  .action-btn {
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+  .action-btn-primary {
+    background-color: ${BRAND.lightAccent};
+    color: ${BRAND.accent};
+  }
+  .action-btn-primary:hover {
+    background-color: ${BRAND.accent};
+    color: ${BRAND.white};
+  }
+  .action-btn-outline {
+    border: 1px solid ${BRAND.border};
+    color: ${BRAND.text};
+    background-color: ${BRAND.white};
+  }
+  .action-btn-outline:hover {
+    border-color: ${BRAND.secondary};
+    color: ${BRAND.primary};
   }
   .badge {
     padding: 4px 10px;
@@ -102,6 +144,24 @@ const FONTS = `
   .scrollable-content::-webkit-scrollbar-thumb {
     background-color: #cbd5e1;
     border-radius: 10px;
+  }
+  .add-btn {
+    background-color: ${BRAND.primary};
+    color: ${BRAND.white};
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: opacity 0.2s;
+  }
+  .add-btn:hover {
+    opacity: 0.9;
   }
 `;
 
@@ -177,15 +237,27 @@ const CompanyDashboard = () => {
   const data = useMemo(() => {
     if (!selectedCompanyId) return { contracts: [], opportunities: [], quotations: [], leads: [], shipments: [] };
     
-    // Filter locally by companyId to ensure absolute correctness regardless of Twenty REST filter limitations
-    return {
-      contracts: allData.contracts.filter((r: any) => relationId(r, 'company') === selectedCompanyId),
-      opportunities: allData.opportunities.filter((r: any) => relationId(r, 'company') === selectedCompanyId),
-      quotations: allData.quotations.filter((r: any) => relationId(r, 'buyerCompanyId') === selectedCompanyId), // Quotations use buyerCompanyId
-      leads: allData.leads.filter((r: any) => relationId(r, 'company') === selectedCompanyId),
-      shipments: allData.shipments.filter((r: any) => relationId(r, 'company') === selectedCompanyId),
+    // Support matching by name for records that were created BEFORE the relation field existed.
+    // This perfectly restores visibility of the 'unlinked' dummy data!
+    const selectedComp = companies.find(c => c.id === selectedCompanyId);
+    const compName = selectedComp?.name?.toLowerCase().trim();
+
+    const matches = (r: any, relName: string) => {
+      if (relationId(r, relName) === selectedCompanyId) return true;
+      // Fallback matching logic for old data (before the schema change)
+      if (compName && r[relName] && typeof r[relName] === 'string' && r[relName].toLowerCase().trim() === compName) return true;
+      if (compName && r.companyName && typeof r.companyName === 'string' && r.companyName.toLowerCase().trim() === compName) return true;
+      return false;
     };
-  }, [allData, selectedCompanyId]);
+
+    return {
+      contracts: allData.contracts.filter((r: any) => matches(r, 'company')),
+      opportunities: allData.opportunities.filter((r: any) => matches(r, 'company')),
+      quotations: allData.quotations.filter((r: any) => matches(r, 'buyerCompanyId')),
+      leads: allData.leads.filter((r: any) => matches(r, 'company')),
+      shipments: allData.shipments.filter((r: any) => matches(r, 'company')),
+    };
+  }, [allData, selectedCompanyId, companies]);
 
   const selectedCompany = companies.find(c => c.id === selectedCompanyId);
 
@@ -200,14 +272,18 @@ const CompanyDashboard = () => {
             <h2 style={{ margin: 0, color: BRAND.white, fontSize: '20px', fontWeight: 700, letterSpacing: '1px' }}>
               CLIENT DIRECTORY
             </h2>
-            <div style={{ color: BRAND.text, fontSize: '12px', marginTop: '4px' }}>Select a client to view their master profile</div>
+            <div style={{ color: BRAND.text, fontSize: '12px', marginTop: '4px' }}>Select a client to manage their interactions</div>
+            
+            <a href="/object/companies/new" className="add-btn" style={{ marginTop: '16px', justifyContent: 'center' }}>
+              + Add New Company
+            </a>
           </div>
           
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {loading ? (
               <div style={{ padding: '40px 20px', textAlign: 'center', color: BRAND.text }}>Loading clients...</div>
             ) : companies.length === 0 ? (
-              <div style={{ padding: '40px 20px', textAlign: 'center', color: BRAND.text }}>No companies found. Add one in the Companies object.</div>
+              <div style={{ padding: '40px 20px', textAlign: 'center', color: BRAND.text }}>No companies found.</div>
             ) : (
               companies.map(company => (
                 <div 
@@ -233,8 +309,8 @@ const CompanyDashboard = () => {
           {!selectedCompany ? (
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', color: BRAND.text }}>
               <div style={{ fontSize: '64px', marginBottom: '20px', opacity: 0.2 }}>🏢</div>
-              <h2 style={{ margin: '0 0 8px 0', color: BRAND.primary }}>Master Profile Dashboard</h2>
-              <p style={{ margin: 0 }}>Select a company from the sidebar to view their aggregated data.</p>
+              <h2 style={{ margin: '0 0 8px 0', color: BRAND.primary }}>Interactive Profile Dashboard</h2>
+              <p style={{ margin: 0 }}>Select a company from the sidebar to manage their operations.</p>
             </div>
           ) : (
             <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
@@ -249,9 +325,11 @@ const CompanyDashboard = () => {
                     <h1 style={{ margin: '0 0 8px 0', color: BRAND.primary, fontSize: '32px', fontWeight: 700 }}>
                       {selectedCompany.name}
                     </h1>
-                    <a href={`/object/companies/${selectedCompany.id}`} className="badge" style={{ backgroundColor: BRAND.lightAccent, color: BRAND.accent, textDecoration: 'none', padding: '6px 12px' }}>
-                      View Full Record ↗
-                    </a>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <a href={`/object/companies/${selectedCompany.id}`} className="action-btn action-btn-primary">
+                        ✎ Edit Profile
+                      </a>
+                    </div>
                   </div>
                   
                   <div style={{ display: 'flex', gap: '20px', fontSize: '14px', color: BRAND.secondary }}>
@@ -272,27 +350,33 @@ const CompanyDashboard = () => {
                 <div className="data-card" style={{ maxHeight: '350px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                     <h3 style={{ margin: 0, fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ color: BRAND.accent }}>📄</span> Active Contracts
+                      <span style={{ color: BRAND.accent }}>📄</span> Contracts
+                      <span className="badge" style={{ backgroundColor: '#F1F5F9', color: BRAND.secondary }}>{data.contracts.length}</span>
                     </h3>
-                    <span className="badge" style={{ backgroundColor: '#F1F5F9', color: BRAND.secondary }}>{data.contracts.length}</span>
+                    <a href="/object/contracts/new" className="add-btn">+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.contracts.length === 0 ? (
                       <div style={{ fontSize: '14px', color: BRAND.text, fontStyle: 'italic', padding: '20px', textAlign: 'center' }}>No active contracts.</div>
                     ) : (
                       data.contracts.map((c: any) => (
-                        <a href={`/object/contracts/${c.id}`} key={c.id} className="record-item">
-                          <div className="record-item-title">{c.name || 'Unnamed Contract'}</div>
-                          <div className="record-item-meta">
-                            <span>Status: <strong style={{ color: BRAND.green }}>{c.status || 'ACTIVE'}</strong></span>
-                            <span>{c.totalQuantity || 0} MT</span>
+                        <div key={c.id} className="record-item">
+                          <div className="record-item-main">
+                            <div className="record-item-title">{c.name || 'Unnamed Contract'}</div>
+                            <div className="record-item-meta">
+                              <span>Status: <strong style={{ color: BRAND.green }}>{c.status || 'ACTIVE'}</strong></span>
+                              <span>{c.totalQuantity || 0} MT</span>
+                            </div>
                           </div>
-                        </a>
+                          <div className="record-actions">
+                            <a href={`/object/contracts/${c.id}`} className="action-btn action-btn-outline">View</a>
+                          </div>
+                        </div>
                       ))
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/objects/contracts" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>Go to Contracts Dashboard &rarr;</a>
+                    <a href="/objects/contracts" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Contracts &rarr;</a>
                   </div>
                 </div>
 
@@ -300,27 +384,33 @@ const CompanyDashboard = () => {
                 <div className="data-card" style={{ maxHeight: '350px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                     <h3 style={{ margin: 0, fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ color: BRAND.yellow }}>🎯</span> Pipeline Opportunities
+                      <span style={{ color: BRAND.yellow }}>🎯</span> Pipeline
+                      <span className="badge" style={{ backgroundColor: '#FFFBEB', color: BRAND.yellow }}>{data.opportunities.length}</span>
                     </h3>
-                    <span className="badge" style={{ backgroundColor: '#FFFBEB', color: BRAND.yellow }}>{data.opportunities.length}</span>
+                    <a href="/object/opportunities/new" className="add-btn" style={{ backgroundColor: BRAND.yellow }}>+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.opportunities.length === 0 ? (
                       <div style={{ fontSize: '14px', color: BRAND.text, fontStyle: 'italic', padding: '20px', textAlign: 'center' }}>No open opportunities.</div>
                     ) : (
                       data.opportunities.map((o: any) => (
-                        <a href={`/object/opportunities/${o.id}`} key={o.id} className="record-item">
-                          <div className="record-item-title">{o.name || 'Unnamed Opportunity'}</div>
-                          <div className="record-item-meta">
-                            <span className="badge" style={{ backgroundColor: '#F1F5F9', color: BRAND.secondary, padding: '2px 8px', fontSize: '10px' }}>{o.stage || 'NEW'}</span>
-                            <span style={{ fontWeight: 600 }}>₹{o.amount?.amountMicros ? (o.amount.amountMicros / 1000000).toLocaleString() : 0}</span>
+                        <div key={o.id} className="record-item">
+                          <div className="record-item-main">
+                            <div className="record-item-title">{o.name || 'Unnamed Opportunity'}</div>
+                            <div className="record-item-meta">
+                              <span className="badge" style={{ backgroundColor: '#F1F5F9', color: BRAND.secondary, padding: '2px 8px', fontSize: '10px' }}>{o.stage || 'NEW'}</span>
+                              <span style={{ fontWeight: 600 }}>₹{o.amount?.amountMicros ? (o.amount.amountMicros / 1000000).toLocaleString() : 0}</span>
+                            </div>
                           </div>
-                        </a>
+                          <div className="record-actions">
+                            <a href={`/object/opportunities/${o.id}`} className="action-btn action-btn-outline">View</a>
+                          </div>
+                        </div>
                       ))
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/objects/opportunities" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>Go to Opportunities Dashboard &rarr;</a>
+                    <a href="/objects/opportunities" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Opportunities &rarr;</a>
                   </div>
                 </div>
 
@@ -328,27 +418,33 @@ const CompanyDashboard = () => {
                 <div className="data-card" style={{ maxHeight: '350px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                     <h3 style={{ margin: 0, fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ color: BRAND.purple }}>👤</span> Associated Leads
+                      <span style={{ color: BRAND.purple }}>👤</span> Leads
+                      <span className="badge" style={{ backgroundColor: '#F3E8FF', color: BRAND.purple }}>{data.leads.length}</span>
                     </h3>
-                    <span className="badge" style={{ backgroundColor: '#F3E8FF', color: BRAND.purple }}>{data.leads.length}</span>
+                    <a href="/object/leads/new" className="add-btn" style={{ backgroundColor: BRAND.purple }}>+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.leads.length === 0 ? (
                       <div style={{ fontSize: '14px', color: BRAND.text, fontStyle: 'italic', padding: '20px', textAlign: 'center' }}>No leads recorded.</div>
                     ) : (
                       data.leads.map((l: any) => (
-                        <a href={`/object/leads/${l.id}`} key={l.id} className="record-item">
-                          <div className="record-item-title">{l.name || 'Unnamed Lead'}</div>
-                          <div className="record-item-meta">
-                            <span>Status: {l.status || 'NEW'}</span>
-                            <span>Source: <strong>{l.source || 'UNKNOWN'}</strong></span>
+                        <div key={l.id} className="record-item">
+                          <div className="record-item-main">
+                            <div className="record-item-title">{l.name || 'Unnamed Lead'}</div>
+                            <div className="record-item-meta">
+                              <span>Status: {l.status || 'NEW'}</span>
+                              <span>Source: <strong>{l.source || 'UNKNOWN'}</strong></span>
+                            </div>
                           </div>
-                        </a>
+                          <div className="record-actions">
+                            <a href={`/object/leads/${l.id}`} className="action-btn action-btn-outline">View</a>
+                          </div>
+                        </div>
                       ))
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/objects/leads" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>Go to Leads Dashboard &rarr;</a>
+                    <a href="/objects/leads" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Leads &rarr;</a>
                   </div>
                 </div>
 
@@ -356,27 +452,33 @@ const CompanyDashboard = () => {
                 <div className="data-card" style={{ maxHeight: '350px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                     <h3 style={{ margin: 0, fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ color: BRAND.green }}>🚢</span> Active Shipments
+                      <span style={{ color: BRAND.green }}>🚢</span> Shipments
+                      <span className="badge" style={{ backgroundColor: '#ECFDF5', color: BRAND.green }}>{data.shipments.length}</span>
                     </h3>
-                    <span className="badge" style={{ backgroundColor: '#ECFDF5', color: BRAND.green }}>{data.shipments.length}</span>
+                    <a href="/object/exportShipments/new" className="add-btn" style={{ backgroundColor: BRAND.green }}>+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.shipments.length === 0 ? (
                       <div style={{ fontSize: '14px', color: BRAND.text, fontStyle: 'italic', padding: '20px', textAlign: 'center' }}>No shipments recorded.</div>
                     ) : (
                       data.shipments.map((s: any) => (
-                        <a href={`/object/exportShipments/${s.id}`} key={s.id} className="record-item">
-                          <div className="record-item-title">{s.invoiceNumber || 'Pending Invoice'}</div>
-                          <div className="record-item-meta">
-                            <span>Status: <strong style={{ color: BRAND.green }}>{s.status || 'BOOKED'}</strong></span>
-                            <span>{s.destinationPort || 'TBD'}</span>
+                        <div key={s.id} className="record-item">
+                          <div className="record-item-main">
+                            <div className="record-item-title">{s.invoiceNumber || 'Pending Invoice'}</div>
+                            <div className="record-item-meta">
+                              <span>Status: <strong style={{ color: BRAND.green }}>{s.status || 'BOOKED'}</strong></span>
+                              <span>{s.destinationPort || 'TBD'}</span>
+                            </div>
                           </div>
-                        </a>
+                          <div className="record-actions">
+                            <a href={`/object/exportShipments/${s.id}`} className="action-btn action-btn-outline">View</a>
+                          </div>
+                        </div>
                       ))
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/objects/exportShipments" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>Go to Shipments Dashboard &rarr;</a>
+                    <a href="/objects/exportShipments" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Shipments &rarr;</a>
                   </div>
                 </div>
 
