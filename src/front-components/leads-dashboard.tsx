@@ -84,7 +84,21 @@ const LeadsDashboard = () => {
     setLoading(false);
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadData(); }, []);\n
+  // Auto-filtering based on query parameters from Company Dashboard
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const highlightId = params.get('id');
+    
+    if (highlightId && leads.length > 0) {
+      setSelectedLeadIds(new Set([highlightId]));
+      setTimeout(() => {
+        const el = document.getElementById(`lead-row-${highlightId}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+    }
+  }, [leads]);
+
 
   const currentMember = useMemo(() => {
     if (!rawUserId) return null;
