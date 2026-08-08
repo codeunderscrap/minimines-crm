@@ -76,7 +76,7 @@ const LeadsDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     const [leadData, memberData] = await Promise.all([
-      fetchApi('leads?limit=500'),
+      fetchApi('leads?limit=500&depth=1'),
       fetchApi('workspaceMembers?limit=100'),
     ]);
     setLeads(leadData);
@@ -204,14 +204,14 @@ const LeadsDashboard = () => {
     setIsUpdating(true);
     try {
       const opp = await fetchApi('bdOpportunities', 'POST', {
-        name: `${lead.company || lead.name} - Opportunity`,
+        name: `${((typeof lead.company === 'object' && lead.company !== null ? lead.company.name : lead.company) || lead.name)} - Opportunity`,
         linkedLeadId: lead.id,
-        companyName: lead.company || '',
+        companyName: (typeof lead.company === 'object' && lead.company !== null ? lead.company.name : lead.company) || '',
         stage: 'REQUIREMENTS',
       });
       try {
         await fetchApi('opportunities', 'POST', {
-          name: `${lead.company || lead.name} - BD Pipeline`,
+          name: `${((typeof lead.company === 'object' && lead.company !== null ? lead.company.name : lead.company) || lead.name)} - BD Pipeline`,
         });
       } catch (_) {}
 
@@ -426,7 +426,7 @@ const LeadsDashboard = () => {
                       {typeof lead.email === 'string' ? lead.email : (lead.email?.primaryEmail || '')}
                     </div>
                   </div>
-                  <div style={{ color: BRAND.secondary }}>{lead.company || '-'}</div>
+                  <div style={{ color: BRAND.secondary }}>{typeof lead.company === 'object' && lead.company !== null ? lead.company.name : (lead.company || '-')}</div>
                   <div>
                     <span style={{ fontSize: '11px', backgroundColor: BRAND.bg, padding: '3px 8px', borderRadius: '4px', fontWeight: 600 }}>
                       {lead.source || 'UNKNOWN'}
