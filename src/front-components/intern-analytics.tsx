@@ -19,7 +19,7 @@ const API_KEY =
 
 const fetchApi = async (path: string) => {
   try {
-    const res = await fetch(`https://api.twenty.com/rest/${path}`, {
+    const res = await fetch(`https://minimines.twenty.com/rest/${path}`, {
       headers: { Authorization: API_KEY, 'Content-Type': 'application/json' },
     });
     const json = await res.json();

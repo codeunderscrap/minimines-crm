@@ -179,7 +179,7 @@ const StatCard = ({ label, value, sub, link }: any) => {
 };
 
 const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
-  const url = `https://api.twenty.com/rest/${path}`;
+  const url = `https://minimines.twenty.com/rest/${path}`;
   const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJiZTliODFjNy0yOTU1LTRkNDQtOWNmYy01YmQ3YTQ4ZWE1ZDAiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiYmU5YjgxYzctMjk1NS00ZDQ0LTljZmMtNWJkN2E0OGVhNWQwIiwiaWF0IjoxNzg2MDAzNTcwLCJleHAiOjQ5Mzk1MTcxNjksImp0aSI6ImY2ZDJhYTRmLWU1ZGEtNDJiYS05NGY0LWRhODk2YWI2YmI5ZSJ9.xBds_qiKcR8OWNq7Y2H6DlNLPNpatMmhCatHQP8bvI83L74vDYo-M8LVdlmjJFzVuGNZLJ7lIv5a_8AOh__LNw';
   
   const options: any = {
@@ -190,7 +190,13 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
 
   try {
     const res = await fetch(url, options);
-    const json = await res.json();
+    const text = await res.text();
+    let json;
+    try { json = JSON.parse(text); } catch(e) { throw new Error('Invalid JSON: ' + text.substring(0, 50)); }
+    
+    if (!res.ok) {
+      throw new Error('API ' + res.status + ': ' + (json.message || JSON.stringify(json)));
+    }
     
     if (method !== 'GET') return json;
 
@@ -203,9 +209,9 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
       items = [];
     }
     return items;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Fetch error:', error);
-    return method === 'GET' ? [] : null;
+    return method === 'GET' ? { _errorMsg: error.message || String(error) } : null;
   }
 };
 
@@ -387,6 +393,7 @@ const ShipmentTracker = ({ shipments = [] }: { shipments: any[] }) => {
 const EnquiryQuickReply = () => {
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selectedEnquiry, setSelectedEnquiry] = useState<any>(null);
   const [replyText, setReplyText] = useState('');
 
@@ -543,6 +550,7 @@ const MainPage = () => {
     leads: []
   });
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [pageLinks, setPageLinks] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -555,13 +563,18 @@ const MainPage = () => {
         fetchTwenty('leads?limit=1000')
       ]).then(([c, s, e, o, l]) => ({ contracts: c, salesOrders: s, exportShipments: e, opportunities: o, leads: l }));
 
-      setData({ contracts, salesOrders, exportShipments, opportunities, leads });
+      const errObj = [contracts, salesOrders, exportShipments, opportunities, leads].find((x: any) => x && x._errorMsg);
+      if (errObj) {
+        setErrorMsg((errObj as any)._errorMsg);
+      } else {
+        setData({ contracts: contracts as any, salesOrders: salesOrders as any, exportShipments: exportShipments as any, opportunities: opportunities as any, leads: leads as any });
+      }
       setLoading(false);
     };
 
     const resolvePageLinks = async () => {
       try {
-        const res = await fetch('https://api.twenty.com/rest/metadata/pageLayouts', {
+        const res = await fetch('https://minimines.twenty.com/rest/metadata/pageLayouts', {
           headers: {
             Authorization: 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJiZTliODFjNy0yOTU1LTRkNDQtOWNmYy01YmQ3YTQ4ZWE1ZDAiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiYmU5YjgxYzctMjk1NS00ZDQ0LTljZmMtNWJkN2E0OGVhNWQwIiwiaWF0IjoxNzg2MDAzNTcwLCJleHAiOjQ5Mzk1MTcxNjksImp0aSI6ImY2ZDJhYTRmLWU1ZGEtNDJiYS05NGY0LWRhODk2YWI2YmI5ZSJ9.xBds_qiKcR8OWNq7Y2H6DlNLPNpatMmhCatHQP8bvI83L74vDYo-M8LVdlmjJFzVuGNZLJ7lIv5a_8AOh__LNw',
             'Content-Type': 'application/json',
@@ -604,6 +617,13 @@ const MainPage = () => {
     return <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif" }}>Loading secure CRM data...</div>;
   }
 
+  if (errorMsg) {
+    return <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif", color: 'red' }}>
+      <h1>Dashboard Error: Network/API Blocked</h1>
+      <pre style={{ whiteSpace: 'pre-wrap' }}>{errorMsg}</pre>
+    </div>;
+  }
+
   return (
     <>
       <style>{FONTS}</style>
@@ -612,7 +632,7 @@ const MainPage = () => {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', borderBottom: `2px solid ${BRAND.primary}`, paddingBottom: '24px' }}>
             <div>
-              <h1 className="h1">MiniMines BD CRM [v3]</h1>
+              <h1 className="h1">MiniMines BD CRM [v4]</h1>
               <div className="subtitle">Corporate Command Center</div>
             </div>
             <div style={{ display: 'flex', gap: '16px' }}>

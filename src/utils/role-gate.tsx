@@ -14,7 +14,7 @@ export const useUserRole = (): UserRole | null => {
     (async () => {
       try {
         const res = await fetch(
-          'https://api.twenty.com/rest/workspaceMembers?limit=100',
+          'https://minimines.twenty.com/rest/workspaceMembers?limit=100',
           { headers: { Authorization: API_KEY, 'Content-Type': 'application/json' } },
         );
         const json = await res.json();
