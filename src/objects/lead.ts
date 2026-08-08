@@ -35,7 +35,7 @@ export default defineObject({
       label: 'Lead Name',
     },
     {
-      universalIdentifier: '3c5dbbb2-5915-4e16-bb7c-61cdab1a628d',
+      universalIdentifier: 'ee73f5f3-3aa8-4a21-a8c6-1796e7eb1d43',
       name: 'company',
       type: FieldType.RELATION,
       relationTargetObjectMetadataUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company.universalIdentifier,

@@ -13,7 +13,7 @@ export default defineView({
   isCompact: false,
   viewFields: [
     { fieldMetadataUniversalIdentifier: '12b90fc3-ebff-4269-a4f1-ec1d1634aad7', position: 0, size: 200 },
-    { fieldMetadataUniversalIdentifier: '3c5dbbb2-5915-4e16-bb7c-61cdab1a628d', position: 1, size: 180 },
+    { fieldMetadataUniversalIdentifier: 'ee73f5f3-3aa8-4a21-a8c6-1796e7eb1d43', position: 1, size: 180 },
     { fieldMetadataUniversalIdentifier: 'b21064a2-b73d-4680-8525-0a19f04ec0e4', position: 2, size: 200 },
     { fieldMetadataUniversalIdentifier: 'ddc9818e-4ad2-46af-9536-fcbb5a37f8a4', position: 3, size: 150 },
     { fieldMetadataUniversalIdentifier: '620d71c8-ff98-465e-a2d6-234531ba3858', position: 4, size: 120 },

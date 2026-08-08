@@ -49,7 +49,7 @@ export default defineObject({
       ]
     },
     {
-      universalIdentifier: 'a55042df-d847-4f1d-bdbe-40353cf36d94',
+      universalIdentifier: '4eff267f-3024-4e77-bd31-72739bad2fa6',
       name: 'company',
       type: FieldType.RELATION,
       label: 'Company',

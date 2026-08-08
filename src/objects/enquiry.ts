@@ -41,7 +41,7 @@ export default defineObject({
       label: 'Customer Name',
     },
     {
-      universalIdentifier: ENQUIRY_COMPANY_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'c44febc8-c4be-4354-8e0a-d9ac83b01d36',
       name: 'company',
       type: FieldType.RELATION,
       relationTargetObjectMetadataUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company.universalIdentifier,

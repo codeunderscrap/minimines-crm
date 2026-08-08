@@ -24,7 +24,7 @@ export default defineObject({
       label: 'Linked Lead ID',
     },
     {
-      universalIdentifier: 'b2a164c9-b75d-4680-8525-0a19f04ec0e4',
+      universalIdentifier: '5f504f3e-8e13-4009-a753-52a9028158bd',
       name: 'companyName',
       type: FieldType.RELATION,
       relationTargetObjectMetadataUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company.universalIdentifier,

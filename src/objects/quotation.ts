@@ -12,7 +12,7 @@ export default defineObject({
   labelIdentifierFieldMetadataUniversalIdentifier: '0c0fe0ec-93aa-4c3c-aeaf-d891d8a03981',
   fields: [
     { universalIdentifier: '0c0fe0ec-93aa-4c3c-aeaf-d891d8a03981', name: 'quoteNumber', type: FieldType.TEXT, label: 'Quote Number' },
-    { universalIdentifier: '79b1cf3d-60df-4cd9-9fa7-9d96922569cb', name: 'buyerCompanyId',
+    { universalIdentifier: '4399ed12-2c2e-4f33-8ff6-d7bc99bc704b', name: 'buyerCompanyId',
       type: FieldType.RELATION,
       relationTargetObjectMetadataUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company.universalIdentifier,
       relationTargetFieldMetadataUniversalIdentifier: '598c1d70-24e2-494b-8db7-5aa206168270',
