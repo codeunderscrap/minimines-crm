@@ -129,7 +129,7 @@ const CompanyDashboard = () => {
                 >
                   <div style={{ fontWeight: 600, color: BRAND.primary, fontSize: '14px' }}>{company.name || 'Unnamed Company'}</div>
                   <div style={{ fontSize: '12px', color: BRAND.text, marginTop: '4px' }}>
-                    {company.domainName || 'No Domain'}
+                    {company.domainName?.primaryLinkUrl || company.domainName?.primaryLinkLabel || 'No Domain'}
                   </div>
                 </div>
               ))
@@ -156,9 +156,9 @@ const CompanyDashboard = () => {
                     {selectedCompany.name}
                   </h1>
                   <div style={{ display: 'flex', gap: '15px', marginTop: '8px', fontSize: '14px', color: BRAND.secondary }}>
-                    <span>{selectedCompany.domainName || 'No Website'}</span>
+                    <span>{selectedCompany.domainName?.primaryLinkUrl || selectedCompany.domainName?.primaryLinkLabel || 'No Website'}</span>
                     <span>•</span>
-                    <span>{selectedCompany.address || 'No Address'}</span>
+                    <span>{selectedCompany.address?.address1 || selectedCompany.address?.city || 'No Address'}</span>
                   </div>
                 </div>
               </div>
