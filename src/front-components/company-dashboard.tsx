@@ -376,7 +376,7 @@ const CompanyDashboard = () => {
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/objects/contracts" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Contracts &rarr;</a>
+                    <a href="/pages/9d924817-9758-440e-bf63-0812a34cc57b" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Contracts &rarr;</a>
                   </div>
                 </div>
 
@@ -410,7 +410,7 @@ const CompanyDashboard = () => {
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/objects/opportunities" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Opportunities &rarr;</a>
+                    <a href="/pages/4f324362-46e8-45fd-b81a-f1b2e3b17e6b" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Opportunities &rarr;</a>
                   </div>
                 </div>
 
@@ -444,7 +444,7 @@ const CompanyDashboard = () => {
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/objects/leads" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Leads &rarr;</a>
+                    <a href="/pages/210c2f1a-6ef4-4599-9027-60c70a118cef" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Leads &rarr;</a>
                   </div>
                 </div>
 
@@ -478,7 +478,7 @@ const CompanyDashboard = () => {
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/objects/exportShipments" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Shipments &rarr;</a>
+                    <a href="/pages/81463067-26a7-44cf-8e8f-72de3806f9cd" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Shipments &rarr;</a>
                   </div>
                 </div>
 
