@@ -180,7 +180,7 @@ const StatCard = ({ label, value, sub, link }: any) => {
 
 const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
   const url = `https://minimines.twenty.com/rest/${path}`;
-  const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJiZTliODFjNy0yOTU1LTRkNDQtOWNmYy01YmQ3YTQ4ZWE1ZDAiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiYmU5YjgxYzctMjk1NS00ZDQ0LTljZmMtNWJkN2E0OGVhNWQwIiwiaWF0IjoxNzg2MDAzNTcwLCJleHAiOjQ5Mzk1MTcxNjksImp0aSI6ImY2ZDJhYTRmLWU1ZGEtNDJiYS05NGY0LWRhODk2YWI2YmI5ZSJ9.xBds_qiKcR8OWNq7Y2H6DlNLPNpatMmhCatHQP8bvI83L74vDYo-M8LVdlmjJFzVuGNZLJ7lIv5a_8AOh__LNw';
+  const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJlYzFlMDcwZi0yZmE0LTQ3MjMtYmVmMy0xYmY5NGFlNTg4ZDEiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiZWMxZTA3MGYtMmZhNC00NzIzLWJlZjMtMWJmOTRhZTU4OGQxIiwiaWF0IjoxNzg2MTAxMzgzLCJleHAiOjQ5Mzk3MDEzODIsImp0aSI6IjhjZmY3MGFlLTgzZmItNDQ4NS05YjI0LWFlNjczYzQzZmE0NSJ9.Wg93DjZtbUC8-a1I2IoVSMixlv4TIdA4ayjXG6C8Zm258IW6nQbEIyX7t3R9hdGeMfy6ssbplJRP2vWHBW6Odg';
   
   const options: any = {
     method,
@@ -576,7 +576,7 @@ const MainPage = () => {
       try {
         const res = await fetch('https://minimines.twenty.com/rest/metadata/pageLayouts', {
           headers: {
-            Authorization: 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJiZTliODFjNy0yOTU1LTRkNDQtOWNmYy01YmQ3YTQ4ZWE1ZDAiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiYmU5YjgxYzctMjk1NS00ZDQ0LTljZmMtNWJkN2E0OGVhNWQwIiwiaWF0IjoxNzg2MDAzNTcwLCJleHAiOjQ5Mzk1MTcxNjksImp0aSI6ImY2ZDJhYTRmLWU1ZGEtNDJiYS05NGY0LWRhODk2YWI2YmI5ZSJ9.xBds_qiKcR8OWNq7Y2H6DlNLPNpatMmhCatHQP8bvI83L74vDYo-M8LVdlmjJFzVuGNZLJ7lIv5a_8AOh__LNw',
+            Authorization: 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJlYzFlMDcwZi0yZmE0LTQ3MjMtYmVmMy0xYmY5NGFlNTg4ZDEiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiZWMxZTA3MGYtMmZhNC00NzIzLWJlZjMtMWJmOTRhZTU4OGQxIiwiaWF0IjoxNzg2MTAxMzgzLCJleHAiOjQ5Mzk3MDEzODIsImp0aSI6IjhjZmY3MGFlLTgzZmItNDQ4NS05YjI0LWFlNjczYzQzZmE0NSJ9.Wg93DjZtbUC8-a1I2IoVSMixlv4TIdA4ayjXG6C8Zm258IW6nQbEIyX7t3R9hdGeMfy6ssbplJRP2vWHBW6Odg',
             'Content-Type': 'application/json',
           },
         });
@@ -632,7 +632,7 @@ const MainPage = () => {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', borderBottom: `2px solid ${BRAND.primary}`, paddingBottom: '24px' }}>
             <div>
-              <h1 className="h1">MiniMines BD CRM [v4]</h1>
+              <h1 className="h1">MiniMines BD CRM [v5]</h1>
               <div className="subtitle">Corporate Command Center</div>
             </div>
             <div style={{ display: 'flex', gap: '16px' }}>
