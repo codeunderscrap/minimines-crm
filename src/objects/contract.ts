@@ -25,7 +25,7 @@ export default defineObject({
         { position: 1, color: 'green', label: 'Active', value: 'ACTIVE' },
         { position: 2, color: 'green', label: 'Expired', value: 'EXPIRED' }
       ]
-    }
+    },
     {
       universalIdentifier: '0ed7032b-f909-4247-9cd2-9da64e368c16',
       name: 'company',

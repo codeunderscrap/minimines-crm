@@ -26,7 +26,7 @@ export default defineObject({
         { position: 1, color: 'green', label: 'In Progress', value: 'IN_PROGRESS' },
         { position: 2, color: 'green', label: 'Shipped', value: 'SHIPPED' }
       ]
-    }
+    },
     {
       universalIdentifier: '14209faf-2ee2-4830-8713-c562769ed597',
       name: 'company',

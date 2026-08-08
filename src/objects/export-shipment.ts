@@ -47,7 +47,7 @@ export default defineObject({
         { position: 2, color: 'orange', label: 'In Transit', value: 'IN_TRANSIT' },
         { position: 3, color: 'green', label: 'Delivered', value: 'DELIVERED' }
       ]
-    }
+    },
     {
       universalIdentifier: 'a55042df-d847-4f1d-bdbe-40353cf36d94',
       name: 'company',
