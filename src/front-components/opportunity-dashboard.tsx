@@ -81,6 +81,23 @@ const OpportunityDashboard = () => {
     loadData();
   }, []);
 
+  // Auto-filtering based on query parameters from Company Dashboard
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const highlightId = params.get('id');
+    
+    if (highlightId && opportunities.length > 0) {
+      // Auto select the specific record
+      setSelectedOppIds(new Set([highlightId]));
+      // Scroll to it
+      setTimeout(() => {
+        const el = document.getElementById(`opp-row-${highlightId}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+    }
+  }, [opportunities]);
+
+
   const handleUpdateStage = async (id: string, stage: string) => {
     setIsUpdating(true);
     await fetchTwenty(`bdOpportunities/${id}`, 'PATCH', { stage });
@@ -230,7 +247,7 @@ const OpportunityDashboard = () => {
 
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, backgroundColor: BRAND.bg }}>
                     {stageOpps.map(opp => (
-                      <div key={opp.id} style={{ backgroundColor: BRAND.white, border: `1px solid ${BRAND.border}`, borderRadius: '6px', padding: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                      <div key={opp.id} id={`opp-row-${opp.id}`} style={{ backgroundColor: BRAND.white, border: `1px solid ${BRAND.border}`, borderRadius: '6px', padding: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
                         <div style={{ fontWeight: 600, color: BRAND.primary, marginBottom: '4px' }}>{opp.name}</div>
                         <div style={{ fontSize: '12px', color: BRAND.secondary, marginBottom: '12px' }}>{opp.companyName || 'No Company'}</div>
                         

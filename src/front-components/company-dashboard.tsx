@@ -274,7 +274,7 @@ const CompanyDashboard = () => {
             </h2>
             <div style={{ color: BRAND.text, fontSize: '12px', marginTop: '4px' }}>Select a client to manage their interactions</div>
             
-            <a href="/page/a1cd845e-046a-4147-a04f-895290bf6b73" className="add-btn" style={{ marginTop: '16px', justifyContent: 'center' }}>
+            <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?companyId=${selectedCompany.id}`} className="add-btn" style={{ marginTop: '16px', justifyContent: 'center' }}>
               + Add New Company
             </a>
           </div>
@@ -326,7 +326,7 @@ const CompanyDashboard = () => {
                       {selectedCompany.name}
                     </h1>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                      <a href={`/objects/companies/${selectedCompany.id}`} className="action-btn action-btn-primary">
+                      <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?id=${selectedCompany.id}`} className="action-btn action-btn-primary">
                         ✎ Edit Profile
                       </a>
                     </div>
@@ -353,7 +353,7 @@ const CompanyDashboard = () => {
                       <span style={{ color: BRAND.accent }}>📄</span> Contracts
                       <span className="badge" style={{ backgroundColor: '#F1F5F9', color: BRAND.secondary }}>{data.contracts.length}</span>
                     </h3>
-                    <a href="/page/a1cd845e-046a-4147-a04f-895290bf6b73" className="add-btn">+ Create</a>
+                    <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?companyId=${selectedCompany.id}`} className="add-btn">+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.contracts.length === 0 ? (
@@ -369,14 +369,14 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/objects/companies/${c.id}`} className="action-btn action-btn-outline">View</a>
+                            <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?id=${c.id}&companyId=${selectedCompany.id}`} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/page/a1cd845e-046a-4147-a04f-895290bf6b73" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Contracts &rarr;</a>
+                    <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?companyId=${selectedCompany.id}`} style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Contracts &rarr;</a>
                   </div>
                 </div>
 
@@ -387,7 +387,7 @@ const CompanyDashboard = () => {
                       <span style={{ color: BRAND.yellow }}>🎯</span> Pipeline
                       <span className="badge" style={{ backgroundColor: '#FFFBEB', color: BRAND.yellow }}>{data.opportunities.length}</span>
                     </h3>
-                    <a href="/page/a1cd845e-046a-4147-a04f-895290bf6b73" className="add-btn" style={{ backgroundColor: BRAND.yellow }}>+ Create</a>
+                    <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?companyId=${selectedCompany.id}`} className="add-btn" style={{ backgroundColor: BRAND.yellow }}>+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.opportunities.length === 0 ? (
@@ -403,14 +403,14 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/objects/companies/${o.id}`} className="action-btn action-btn-outline">View</a>
+                            <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?id=${o.id}&companyId=${selectedCompany.id}`} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/page/a1cd845e-046a-4147-a04f-895290bf6b73" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Opportunities &rarr;</a>
+                    <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?companyId=${selectedCompany.id}`} style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Opportunities &rarr;</a>
                   </div>
                 </div>
 
@@ -421,7 +421,7 @@ const CompanyDashboard = () => {
                       <span style={{ color: BRAND.purple }}>👤</span> Leads
                       <span className="badge" style={{ backgroundColor: '#F3E8FF', color: BRAND.purple }}>{data.leads.length}</span>
                     </h3>
-                    <a href="/page/32584c0d-ff5b-43c8-a672-802f0dcd44d4" className="add-btn" style={{ backgroundColor: BRAND.purple }}>+ Create</a>
+                    <a href={`/page/32584c0d-ff5b-43c8-a672-802f0dcd44d4?companyId=${selectedCompany.id}`} className="add-btn" style={{ backgroundColor: BRAND.purple }}>+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.leads.length === 0 ? (
@@ -437,14 +437,14 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/objects/leads/${l.id}`} className="action-btn action-btn-outline">View</a>
+                            <a href={`/page/32584c0d-ff5b-43c8-a672-802f0dcd44d4?id=${l.id}&companyId=${selectedCompany.id}`} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/page/32584c0d-ff5b-43c8-a672-802f0dcd44d4" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Leads &rarr;</a>
+                    <a href={`/page/32584c0d-ff5b-43c8-a672-802f0dcd44d4?companyId=${selectedCompany.id}`} style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Leads &rarr;</a>
                   </div>
                 </div>
 
@@ -455,7 +455,7 @@ const CompanyDashboard = () => {
                       <span style={{ color: BRAND.green }}>🚢</span> Shipments
                       <span className="badge" style={{ backgroundColor: '#ECFDF5', color: BRAND.green }}>{data.shipments.length}</span>
                     </h3>
-                    <a href="/page/1bfd5bef-628e-4e93-a506-480773026866" className="add-btn" style={{ backgroundColor: BRAND.green }}>+ Create</a>
+                    <a href={`/page/1bfd5bef-628e-4e93-a506-480773026866?companyId=${selectedCompany.id}`} className="add-btn" style={{ backgroundColor: BRAND.green }}>+ Create</a>
                   </div>
                   <div className="scrollable-content">
                     {data.shipments.length === 0 ? (
@@ -471,14 +471,14 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/objects/exportShipments/${s.id}`} className="action-btn action-btn-outline">View</a>
+                            <a href={`/page/1bfd5bef-628e-4e93-a506-480773026866?id=${s.id}&companyId=${selectedCompany.id}`} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))
                     )}
                   </div>
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${BRAND.border}`, textAlign: 'center' }}>
-                    <a href="/page/1bfd5bef-628e-4e93-a506-480773026866" style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Shipments &rarr;</a>
+                    <a href={`/page/1bfd5bef-628e-4e93-a506-480773026866?companyId=${selectedCompany.id}`} style={{ color: BRAND.accent, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>See All Shipments &rarr;</a>
                   </div>
                 </div>
 

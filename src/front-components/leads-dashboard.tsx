@@ -407,7 +407,7 @@ const LeadsDashboard = () => {
               const assocName = relationName(lead, 'assignedAssociate');
 
               return (
-                <div key={lead.id} style={{
+                <div key={lead.id} id={`lead-row-${lead.id}`} style={{
                   display: 'grid', gridTemplateColumns: gridCols, gap: '12px', padding: '13px 20px',
                   borderBottom: `1px solid ${BRAND.border}`, alignItems: 'center', fontSize: '13px',
                   backgroundColor: isSelected ? 'rgba(59, 110, 147, 0.05)' : 'transparent',
