@@ -440,16 +440,18 @@ const LeadsDashboard = () => {
               <option value="assigned">Assigned Leads</option>
             </select>
 
-            <select 
-              value={filterMemberId}
-              onChange={(e) => setFilterMemberId(e.target.value)}
-              style={{ padding: '8px 12px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontSize: '13px', minWidth: '180px' }}
-            >
-              <option value="">-- Filter by Associate --</option>
-              {assignableMembers.map(m => (
-                <option key={m.id} value={m.id}>{getMemberName(m.id)}</option>
-              ))}
-            </select>
+            {role !== 'associate' && (
+              <select 
+                value={filterMemberId}
+                onChange={(e) => setFilterMemberId(e.target.value)}
+                style={{ padding: '8px 12px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontSize: '13px', minWidth: '180px' }}
+              >
+                <option value="">-- Filter by Associate --</option>
+                {assignableMembers.map(m => (
+                  <option key={m.id} value={m.id}>{getMemberName(m.id)}</option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div style={{ backgroundColor: BRAND.white, border: `1px solid ${BRAND.border}`, borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0, 27, 46, 0.04)' }}>
