@@ -432,8 +432,8 @@ const ShipmentLogisticsDashboard = () => {
                     alignItems: 'center',
                     fontSize: '13px',
                     cursor: 'pointer',
-                    backgroundColor: isSelected ? '#EBF5FF' : 'transparent',
-                    borderLeft: isSelected ? `3px solid ${BRAND.accent}` : '3px solid transparent',
+                    backgroundColor: (isSelected || s.id === urlHighlightId) ? '#F0F8FF' : 'transparent',
+                    borderLeft: (isSelected || s.id === urlHighlightId) ? '4px solid #1E507B' : '4px solid transparent',
                     transition: 'background-color 0.15s',
                   }}
                 >

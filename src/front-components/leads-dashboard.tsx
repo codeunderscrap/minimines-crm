@@ -84,6 +84,9 @@ const LeadsDashboard = () => {
     setLoading(false);
   };
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlHighlightId = urlParams.get('id');
+
   useEffect(() => { loadData(); }, []);
   // Auto-filtering based on query parameters from Company Dashboard
   useEffect(() => {
@@ -424,7 +427,8 @@ const LeadsDashboard = () => {
                 <div key={lead.id} id={`lead-row-${lead.id}`} style={{
                   display: 'grid', gridTemplateColumns: gridCols, gap: '12px', padding: '13px 20px',
                   borderBottom: `1px solid ${BRAND.border}`, alignItems: 'center', fontSize: '13px',
-                  backgroundColor: isSelected ? 'rgba(59, 110, 147, 0.05)' : 'transparent',
+                  backgroundColor: (isSelected || lead.id === urlHighlightId) ? '#F0F8FF' : 'transparent',
+                  borderLeft: (isSelected || lead.id === urlHighlightId) ? '4px solid #1E507B' : '4px solid transparent',
                 }}>
                   {canAssign && (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
