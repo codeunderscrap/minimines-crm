@@ -85,9 +85,9 @@ const LeadsDashboard = () => {
   };
 
   const urlParams = new URLSearchParams(window.location.search);
-  const urlHighlightId = urlParams.get('id');
+  const urlHighlightId = typeof window !== 'undefined' ? (sessionStorage.getItem('urlHighlightId') || urlParams.get('id')) : null;
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadData(); setTimeout(() => sessionStorage.removeItem("urlHighlightId"), 2000); }, []);
   // Auto-filtering based on query parameters from Company Dashboard
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

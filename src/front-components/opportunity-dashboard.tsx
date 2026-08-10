@@ -71,7 +71,7 @@ const OpportunityDashboard = () => {
   const [successMsg, setSuccessMsg] = useState<any>(null);
 
   const urlParams = new URLSearchParams(window.location.search);
-  const urlHighlightId = urlParams.get('id');
+  const urlHighlightId = typeof window !== 'undefined' ? (sessionStorage.getItem('urlHighlightId') || urlParams.get('id')) : null;
 
   const loadData = async () => {
     setLoading(true);
