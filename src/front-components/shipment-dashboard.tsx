@@ -108,8 +108,9 @@ const ShipmentLogisticsDashboard = () => {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlHighlightId = typeof window !== 'undefined' ? (sessionStorage.getItem('urlHighlightId') || urlParams.get('id')) : null;
+  const searchStr = typeof window !== 'undefined' && window.location ? window.location.search : '';
+  const urlParams = new URLSearchParams(searchStr);
+  const urlHighlightId = typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('urlHighlightId') || urlParams.get('id')) : urlParams.get('id');
 
   const loadData = async () => {
     setLoading(true);

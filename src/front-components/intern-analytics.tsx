@@ -12,6 +12,10 @@ const BRAND = {
   white: '#FFFFFF',
   border: '#EAEAEA',
   bg: '#F9F9F9',
+  red: '#E74C3C',
+  orange: '#F39C12',
+  green: '#27AE60',
+  blue: '#3B6E93'
 };
 
 const API_KEY =
@@ -39,6 +43,18 @@ const relationId = (record: any, name: string): string | null => {
   return record?.[`${name}Id`] ?? null;
 };
 
+const relationName = (record: any, fieldName: string) => {
+  const nested = record?.[fieldName];
+  if (nested && typeof nested === 'object' && nested.name) return nested.name;
+  return null;
+};
+
+const formatDate = (isoString: string) => {
+  if (!isoString) return '-';
+  const d = new Date(isoString);
+  return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+};
+
 const AssociateAnalytics = () => {
   const userRole = useUserRole();
   const [loading, setLoading] = useState(true);
@@ -48,39 +64,53 @@ const AssociateAnalytics = () => {
     const loadData = async () => {
       const [members, leads] = await Promise.all([
         fetchApi('workspaceMembers?limit=100'),
-        fetchApi('leads?limit=500'),
+        fetchApi('leads?limit=1000'),
       ]);
 
       const associates = (Array.isArray(members) ? members : []).filter((m: any) => {
-        // Exclude generic IT admins from performance analytics, but include everyone else
-        return !m.name?.firstName?.includes('ITADMIN') && !m.name?.lastName?.includes('MM');
+        const nameStr = `${m.name?.firstName || ''} ${m.name?.lastName || ''}`.toUpperCase();
+        const emailStr = (m.emails?.[0]?.primaryEmail || '').toUpperCase();
+        // Exclude system accounts/admins from tracking
+        return !nameStr.includes('ITADMIN') && !emailStr.includes('ITADMIN');
       });
 
       const data = associates.map((assoc: any) => {
         const assignedLeads = leads.filter(
-          (l: any) => relationId(l, 'assignedAssociate') === assoc.id,
+          (l: any) => relationId(l, 'assignedAssociate') === assoc.id || relationId(l, 'assignedManagerPrimary') === assoc.id
         );
-        const converted = assignedLeads.filter(
-          (l: any) => l.convertedToOpportunityId,
-        ).length;
-        const followedUp = assignedLeads.filter(
-          (l: any) => l.followUpStatus && l.followUpStatus !== 'NONE',
-        ).length;
-
+        
         const name =
           typeof assoc.name === 'string'
             ? assoc.name
-            : `${assoc.name?.firstName || ''} ${assoc.name?.lastName || ''}`.trim() || 'Unnamed';
+            : `${assoc.name?.firstName || ''} ${assoc.name?.lastName || ''}`.trim() || assoc.emails?.[0]?.primaryEmail || 'Unnamed';
+
+        const stats = {
+          total: assignedLeads.length,
+          new: assignedLeads.filter((l: any) => l.status === 'NEW').length,
+          contacted: assignedLeads.filter((l: any) => l.status === 'CONTACTED').length,
+          qualified: assignedLeads.filter((l: any) => l.status === 'QUALIFIED').length,
+          converted: assignedLeads.filter((l: any) => l.convertedToOpportunityId).length,
+        };
+
+        // Sort leads: NEW first, then by createdAt desc
+        const sortedLeads = assignedLeads.sort((a: any, b: any) => {
+          if (a.status === 'NEW' && b.status !== 'NEW') return -1;
+          if (a.status !== 'NEW' && b.status === 'NEW') return 1;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
 
         return {
+          id: assoc.id,
           name,
-          totalLeads: assignedLeads.length,
-          converted,
-          followedUp,
+          stats,
+          leads: sortedLeads,
         };
       });
 
-      setAssociateData(data.length > 0 ? data : []);
+      // Filter out associates with 0 leads so the view isn't cluttered
+      const activeData = data.filter(d => d.stats.total > 0);
+      
+      setAssociateData(activeData);
       setLoading(false);
     };
     loadData();
@@ -91,189 +121,196 @@ const AssociateAnalytics = () => {
 
   if (loading) {
     return (
-      <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif" }}>
-        Loading Associate Performance Data...
+      <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif", fontSize: '18px', color: BRAND.primary }}>
+        Loading Advanced Analytics & Tracking Data...
       </div>
     );
   }
 
-  const maxLeads = Math.max(...associateData.map((d) => d.totalLeads), 1);
+  const getStatusStyle = (status: string) => {
+    switch(status) {
+      case 'NEW': return { bg: '#FEE2E2', color: '#B91C1C' }; // Red alert
+      case 'CONTACTED': return { bg: '#FEF3C7', color: '#D97706' }; // Yellow warning
+      case 'QUALIFIED': return { bg: '#D1FAE5', color: '#047857' }; // Green success
+      case 'DISQUALIFIED': return { bg: '#F3F4F6', color: '#374151' }; // Gray
+      default: return { bg: '#E0E7FF', color: '#4338CA' }; // Default blue
+    }
+  };
 
   return (
     <div
       style={{
         fontFamily: "'Barlow', sans-serif",
         backgroundColor: '#FFFFFF',
-        border: `1px solid ${BRAND.border}`,
-        padding: '24px',
-        height: '100%',
+        padding: '32px',
+        minHeight: '100%',
         boxSizing: 'border-box',
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=Barlow:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=Barlow:wght@400;500;600;700&display=swap');
+        
+        .tracker-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 16px;
+          border: 1px solid ${BRAND.border};
+          border-radius: 8px;
+          overflow: hidden;
+        }
+        .tracker-table th {
+          background-color: ${BRAND.bg};
+          color: ${BRAND.secondary};
+          font-weight: 600;
+          text-align: left;
+          padding: 12px 16px;
+          font-size: 13px;
+          text-transform: uppercase;
+          border-bottom: 2px solid ${BRAND.border};
+        }
+        .tracker-table td {
+          padding: 14px 16px;
+          border-bottom: 1px solid ${BRAND.border};
+          font-size: 14px;
+          color: ${BRAND.primary};
+        }
+        .tracker-table tr:hover {
+          background-color: #F8FAFC;
+        }
+        
+        .metric-card {
+          flex: 1;
+          background: #fff;
+          border: 1px solid ${BRAND.border};
+          border-radius: 8px;
+          padding: 16px 20px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .metric-title {
+          font-size: 12px;
+          color: ${BRAND.secondary};
+          text-transform: uppercase;
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
+        .metric-value {
+          font-size: 24px;
+          font-weight: 700;
+          font-family: 'Barlow Condensed', sans-serif;
+        }
       `}</style>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '24px',
-        }}
-      >
+      <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: `2px solid ${BRAND.primary}`, paddingBottom: '16px' }}>
         <div>
-          <h2
-            style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: '24px',
-              color: BRAND.primary,
-              textTransform: 'uppercase',
-              margin: '0 0 4px 0',
-            }}
-          >
-            Associate Performance
-          </h2>
-          <div style={{ fontSize: '14px', color: BRAND.text }}>
-            Assigned leads, follow-ups &amp; conversions per associate
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '32px', color: BRAND.primary, margin: '0 0 8px 0', textTransform: 'uppercase' }}>
+            Team Accountability Tracker
+          </h1>
+          <div style={{ fontSize: '15px', color: BRAND.text }}>
+            Detailed breakdown of every lead assigned to your team and their current status.
           </div>
-        </div>
-        <div
-          style={{
-            padding: '6px 12px',
-            backgroundColor: BRAND.bg,
-            border: `1px solid ${BRAND.border}`,
-            fontSize: '12px',
-            fontWeight: 600,
-            color: BRAND.secondary,
-          }}
-        >
-          ALL TIME
         </div>
       </div>
 
       {associateData.length === 0 ? (
-        <div
-          style={{
-            padding: '40px',
-            textAlign: 'center',
-            color: BRAND.text,
-            fontSize: '14px',
-          }}
-        >
-          No associates found. Assign the "Sales Associate" job title to team
-          members.
+        <div style={{ padding: '60px', textAlign: 'center', color: BRAND.text, fontSize: '16px', background: BRAND.bg, borderRadius: '8px' }}>
+          No associates have leads assigned to them yet. Go to the Leads Dashboard to assign leads.
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {associateData.map((assoc, i) => (
-            <div
-              key={i}
-              style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-end',
-                }}
-              >
-                <span
-                  style={{
-                    fontWeight: 600,
-                    color: BRAND.primary,
-                    fontSize: '15px',
-                  }}
-                >
-                  {assoc.name}
-                </span>
-                <span style={{ fontSize: '13px', color: BRAND.secondary }}>
-                  <strong>{assoc.totalLeads}</strong> Leads &nbsp;|&nbsp;{' '}
-                  <strong>{assoc.followedUp}</strong> Followed Up &nbsp;|&nbsp;{' '}
-                  <strong style={{ color: BRAND.accent }}>
-                    {assoc.converted}
-                  </strong>{' '}
-                  Converted
-                </span>
-              </div>
-
-              <div
-                style={{
-                  width: '100%',
-                  height: '16px',
-                  backgroundColor: '#E0E0E0',
-                  borderRadius: '4px',
-                  overflow: 'hidden',
-                  display: 'flex',
-                }}
-              >
-                <div
-                  style={{
-                    width: `${(assoc.totalLeads / maxLeads) * 100}%`,
-                    height: '100%',
-                    backgroundColor: BRAND.lightAccent,
-                    position: 'relative',
-                  }}
-                >
-                  <div
-                    style={{
-                      width:
-                        assoc.totalLeads > 0
-                          ? `${(assoc.converted / assoc.totalLeads) * 100}%`
-                          : '0%',
-                      height: '100%',
-                      backgroundColor: BRAND.accent,
-                    }}
-                  ></div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+          {associateData.map((assoc) => (
+            <div key={assoc.id} style={{ display: 'flex', flexDirection: 'column' }}>
+              
+              {/* Associate Header & Stats */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: BRAND.primary, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px' }}>
+                    {assoc.name.charAt(0)}
+                  </div>
+                  <h2 style={{ fontSize: '22px', color: BRAND.primary, margin: 0, fontWeight: 700 }}>{assoc.name}</h2>
                 </div>
               </div>
+
+              <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
+                <div className="metric-card">
+                  <div className="metric-title">Total Assigned</div>
+                  <div className="metric-value" style={{ color: BRAND.primary }}>{assoc.stats.total}</div>
+                </div>
+                <div className="metric-card" style={{ borderLeft: `4px solid ${BRAND.red}` }}>
+                  <div className="metric-title">Requires Action (NEW)</div>
+                  <div className="metric-value" style={{ color: BRAND.red }}>{assoc.stats.new}</div>
+                </div>
+                <div className="metric-card" style={{ borderLeft: `4px solid ${BRAND.orange}` }}>
+                  <div className="metric-title">Contacted</div>
+                  <div className="metric-value" style={{ color: BRAND.orange }}>{assoc.stats.contacted}</div>
+                </div>
+                <div className="metric-card" style={{ borderLeft: `4px solid ${BRAND.green}` }}>
+                  <div className="metric-title">Qualified</div>
+                  <div className="metric-value" style={{ color: BRAND.green }}>{assoc.stats.qualified}</div>
+                </div>
+              </div>
+
+              {/* Detailed Tracker Table */}
+              <table className="tracker-table">
+                <thead>
+                  <tr>
+                    <th>Lead Name</th>
+                    <th>Company</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>Follow Up</th>
+                    <th>Added On</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {assoc.leads.map((lead: any) => {
+                    const statusStyle = getStatusStyle(lead.status || 'NEW');
+                    return (
+                      <tr key={lead.id} style={{ backgroundColor: lead.status === 'NEW' ? '#FEF2F2' : 'transparent' }}>
+                        <td style={{ fontWeight: 600 }}>{lead.name || 'Unnamed Lead'}</td>
+                        <td>{relationName(lead, 'company') || '-'}</td>
+                        <td style={{ fontSize: '13px', color: BRAND.secondary }}>{lead.source || 'UNKNOWN'}</td>
+                        <td>
+                          <span style={{
+                            backgroundColor: statusStyle.bg,
+                            color: statusStyle.color,
+                            padding: '4px 10px',
+                            borderRadius: '999px',
+                            fontSize: '12px',
+                            fontWeight: 700
+                          }}>
+                            {lead.status || 'NEW'}
+                          </span>
+                        </td>
+                        <td>
+                          {lead.followUpStatus && lead.followUpStatus !== 'NONE' ? (
+                            <span style={{ fontSize: '13px', fontWeight: 600, color: BRAND.orange }}>
+                              {lead.followUpStatus.replace(/_/g, ' ')}
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: '13px', color: BRAND.text }}>-</span>
+                          )}
+                        </td>
+                        <td style={{ fontSize: '13px', color: BRAND.secondary }}>{formatDate(lead.createdAt)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+
             </div>
           ))}
         </div>
       )}
-
-      <div
-        style={{
-          marginTop: '24px',
-          paddingTop: '16px',
-          borderTop: `1px solid ${BRAND.border}`,
-          display: 'flex',
-          gap: '16px',
-          fontSize: '12px',
-          color: BRAND.secondary,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div
-            style={{
-              width: '12px',
-              height: '12px',
-              backgroundColor: BRAND.lightAccent,
-              borderRadius: '2px',
-            }}
-          ></div>
-          Total Leads Assigned
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div
-            style={{
-              width: '12px',
-              height: '12px',
-              backgroundColor: BRAND.accent,
-              borderRadius: '2px',
-            }}
-          ></div>
-          Successfully Converted
-        </div>
-      </div>
     </div>
   );
 };
 
 export default defineFrontComponent({
   universalIdentifier: INTERN_ANALYTICS_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
-  name: 'Associate Analytics',
+  name: 'Team Accountability Tracker',
   component: AssociateAnalytics,
 });
 
-// cache-bust: 1786104341232
+// cache-bust: 1786111300000

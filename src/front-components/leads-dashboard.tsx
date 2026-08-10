@@ -84,8 +84,9 @@ const LeadsDashboard = () => {
     setLoading(false);
   };
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlHighlightId = typeof window !== 'undefined' ? (sessionStorage.getItem('urlHighlightId') || urlParams.get('id')) : null;
+  const searchStr = typeof window !== 'undefined' && window.location ? window.location.search : '';
+  const urlParams = new URLSearchParams(searchStr);
+  const urlHighlightId = typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('urlHighlightId') || urlParams.get('id')) : urlParams.get('id');
 
   useEffect(() => { loadData(); setTimeout(() => sessionStorage.removeItem("urlHighlightId"), 2000); }, []);
   // Auto-filtering based on query parameters from Company Dashboard
