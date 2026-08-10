@@ -74,9 +74,7 @@ const LeadsDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterAssigned, setFilterAssigned] = useState('');
     const [filterMemberId, setFilterMemberId] = useState('');
-  const [subProfileId, setSubProfileId] = useState<string | null>(
-    typeof window !== 'undefined' && window.localStorage ? window.localStorage.getItem('minimines_sub_profile_id') : null
-  );
+
   const [successMsg, setSuccessMsg] = useState<React.ReactNode>(null);
 
   const loadData = async () => {
@@ -184,12 +182,8 @@ const LeadsDashboard = () => {
         relationId(l, 'assignedManagerSecondary') === currentUserId
       );
     } else if (role === 'associate') {
-      // Shared associate accounts use subProfileId to isolate their view
-      if (subProfileId) {
-        baseLeads = leads.filter(l => relationId(l, 'assignedAssociate') === subProfileId);
-      } else {
-        baseLeads = leads;
-      }
+      // Show associates their specific dashboard with their assigned leads only
+      baseLeads = leads.filter(l => relationId(l, 'assignedAssociate') === currentUserId);
     } // HOD sees all by default
 
     // Now apply filters
@@ -207,13 +201,13 @@ const LeadsDashboard = () => {
       
       return keep;
     });
-  }, [role, currentUserId, leads, filterAssigned, filterMemberId, subProfileId]);
+  }, [role, currentUserId, leads, filterAssigned, filterMemberId]);
 
   const assignableMembers = useMemo(() => {
     return members; // Show all users so the shared associate account can select anyone
   }, [members]);
 
-  const canAssign = true;
+  const canAssign = role !== 'associate';
   const canConvert = role !== 'associate';
   const canAcknowledge = role !== 'associate';
 
@@ -374,29 +368,6 @@ const LeadsDashboard = () => {
                 <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '28px', color: BRAND.primary, margin: 0, textTransform: 'uppercase' }}>
                   {title}
                 </h1>
-                
-                {role === 'associate' && (
-                  <div style={{ marginLeft: '16px', display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', backgroundColor: '#F0F8FF', borderRadius: '6px', border: `1px solid ${BRAND.accent}` }}>
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: BRAND.primary }}>Who is using this account?</span>
-                    <select
-                      value={subProfileId || ''}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setSubProfileId(val || null);
-                        if (typeof window !== 'undefined' && window.localStorage) {
-                          if (val) window.localStorage.setItem('minimines_sub_profile_id', val);
-                          else window.localStorage.removeItem('minimines_sub_profile_id');
-                        }
-                      }}
-                      style={{ padding: '4px 8px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontSize: '13px', color: BRAND.primary, fontWeight: 600 }}
-                    >
-                      <option value="">-- Select your profile --</option>
-                      {assignableMembers.map(m => (
-                        <option key={m.id} value={m.id}>{getMemberName(m.id)}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
                 <span style={{ fontSize: '11px', padding: '3px 10px', borderRadius: '999px', fontWeight: 700, backgroundColor: roleBg, color: roleFg }}>
                   {roleLabel}
                 </span>
