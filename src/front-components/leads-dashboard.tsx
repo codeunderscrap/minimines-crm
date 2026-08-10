@@ -72,6 +72,8 @@ const LeadsDashboard = () => {
   const [selectedMemberId, setSelectedMemberId] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterAssigned, setFilterAssigned] = useState('');
+  const [filterMemberId, setFilterMemberId] = useState('');
   const [successMsg, setSuccessMsg] = useState<React.ReactNode>(null);
 
   const loadData = async () => {
@@ -172,9 +174,6 @@ const LeadsDashboard = () => {
   };
 
   const visibleLeads = useMemo(() => {
-    const params = new URLSearchParams(typeof window !== 'undefined' && window.location ? window.location.search : '');
-    const filterAssigned = params.get('filterAssigned');
-    const filterMemberId = params.get('filterMemberId');
 
     let baseLeads = leads;
     if (role === 'manager') {
@@ -201,7 +200,7 @@ const LeadsDashboard = () => {
       
       return keep;
     });
-  }, [role, currentUserId, leads, typeof window !== 'undefined' && window.location ? window.location.search : '']);
+  }, [role, currentUserId, leads, filterAssigned, filterMemberId]);
 
   const assignableMembers = useMemo(() => {
     return members; // Show all users so the shared associate account can select anyone
@@ -431,17 +430,8 @@ const LeadsDashboard = () => {
           <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', alignItems: 'center' }}>
             <span style={{ fontSize: '14px', fontWeight: 600, color: BRAND.textDark }}>Filters:</span>
             <select 
-              value={typeof window !== 'undefined' && window.location ? new URLSearchParams(window.location.search).get('filterAssigned') || '' : ''}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (typeof window !== 'undefined' && window.location) {
-                  const url = new URL(window.location.href);
-                  if (val) url.searchParams.set('filterAssigned', val);
-                  else url.searchParams.delete('filterAssigned');
-                  window.history.pushState({}, '', url);
-                  window.dispatchEvent(new Event('popstate'));
-                }
-              }}
+              value={filterAssigned}
+              onChange={(e) => setFilterAssigned(e.target.value)}
               style={{ padding: '8px 12px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontSize: '13px' }}
             >
               <option value="">-- All Leads --</option>
@@ -450,17 +440,8 @@ const LeadsDashboard = () => {
             </select>
 
             <select 
-              value={typeof window !== 'undefined' && window.location ? new URLSearchParams(window.location.search).get('filterMemberId') || '' : ''}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (typeof window !== 'undefined' && window.location) {
-                  const url = new URL(window.location.href);
-                  if (val) url.searchParams.set('filterMemberId', val);
-                  else url.searchParams.delete('filterMemberId');
-                  window.history.pushState({}, '', url);
-                  window.dispatchEvent(new Event('popstate'));
-                }
-              }}
+              value={filterMemberId}
+              onChange={(e) => setFilterMemberId(e.target.value)}
               style={{ padding: '8px 12px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontSize: '13px', minWidth: '180px' }}
             >
               <option value="">-- Filter by Associate --</option>
