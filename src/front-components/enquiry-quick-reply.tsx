@@ -351,7 +351,7 @@ export const InboundLeadsHub = () => {
   // ── Load enquiries ─────────────────────────────────────────────────────────
   const loadEnquiries = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
-    const data = await api(`enquiries?orderBy=createdAt,desc&limit=50`);
+    const data = await api(`enquiries?filter[source][eq]=WEBSITE&orderBy=createdAt,desc&limit=50`);
     const arr: any[] = Array.isArray(data) ? data : [];
 
     if (arr.length === 0) {

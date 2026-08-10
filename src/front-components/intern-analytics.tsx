@@ -52,8 +52,8 @@ const AssociateAnalytics = () => {
       ]);
 
       const associates = (Array.isArray(members) ? members : []).filter((m: any) => {
-        const t = (m.jobTitle || '').toLowerCase();
-        return t.includes('associate') || t.includes('intern');
+        // Exclude generic IT admins from performance analytics, but include everyone else
+        return !m.name?.firstName?.includes('ITADMIN') && !m.name?.lastName?.includes('MM');
       });
 
       const data = associates.map((assoc: any) => {

@@ -170,11 +170,10 @@ const LeadsDashboard = () => {
   }, [role, currentUserId, leads]);
 
   const assignableMembers = useMemo(() => {
-    if (role === 'associate') return [];
-    return members.filter((m: any) => m.id !== currentUserId);
-  }, [role, members, currentUserId]);
+    return members; // Show all users so the shared associate account can select anyone
+  }, [members]);
 
-  const canAssign = role !== 'associate';
+  const canAssign = true;
   const canConvert = role !== 'associate';
   const canAcknowledge = role !== 'associate';
 
