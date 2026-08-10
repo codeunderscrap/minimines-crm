@@ -571,6 +571,15 @@ const LeadsDashboard = () => {
                       ))}
                     </select>
                   </div>
+                  <div>
+                    <input
+                      list="worked-by-list"
+                      defaultValue={lead.workedBy || ''}
+                      onBlur={(e) => handleUpdateWorkedBy(lead.id, e.target.value)}
+                      placeholder="Type name..."
+                      style={{ padding: '6px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, width: '100px', fontSize: '12px' }}
+                    />
+                  </div>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                     <select
                       value={lead.followUpStatus || 'NONE'}
