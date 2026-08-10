@@ -10,5 +10,6 @@ export default defineNavigationMenuItem({
   icon: 'IconPhoneCall',
   position: 9,
   type: NavigationMenuItemType.PAGE_LAYOUT,
+  folderUniversalIdentifier: 'e4a2d8b5-31a9-467b-83c9-04d166cfa92a',
   pageLayoutUniversalIdentifier: INTERN_ANALYTICS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });

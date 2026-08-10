@@ -364,6 +364,9 @@ const LeadsDashboard = () => {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px', borderBottom: `2px solid ${BRAND.primary}`, paddingBottom: '20px' }}>
             <div>
+              <div style={{ fontSize: '15px', color: BRAND.primary, marginBottom: '2px', fontWeight: 600, letterSpacing: '0.3px' }}>
+                Welcome, {getMemberName(currentUserId) || 'Team Member'}
+              </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
                 <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '28px', color: BRAND.primary, margin: 0, textTransform: 'uppercase' }}>
                   {title}

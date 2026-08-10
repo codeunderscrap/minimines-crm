@@ -10,6 +10,7 @@ export default defineNavigationMenuItem({
   icon: 'IconBox',
   position: 18,
   type: NavigationMenuItemType.PAGE_LAYOUT,
+  folderUniversalIdentifier: 'f1b3e9c6-42b0-578c-94da-15e277dfb03b',
   pageLayoutUniversalIdentifier: SALES_ORDER_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });
 

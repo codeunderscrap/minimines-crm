@@ -10,5 +10,6 @@ export default defineNavigationMenuItem({
   icon: 'IconFiles',
   position: 14,
   type: NavigationMenuItemType.PAGE_LAYOUT,
+  folderUniversalIdentifier: 'f1b3e9c6-42b0-578c-94da-15e277dfb03b',
   pageLayoutUniversalIdentifier: EXPORT_DOCUMENT_TRACKER_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });

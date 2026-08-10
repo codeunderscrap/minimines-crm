@@ -10,5 +10,6 @@ export default defineNavigationMenuItem({
   icon: 'IconReceipt',
   position: 4,
   type: NavigationMenuItemType.PAGE_LAYOUT,
+  folderUniversalIdentifier: 'e4a2d8b5-31a9-467b-83c9-04d166cfa92a',
   pageLayoutUniversalIdentifier: QUOTATION_DASHBOARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });
