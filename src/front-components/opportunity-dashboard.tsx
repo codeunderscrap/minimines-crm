@@ -70,6 +70,9 @@ const OpportunityDashboard = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<any>(null);
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlHighlightId = urlParams.get('id');
+
   const loadData = async () => {
     setLoading(true);
     const data = await fetchTwenty('bdOpportunities?limit=100');

@@ -108,6 +108,9 @@ const ShipmentLogisticsDashboard = () => {
     setTimeout(() => setToast(null), 3500);
   };
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlHighlightId = urlParams.get('id');
+
   const loadData = async () => {
     setLoading(true);
     const [shipments, docs] = await Promise.all([
