@@ -370,7 +370,7 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?id=${c.id}&companyId=${selectedCompany.id}`} onClick={() => sessionStorage.setItem("urlHighlightId", c.id)} className="action-btn action-btn-outline">View</a>
+                            <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?id=${c.id}&companyId=${selectedCompany.id}`} onClick={() => { if (typeof window !== 'undefined' && window.sessionStorage) window.sessionStorage.setItem('urlHighlightId', c.id); }} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))
@@ -404,7 +404,7 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?id=${o.id}&companyId=${selectedCompany.id}`} onClick={() => sessionStorage.setItem("urlHighlightId", o.id)} className="action-btn action-btn-outline">View</a>
+                            <a href={`/page/a1cd845e-046a-4147-a04f-895290bf6b73?id=${o.id}&companyId=${selectedCompany.id}`} onClick={() => { if (typeof window !== 'undefined' && window.sessionStorage) window.sessionStorage.setItem('urlHighlightId', o.id); }} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))
@@ -438,7 +438,7 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/page/32584c0d-ff5b-43c8-a672-802f0dcd44d4?id=${l.id}&companyId=${selectedCompany.id}`} onClick={() => sessionStorage.setItem("urlHighlightId", l.id)} className="action-btn action-btn-outline">View</a>
+                            <a href={`/page/32584c0d-ff5b-43c8-a672-802f0dcd44d4?id=${l.id}&companyId=${selectedCompany.id}`} onClick={() => { if (typeof window !== 'undefined' && window.sessionStorage) window.sessionStorage.setItem('urlHighlightId', l.id); }} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))
@@ -472,7 +472,7 @@ const CompanyDashboard = () => {
                             </div>
                           </div>
                           <div className="record-actions">
-                            <a href={`/page/1bfd5bef-628e-4e93-a506-480773026866?id=${s.id}&companyId=${selectedCompany.id}`} onClick={() => sessionStorage.setItem("urlHighlightId", s.id)} className="action-btn action-btn-outline">View</a>
+                            <a href={`/page/1bfd5bef-628e-4e93-a506-480773026866?id=${s.id}&companyId=${selectedCompany.id}`} onClick={() => { if (typeof window !== 'undefined' && window.sessionStorage) window.sessionStorage.setItem('urlHighlightId', s.id); }} className="action-btn action-btn-outline">View</a>
                           </div>
                         </div>
                       ))

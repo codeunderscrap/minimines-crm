@@ -86,12 +86,12 @@ const LeadsDashboard = () => {
 
   const searchStr = typeof window !== 'undefined' && window.location ? window.location.search : '';
   const urlParams = new URLSearchParams(searchStr);
-  const urlHighlightId = typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('urlHighlightId') || urlParams.get('id')) : urlParams.get('id');
+  const urlHighlightId = (typeof window !== 'undefined' && window.sessionStorage ? window.sessionStorage.getItem('urlHighlightId') : null) || urlParams.get('id');
 
-  useEffect(() => { loadData(); setTimeout(() => sessionStorage.removeItem("urlHighlightId"), 2000); }, []);
+  useEffect(() => { loadData(); setTimeout(() => { if (typeof window !== 'undefined' && window.sessionStorage) window.sessionStorage.removeItem('urlHighlightId'); }, 2000); }, []);
   // Auto-filtering based on query parameters from Company Dashboard
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(typeof window !== 'undefined' && window.location ? window.location.search : '');
     const highlightId = params.get('id');
     
     if (highlightId && leads.length > 0) {

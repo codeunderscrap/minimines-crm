@@ -72,7 +72,7 @@ const OpportunityDashboard = () => {
 
   const searchStr = typeof window !== 'undefined' && window.location ? window.location.search : '';
   const urlParams = new URLSearchParams(searchStr);
-  const urlHighlightId = typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('urlHighlightId') || urlParams.get('id')) : urlParams.get('id');
+  const urlHighlightId = (typeof window !== 'undefined' && window.sessionStorage ? window.sessionStorage.getItem('urlHighlightId') : null) || urlParams.get('id');
 
   const loadData = async () => {
     setLoading(true);
@@ -87,7 +87,7 @@ const OpportunityDashboard = () => {
 
   // Auto-filtering based on query parameters from Company Dashboard
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(typeof window !== 'undefined' && window.location ? window.location.search : '');
     const highlightId = params.get('id');
     
     if (highlightId && opportunities.length > 0) {
