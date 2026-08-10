@@ -62,27 +62,17 @@ const AssociateAnalytics = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const [members, leads] = await Promise.all([
-        fetchApi('workspaceMembers?limit=100'),
-        fetchApi('leads?limit=1000'),
-      ]);
+      const leads = await fetchApi('leads?limit=1000');
 
-      const associates = (Array.isArray(members) ? members : []).filter((m: any) => {
-        const nameStr = `${m.name?.firstName || ''} ${m.name?.lastName || ''}`.toUpperCase();
-        const emailStr = (m.emails?.[0]?.primaryEmail || '').toUpperCase();
-        // Exclude system accounts/admins from tracking
-        return !nameStr.includes('ITADMIN') && !emailStr.includes('ITADMIN');
-      });
+      // Extract unique associate names from the 'workedBy' field
+      const uniqueNames = Array.from(new Set(
+        (Array.isArray(leads) ? leads : [])
+          .map((l: any) => l.workedBy)
+          .filter((name: string) => typeof name === 'string' && name.trim().length > 0)
+      )) as string[];
 
-      const data = associates.map((assoc: any) => {
-        const assignedLeads = leads.filter(
-          (l: any) => relationId(l, 'assignedAssociate') === assoc.id || relationId(l, 'assignedManagerPrimary') === assoc.id
-        );
-        
-        const name =
-          typeof assoc.name === 'string'
-            ? assoc.name
-            : `${assoc.name?.firstName || ''} ${assoc.name?.lastName || ''}`.trim() || assoc.emails?.[0]?.primaryEmail || 'Unnamed';
+      const data = uniqueNames.map(name => {
+        const assignedLeads = leads.filter((l: any) => l.workedBy === name);
 
         const stats = {
           total: assignedLeads.length,
@@ -100,17 +90,14 @@ const AssociateAnalytics = () => {
         });
 
         return {
-          id: assoc.id,
+          id: name, // Use name as ID
           name,
           stats,
           leads: sortedLeads,
         };
       });
 
-      // Filter out associates with 0 leads so the view isn't cluttered
-      const activeData = data.filter(d => d.stats.total > 0);
-      
-      setAssociateData(activeData);
+      setAssociateData(data);
       setLoading(false);
     };
     loadData();

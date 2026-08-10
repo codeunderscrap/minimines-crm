@@ -74,9 +74,7 @@ const LeadsDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterAssigned, setFilterAssigned] = useState('');
     const [filterMemberId, setFilterMemberId] = useState('');
-  const [subProfileId, setSubProfileId] = useState<string | null>(
-    typeof window !== 'undefined' && window.localStorage ? window.localStorage.getItem('minimines_sub_profile_id') : null
-  );
+
 
   const [successMsg, setSuccessMsg] = useState<React.ReactNode>(null);
 
@@ -185,12 +183,7 @@ const LeadsDashboard = () => {
         relationId(l, 'assignedManagerSecondary') === currentUserId
       );
     } else if (role === 'associate') {
-      // Shared associate accounts use subProfileId to isolate their view
-      if (subProfileId) {
-        baseLeads = leads.filter(l => relationId(l, 'assignedAssociate') === subProfileId);
-      } else {
-        baseLeads = leads;
-      }
+      baseLeads = leads;
     } // HOD sees all by default
 
     // Now apply filters
@@ -208,7 +201,7 @@ const LeadsDashboard = () => {
       
       return keep;
     });
-  }, [role, currentUserId, leads, filterAssigned, filterMemberId, subProfileId]);
+  }, [role, currentUserId, leads, filterAssigned, filterMemberId]);
 
   const assignableMembers = useMemo(() => {
     return members; // Show all users so the shared associate account can select anyone
@@ -216,7 +209,7 @@ const LeadsDashboard = () => {
 
   const canAssign = role !== 'associate';
   const canConvert = role !== 'associate';
-  const canAcknowledge = role !== 'associate';
+  const canAcknowledge = true;
 
   const toggleLeadSelection = (id: string) => {
     if (!canAssign) return;
@@ -299,6 +292,18 @@ const LeadsDashboard = () => {
     }
   };
 
+  const handleUpdateWorkedBy = async (id: string, val: string) => {
+    setIsUpdating(true);
+    try {
+      await fetchApi(`leads/${id}`, 'PATCH', { workedBy: val });
+      await loadData();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const handleSendAcknowledgment = async (lead: any) => {
     if (!canAcknowledge) return;
     setIsUpdating(true);
@@ -354,8 +359,10 @@ const LeadsDashboard = () => {
     : 'Leads assigned to you by your Manager. Update follow-up status as you work them.';
 
   const gridCols = canAssign
-    ? '40px 2fr 1.5fr 1fr 1fr 1.5fr 2fr'
-    : '2fr 1.5fr 1fr 1fr 1.5fr 1.5fr';
+    ? '40px 2fr 1.5fr 1fr 1fr 1.5fr 1.5fr 2fr'
+    : '2fr 1.5fr 1fr 1fr 1.5fr 1.5fr 1.5fr';
+
+  const uniqueWorkedByNames = Array.from(new Set(leads.map(l => l.workedBy).filter(Boolean)));
 
   return (
     <>
@@ -372,7 +379,7 @@ const LeadsDashboard = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px', borderBottom: `2px solid ${BRAND.primary}`, paddingBottom: '20px' }}>
             <div>
               <div style={{ fontSize: '15px', color: BRAND.primary, marginBottom: '2px', fontWeight: 600, letterSpacing: '0.3px' }}>
-                Welcome, {role === 'associate' && subProfileId ? getMemberName(subProfileId) : (getMemberName(currentUserId) || 'Team Member')}
+                Welcome, {getMemberName(currentUserId) || 'Team Member'}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
                 <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '28px', color: BRAND.primary, margin: 0, textTransform: 'uppercase' }}>
@@ -441,28 +448,7 @@ const LeadsDashboard = () => {
           <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', alignItems: 'center' }}>
             <span style={{ fontSize: '14px', fontWeight: 600, color: BRAND.textDark }}>Filters:</span>
             
-            {role === 'associate' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 8px', backgroundColor: '#F0F8FF', borderRadius: '4px', border: `1px solid ${BRAND.accent}` }}>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: BRAND.primary }}>Viewing as:</span>
-                <select
-                  value={subProfileId || ''}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setSubProfileId(val || null);
-                    if (typeof window !== 'undefined' && window.localStorage) {
-                      if (val) window.localStorage.setItem('minimines_sub_profile_id', val);
-                      else window.localStorage.removeItem('minimines_sub_profile_id');
-                    }
-                  }}
-                  style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontSize: '12px', color: BRAND.primary, fontWeight: 600, background: 'transparent' }}
-                >
-                  <option value="">-- All --</option>
-                  {assignableMembers.map(m => (
-                    <option key={m.id} value={m.id}>{getMemberName(m.id)}</option>
-                  ))}
-                </select>
-              </div>
-            )}
+
 
             <select 
               value={filterAssigned}
@@ -509,6 +495,7 @@ const LeadsDashboard = () => {
               <div>Source</div>
               <div>Status</div>
               <div>Assigned To</div>
+              <div>Worked By</div>
               <div>Actions</div>
             </div>
 
