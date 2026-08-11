@@ -77,6 +77,21 @@ const LeadsDashboard = () => {
 
 
   const [successMsg, setSuccessMsg] = useState<React.ReactNode>(null);
+  const [workedbyOptions, setWorkedbyOptions] = useState<string[]>([]);
+
+  const fetchGraphQL = async (query: string) => {
+    try {
+      const res = await fetch('https://minimines.twenty.com/graphql', {
+        method: 'POST',
+        headers: API_HEADERS,
+        body: JSON.stringify({ query })
+      });
+      const json = await res.json();
+      return json?.data;
+    } catch {
+      return null;
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -295,7 +310,7 @@ const LeadsDashboard = () => {
   const handleUpdateWorkedBy = async (id: string, val: string) => {
     setIsUpdating(true);
     try {
-      await fetchApi(`leads/${id}`, 'PATCH', { workedBy: val });
+      await fetchApi(`leads/${id}`, 'PATCH', { workedby: val });
       await loadData();
     } catch (e) {
       console.error(e);
@@ -362,7 +377,7 @@ const LeadsDashboard = () => {
     ? '40px 2fr 1.5fr 1fr 1fr 1.5fr 1.5fr 2fr'
     : '2fr 1.5fr 1fr 1fr 1.5fr 1.5fr 1.5fr';
 
-  const uniqueWorkedByNames = Array.from(new Set(leads.map(l => l.workedBy).filter(Boolean)));
+  
 
   return (
     <>
@@ -572,13 +587,14 @@ const LeadsDashboard = () => {
                     </select>
                   </div>
                   <div>
-                    <input
-                      list="worked-by-list"
-                      defaultValue={lead.workedBy || ''}
-                      onBlur={(e) => handleUpdateWorkedBy(lead.id, e.target.value)}
-                      placeholder="Type name..."
-                      style={{ padding: '6px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, width: '100px', fontSize: '12px' }}
-                    />
+                    <select
+                      value={lead.workedby || ''}
+                      onChange={(e) => handleUpdateWorkedBy(lead.id, e.target.value)}
+                      style={{ padding: '4px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, width: '110px', fontSize: '11px', backgroundColor: '#fff' }}
+                    >
+                      <option value="">- Select -</option>
+                      {workedbyOptions.map(opt => <option key={opt} value={opt}>{opt.replace(/_/g, ' ')}</option>)}
+                    </select>
                   </div>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                     <select

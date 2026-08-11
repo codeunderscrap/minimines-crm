@@ -62,17 +62,39 @@ const AssociateAnalytics = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const leads = await fetchApi('leads?limit=1000');
+      const schemaQuery = `{ __type(name: "LeadWorkedbyEnum") { enumValues { name } } }`;
+      
+      const fetchGraphQL = async (query: string) => {
+        try {
+          const res = await fetch('https://minimines.twenty.com/graphql', {
+            method: 'POST',
+            headers: { Authorization: API_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
+          });
+          const json = await res.json();
+          return json?.data;
+        } catch {
+          return null;
+        }
+      };
 
-      // Extract unique associate names from the 'workedBy' field
-      const uniqueNames = Array.from(new Set(
-        (Array.isArray(leads) ? leads : [])
-          .map((l: any) => l.workedBy)
-          .filter((name: string) => typeof name === 'string' && name.trim().length > 0)
-      )) as string[];
+      const [leads, schema] = await Promise.all([
+        fetchApi('leads?limit=1000'),
+        fetchGraphQL(schemaQuery)
+      ]);
 
-      const data = uniqueNames.map(name => {
-        const assignedLeads = leads.filter((l: any) => l.workedBy === name);
+      let uniqueNames = schema?.__type?.enumValues?.map((e: any) => e.name) || [];
+      if (uniqueNames.length === 0) {
+        // Fallback if enum fails
+        uniqueNames = Array.from(new Set(
+          (Array.isArray(leads) ? leads : [])
+            .map((l: any) => l.workedby)
+            .filter((name: string) => typeof name === 'string' && name.trim().length > 0)
+        )) as string[];
+      }
+
+      const data = uniqueNames.map((name: string) => {
+        const assignedLeads = leads.filter((l: any) => l.workedby === name);
 
         const stats = {
           total: assignedLeads.length,
