@@ -163,7 +163,7 @@ const OnboardingContracts = () => {
                     <div style={{ fontWeight: 600, color: BRAND.primary, fontSize: '14px' }}>
                       <a href={`/object/company/${c.id}`} target="_parent" style={{ color: 'inherit', textDecoration: 'none' }}>{c.name || 'Unknown Company'}</a>
                     </div>
-                    <div style={{ fontSize: '13px', color: BRAND.secondary }}>{c.domainName || 'N/A'}</div>
+                    <div style={{ fontSize: '13px', color: BRAND.secondary }}>{c.domainName?.primaryLinkUrl || c.domainName?.primaryLinkLabel || 'N/A'}</div>
                     
                     <div>
                       <select
