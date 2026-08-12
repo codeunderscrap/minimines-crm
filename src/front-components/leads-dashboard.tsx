@@ -104,14 +104,7 @@ const LeadsDashboard = () => {
     setLeads(leadData);
     setMembers(memberData);
     
-    let opts = schema?.__type?.enumValues?.map((e: any) => e.name) || [];
-    const defaultOpts = ['ABDUL_KHALID', 'RAKESH', 'KUMAR', 'PRASHANTH', 'ADITYA', 'VARUN', 'VEDANT'];
-    if (opts.length === 0) opts = defaultOpts;
-    else {
-      defaultOpts.forEach(d => {
-        if (!opts.includes(d)) opts.push(d);
-      });
-    }
+    const opts = schema?.__type?.enumValues?.map((e: any) => e.name) || [];
     setWorkedbyOptions(opts);
     
     setLoading(false);
