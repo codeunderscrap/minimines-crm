@@ -475,18 +475,16 @@ const LeadsDashboard = () => {
               <option value="assigned">Assigned Leads</option>
             </select>
 
-            {role !== 'associate' && (
-              <select 
-                value={filterMemberId}
-                onChange={(e) => setFilterMemberId(e.target.value)}
-                style={{ padding: '8px 12px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontSize: '13px', minWidth: '180px' }}
-              >
-                <option value="">-- Filter by Associate --</option>
-                {assignableMembers.map(m => (
-                  <option key={m.id} value={m.id}>{getMemberName(m.id)}</option>
-                ))}
-              </select>
-            )}
+            <select 
+              value={filterWorkedBy}
+              onChange={(e) => setFilterWorkedBy(e.target.value)}
+              style={{ padding: '8px 12px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontSize: '13px', minWidth: '180px' }}
+            >
+              <option value="">-- Filter by Associate --</option>
+              {workedbyOptions.map(opt => (
+                <option key={opt} value={opt}>{opt.replace(/_/g, ' ')}</option>
+              ))}
+            </select>
           </div>
 
           <div style={{ backgroundColor: BRAND.white, border: `1px solid ${BRAND.border}`, borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0, 27, 46, 0.04)' }}>
@@ -555,36 +553,9 @@ const LeadsDashboard = () => {
                     </span>
                   </div>
                   <div>
-                    <div style={{ fontSize: '11px', color: BRAND.text, marginBottom: '6px' }}>
-                      {mgrName ? <span>Mgr: <span style={{ color: BRAND.blue, fontWeight: 600 }}>{mgrName}</span></span> : 'Unassigned Mgr'}
+                    <div style={{ fontSize: '12px', color: BRAND.text, fontWeight: 500 }}>
+                      {mgrName ? <span>Mgr: <span style={{ color: BRAND.blue, fontWeight: 600 }}>{mgrName}</span></span> : <span style={{ color: '#999' }}>Unassigned Mgr</span>}
                     </div>
-                    <select
-                      value={relationId(lead, 'assignedAssociate') || ''}
-                      onChange={async (e) => {
-                        const val = e.target.value;
-                        setIsUpdating(true);
-                        try {
-                          await fetchApi(`leads/${lead.id}`, 'PATCH', { assignedAssociateId: val || null });
-                          await loadData();
-                        } catch (err) {
-                          console.error('Failed to update associate', err);
-                        }
-                        setIsUpdating(false);
-                      }}
-                      disabled={isUpdating}
-                      style={{
-                        padding: '4px', borderRadius: '4px', border: `1px solid ${BRAND.border}`,
-                        fontSize: '11px', width: '100%', maxWidth: '140px',
-                        color: assocName ? BRAND.green : BRAND.text, fontWeight: assocName ? 600 : 400,
-                        backgroundColor: '#fff', cursor: isUpdating ? 'not-allowed' : 'pointer',
-                        opacity: isUpdating ? 0.6 : 1
-                      }}
-                    >
-                      <option value="">-- Unassigned --</option>
-                      {assignableMembers.map((m: any) => (
-                        <option key={m.id} value={m.id}>{getMemberName(m.id)}</option>
-                      ))}
-                    </select>
                   </div>
                   <div>
                     <select
