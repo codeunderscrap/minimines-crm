@@ -47,6 +47,14 @@ const DocumentVault = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('ALL');
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -89,13 +97,18 @@ const DocumentVault = () => {
   });
 
   const uploadFile = () => {
-    alert("To upload a document, navigate to the relevant Company or Lead record and upload it in the Attachments section. It will automatically appear here securely.");
+    setToast({ msg: 'To upload a document, navigate to the relevant Company or Lead record and upload it in the Attachments section. It will automatically appear here securely.', type: 'success' });
   };
 
   return (
     <>
       <style>{FONTS}</style>
       <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif", height: '100vh', backgroundColor: BRAND.bg, overflowY: 'auto' }}>
+        {toast && (
+          <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, padding: '12px 20px', borderRadius: '6px', fontWeight: 600, fontSize: '13px', color: BRAND.white, backgroundColor: toast.type === 'success' ? BRAND.green : BRAND.red, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', maxWidth: '400px', lineHeight: '1.4' }}>
+            {toast.msg}
+          </div>
+        )}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
             <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '28px', color: BRAND.primary, margin: 0, textTransform: 'uppercase' }}>

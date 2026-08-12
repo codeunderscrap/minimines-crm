@@ -59,6 +59,14 @@ const OnboardingContracts = () => {
   const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const loadData = async () => {
     setLoading(true);
@@ -107,6 +115,11 @@ const OnboardingContracts = () => {
     <>
       <style>{FONTS}</style>
       <div style={{ padding: '24px', fontFamily: "'Barlow', sans-serif", height: '100vh', backgroundColor: BRAND.bg, overflowY: 'auto' }}>
+        {toast && (
+          <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, padding: '12px 20px', borderRadius: '6px', fontWeight: 600, fontSize: '13px', color: BRAND.white, backgroundColor: toast.type === 'success' ? BRAND.green : BRAND.red, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', maxWidth: '400px', lineHeight: '1.4' }}>
+            {toast.msg}
+          </div>
+        )}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
             <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '28px', color: BRAND.primary, margin: 0, textTransform: 'uppercase' }}>
@@ -198,7 +211,7 @@ const OnboardingContracts = () => {
                       
                       <button
                         onClick={() => {
-                          alert(`To upload the signed contract, please open the company record and attach the PDF to the "Attachments" section. Then change the status here to SIGNED.`);
+                          setToast({ msg: 'To upload the signed contract, please open the company record and attach the PDF to the "Attachments" section. Then change the status here to SIGNED.', type: 'success' });
                         }}
                         style={{ padding: '6px 12px', backgroundColor: BRAND.primary, border: 'none', color: BRAND.white, borderRadius: '4px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
                       >
