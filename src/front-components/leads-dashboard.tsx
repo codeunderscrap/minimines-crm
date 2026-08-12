@@ -73,7 +73,7 @@ const LeadsDashboard = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterAssigned, setFilterAssigned] = useState('');
-    const [filterMemberId, setFilterMemberId] = useState('');
+    const [filterWorkedBy, setFilterWorkedBy] = useState('');
 
 
   const [successMsg, setSuccessMsg] = useState<React.ReactNode>(null);
@@ -210,13 +210,13 @@ const LeadsDashboard = () => {
         keep = keep && !!(relationId(l, 'assignedAssociate') || relationId(l, 'assignedManagerPrimary'));
       }
       
-      if (filterMemberId) {
-        keep = keep && (relationId(l, 'assignedAssociate') === filterMemberId || relationId(l, 'assignedManagerPrimary') === filterMemberId);
+      if (filterWorkedBy) {
+        keep = keep && l.workedby === filterWorkedBy;
       }
       
       return keep;
     });
-  }, [role, currentUserId, leads, filterAssigned, filterMemberId]);
+  }, [role, currentUserId, leads, filterAssigned, filterWorkedBy]);
 
   const assignableMembers = useMemo(() => {
     return members; // Show all users so the shared associate account can select anyone
@@ -590,7 +590,12 @@ const LeadsDashboard = () => {
                     <select
                       value={lead.workedby || ''}
                       onChange={(e) => handleUpdateWorkedBy(lead.id, e.target.value)}
-                      style={{ padding: '4px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, width: '110px', fontSize: '11px', backgroundColor: '#fff' }}
+                      disabled={isUpdating || (role === 'associate' && !!lead.workedby)}
+                      style={{ 
+                        padding: '4px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, width: '110px', fontSize: '11px', backgroundColor: '#fff',
+                        opacity: (role === 'associate' && !!lead.workedby) ? 0.6 : 1,
+                        cursor: (role === 'associate' && !!lead.workedby) ? 'not-allowed' : 'pointer'
+                      }}
                     >
                       <option value="">- Select -</option>
                       {workedbyOptions.map(opt => <option key={opt} value={opt}>{opt.replace(/_/g, ' ')}</option>)}
