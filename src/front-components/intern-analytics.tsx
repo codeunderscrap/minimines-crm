@@ -84,13 +84,12 @@ const AssociateAnalytics = () => {
       ]);
 
       let uniqueNames = schema?.__type?.enumValues?.map((e: any) => e.name) || [];
-      if (uniqueNames.length === 0) {
-        // Fallback if enum fails
-        uniqueNames = Array.from(new Set(
-          (Array.isArray(leads) ? leads : [])
-            .map((l: any) => l.workedby)
-            .filter((name: string) => typeof name === 'string' && name.trim().length > 0)
-        )) as string[];
+      const defaultOpts = ['ABDUL_KHALID', 'RAKESH', 'KUMAR', 'PRASHANTH', 'ADITYA', 'VARUN', 'VEDANT'];
+      if (uniqueNames.length === 0) uniqueNames = defaultOpts;
+      else {
+        defaultOpts.forEach(d => {
+          if (!uniqueNames.includes(d)) uniqueNames.push(d);
+        });
       }
 
       const data = uniqueNames.map((name: string) => {

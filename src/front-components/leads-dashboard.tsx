@@ -95,12 +95,25 @@ const LeadsDashboard = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [leadData, memberData] = await Promise.all([
+    const schemaQuery = `{ __type(name: "LeadWorkedbyEnum") { enumValues { name } } }`;
+    const [leadData, memberData, schema] = await Promise.all([
       fetchApi('leads?limit=500&depth=1'),
       fetchApi('workspaceMembers?limit=100'),
+      fetchGraphQL(schemaQuery)
     ]);
     setLeads(leadData);
     setMembers(memberData);
+    
+    let opts = schema?.__type?.enumValues?.map((e: any) => e.name) || [];
+    const defaultOpts = ['ABDUL_KHALID', 'RAKESH', 'KUMAR', 'PRASHANTH', 'ADITYA', 'VARUN', 'VEDANT'];
+    if (opts.length === 0) opts = defaultOpts;
+    else {
+      defaultOpts.forEach(d => {
+        if (!opts.includes(d)) opts.push(d);
+      });
+    }
+    setWorkedbyOptions(opts);
+    
     setLoading(false);
   };
 
