@@ -17,18 +17,21 @@ export default defineField({
       value: 'NOT_SENT',
       label: 'Not Sent',
       color: 'gray',
+      position: 0,
     },
     {
       universalIdentifier: 'd656159c-40f0-4865-a75d-5dcc47694e96',
       value: 'SENT',
       label: 'Sent',
       color: 'yellow',
+      position: 1,
     },
     {
       universalIdentifier: 'a5173534-76c7-40a4-894e-a9f3e6a0a64f',
       value: 'SIGNED',
       label: 'Signed',
       color: 'green',
+      position: 2,
     },
   ],
 });
