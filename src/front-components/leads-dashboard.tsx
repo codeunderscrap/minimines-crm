@@ -218,7 +218,7 @@ const LeadsDashboard = () => {
         keep = keep && !!(relationId(l, 'assignedAssociate') || relationId(l, 'assignedManagerPrimary'));
       }
       
-      if (filterWorkedBy) {
+      if (filterWorkedBy && filterWorkedBy !== 'All') {
         keep = keep && l.workedby === filterWorkedBy;
       }
       
