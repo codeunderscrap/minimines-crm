@@ -59,10 +59,7 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
   } catch (error) {
     console.error('fetchTwenty Error:', error);
     return [];
-  }
 };
-
-const VIRTUAL_IDENTITIES = ['Associate 1', 'Associate 2', 'Associate 3', 'Associate 4', 'Associate 5'];
 
 const OpportunityDashboard = () => {
   const userRole = useUserRole();
@@ -71,6 +68,7 @@ const OpportunityDashboard = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<any>(null);
+  const [workedbyOptions, setWorkedbyOptions] = useState<string[]>([]);
   
   // Soft RLS Virtual Identity State
   const [virtualIdentity, setVirtualIdentity] = useState<string>(
@@ -87,10 +85,35 @@ const OpportunityDashboard = () => {
   const urlParams = new URLSearchParams(searchStr);
   const urlHighlightId = (typeof window !== 'undefined' && window.sessionStorage ? window.sessionStorage.getItem('urlHighlightId') : null) || urlParams.get('id');
 
+  const fetchGraphQL = async (query: string) => {
+    try {
+      const res = await fetch('https://minimines.twenty.com/graphql', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJlYzFlMDcwZi0yZmE0LTQ3MjMtYmVmMy0xYmY5NGFlNTg4ZDEiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiZWMxZTA3MGYtMmZhNC00NzIzLWJlZjMtMWJmOTRhZTU4OGQxIiwiaWF0IjoxNzg2MTAxMzgzLCJleHAiOjQ5Mzk3MDEzODIsImp0aSI6IjhjZmY3MGFlLTgzZmItNDQ4NS05YjI0LWFlNjczYzQzZmE0NSJ9.Wg93DjZtbUC8-a1I2IoVSMixlv4TIdA4ayjXG6C8Zm258IW6nQbEIyX7t3R9hdGeMfy6ssbplJRP2vWHBW6Odg',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ query })
+      });
+      const json = await res.json();
+      return json?.data;
+    } catch {
+      return null;
+    }
+  };
+
   const loadData = async () => {
     setLoading(true);
-    const data = await fetchTwenty('bdOpportunities?limit=100');
+    const schemaQuery = `{ __type(name: "LeadWorkedbyEnum") { enumValues { name } } }`;
+    const [data, schema] = await Promise.all([
+      fetchTwenty('bdOpportunities?limit=100'),
+      fetchGraphQL(schemaQuery)
+    ]);
     setOpportunities(Array.isArray(data) ? data : []);
+    
+    const opts = schema?.__type?.enumValues?.map((e: any) => e.name) || [];
+    setWorkedbyOptions(opts);
+    
     setLoading(false);
   };
 
@@ -273,8 +296,8 @@ const OpportunityDashboard = () => {
                 }}
               >
                 <option value="All">View All (Manager/HOD)</option>
-                {VIRTUAL_IDENTITIES.map(name => (
-                  <option key={name} value={name}>{name}</option>
+                {workedbyOptions.map(name => (
+                  <option key={name} value={name}>{name.replace(/_/g, ' ')}</option>
                 ))}
               </select>
             </div>
