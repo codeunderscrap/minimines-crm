@@ -538,6 +538,22 @@ const OPPORTUNITY_PAGE_UID = '4f324362-46e8-45fd-b81a-f1b2e3b17e6b';
 const LEADS_PAGE_UID = '210c2f1a-6ef4-4599-9027-60c70a118cef';
 const CONTRACT_PAGE_UID = '9d924817-9758-440e-bf63-0812a34cc57b';
 const SHIPMENT_PAGE_UID = '81463067-26a7-44cf-8e8f-72de3806f9cd';
+const fetchGraphQL = async (query: string) => {
+  try {
+    const res = await fetch('https://minimines.twenty.com/graphql', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJlYzFlMDcwZi0yZmE0LTQ3MjMtYmVmMy0xYmY5NGFlNTg4ZDEiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiZWMxZTA3MGYtMmZhNC00NzIzLWJlZjMtMWJmOTRhZTU4OGQxIiwiaWF0IjoxNzg2MTAxMzgzLCJleHAiOjQ5Mzk3MDEzODIsImp0aSI6IjhjZmY3MGFlLTgzZmItNDQ4NS05YjI0LWFlNjczYzQzZmE0NSJ9.Wg93DjZtbUC8-a1I2IoVSMixlv4TIdA4ayjXG6C8Zm258IW6nQbEIyX7t3R9hdGeMfy6ssbplJRP2vWHBW6Odg',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ query })
+    });
+    const json = await res.json();
+    return json?.data;
+  } catch {
+    return null;
+  }
+};
 
 const MainPage = () => {
   const [data, setData] = useState({
