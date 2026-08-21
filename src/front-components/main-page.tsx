@@ -540,6 +540,8 @@ const EnquiryQuickReply = () => {
 
 const OPPORTUNITY_PAGE_UID = '4f324362-46e8-45fd-b81a-f1b2e3b17e6b';
 const LEADS_PAGE_UID = '210c2f1a-6ef4-4599-9027-60c70a118cef';
+const CONTRACT_PAGE_UID = '9d924817-9758-440e-bf63-0812a34cc57b';
+const SHIPMENT_PAGE_UID = '81463067-26a7-44cf-8e8f-72de3806f9cd';
 
 const MainPage = () => {
   const [data, setData] = useState({
@@ -580,7 +582,8 @@ const MainPage = () => {
             'Content-Type': 'application/json',
           },
         });
-        const layouts: any[] = await res.json();
+        const jsonRes = await res.json();
+        const layouts: any[] = jsonRes?.data || [];
         const map: Record<string, string> = {};
         for (const layout of layouts) {
           if (layout.universalIdentifier) {
@@ -636,16 +639,16 @@ const MainPage = () => {
               <div className="subtitle">Corporate Command Center</div>
             </div>
             <div style={{ display: 'flex', gap: '16px' }}>
-              <a href="/objects/contracts" className="btn btn-outline">Contracts</a>
+              <a href={pageLinks[CONTRACT_PAGE_UID] || '/objects/contracts'} className="btn btn-outline">Contracts</a>
               <a href="/objects/salesOrders" className="btn btn-outline">Sales Orders</a>
-              <a href="/objects/exportShipments" className="btn btn-outline">Shipments</a>
+              <a href={pageLinks[SHIPMENT_PAGE_UID] || '/objects/exportShipments'} className="btn btn-outline">Shipments</a>
               <a href="/objects/lMETrackers" className="btn btn-outline">LME Tracker</a>
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '40px' }}>
-            <StatCard label="Active Contracts" value={activeContracts.toString()} sub="Total Active" link="/objects/contracts" />
-            <StatCard label="Active Shipments" value={data.exportShipments.length.toString()} sub="Total shipments recorded" link="/objects/exportShipments" />
+            <StatCard label="Active Contracts" value={activeContracts.toString()} sub="Total Active" link={pageLinks[CONTRACT_PAGE_UID] || '/objects/contracts'} />
+            <StatCard label="Active Shipments" value={data.exportShipments.length.toString()} sub="Total shipments recorded" link={pageLinks[SHIPMENT_PAGE_UID] || '/objects/exportShipments'} />
             <StatCard label="Open Opportunities" value={openOpportunities.toString()} sub="In Pipeline" link={pageLinks[OPPORTUNITY_PAGE_UID] || '/objects/opportunities'} />
             <StatCard label="Total Leads" value={totalLeadsCount.toString()} sub="New Prospects" link={pageLinks[LEADS_PAGE_UID] || '/objects/leads'} />
           </div>
