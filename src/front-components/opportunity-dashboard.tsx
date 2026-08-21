@@ -121,7 +121,7 @@ const OpportunityDashboard = () => {
         headers: { 'Authorization': apiKey, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           quoteNumber: `QT-${Date.now().toString(36).toUpperCase()}`,
-          buyerCompanyId: opp.companyName || '',
+          buyerCompanyId: opp.companyNameId ? { connect: { id: opp.companyNameId } } : undefined,
           productId: '',
           quantity: 0,
           proposedRate: { amountMicros: 0, currencyCode: 'INR' },
@@ -176,6 +176,7 @@ const OpportunityDashboard = () => {
         linkedOpportunityId: opp.id,
         quantity: 0,
         fulfillmentStatus: 'PENDING',
+        company: opp.companyNameId ? { connect: { id: opp.companyNameId } } : undefined,
       });
       
       let newSoId = null;
