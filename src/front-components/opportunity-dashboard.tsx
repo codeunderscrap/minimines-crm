@@ -59,6 +59,7 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
   } catch (error) {
     console.error('fetchTwenty Error:', error);
     return [];
+  }
 };
 
 const OpportunityDashboard = () => {
