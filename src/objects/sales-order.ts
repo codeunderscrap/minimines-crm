@@ -11,6 +11,7 @@ export default defineObject({
   labelIdentifierFieldMetadataUniversalIdentifier: 'c83b1a20-3b99-4c22-b7e2-45e0f22281aa',
   fields: [
     {
+      universalIdentifier: 'bfcb7743-ac7f-425a-ae92-7ecf34c38d4f',
       name: 'associateName',
       label: 'Associate Name',
       type: FieldType.TEXT,
