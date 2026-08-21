@@ -209,14 +209,25 @@ const OnboardingContracts = () => {
                         </button>
                       )}
                       
-                      <button
-                        onClick={() => {
-                          setToast({ msg: 'To upload the signed contract, please open the company record and attach the PDF to the "Attachments" section. Then change the status here to SIGNED.', type: 'success' });
+                      <a
+                        href={`/object/company/${c.id}`}
+                        target="_parent"
+                        style={{
+                          display: 'inline-block',
+                          backgroundColor: BRAND.primary,
+                          color: BRAND.white,
+                          padding: '8px 16px',
+                          borderRadius: '4px',
+                          border: 'none',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          textDecoration: 'none',
+                          textAlign: 'center',
                         }}
-                        style={{ padding: '6px 12px', backgroundColor: BRAND.primary, border: 'none', color: BRAND.white, borderRadius: '4px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
                       >
-                        Upload PDF
-                      </button>
+                        Open Company Profile
+                      </a>
                     </div>
                   </div>
                 );

@@ -119,9 +119,9 @@ const DocumentVault = () => {
             </div>
           </div>
           <div>
-             <button onClick={uploadFile} style={{ backgroundColor: BRAND.accent, color: BRAND.white, padding: '10px 18px', border: 'none', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', fontSize: '13px' }}>
-               + Upload Document
-             </button>
+             <a href="/objects/companies" target="_parent" style={{ display: 'inline-block', backgroundColor: BRAND.accent, color: BRAND.white, padding: '10px 18px', border: 'none', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', fontSize: '13px', textDecoration: 'none' }}>
+               Go to Companies to Upload
+             </a>
           </div>
         </div>
 
