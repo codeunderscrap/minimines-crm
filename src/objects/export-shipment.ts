@@ -10,6 +10,13 @@ export default defineObject({
   icon: 'IconBox',
   labelIdentifierFieldMetadataUniversalIdentifier: 'c83b1a20-3b99-4c22-b7e2-45e0f33381aa',
   fields: [
+    {
+      name: 'associateName',
+      label: 'Associate Name',
+      type: FieldType.TEXT,
+      description: 'Virtual identity of the associate (Soft RLS)',
+      icon: 'IconUser',
+    },
     { universalIdentifier: 'c83b1a20-3b99-4c22-b7e2-45e0f33381aa', name: 'name', type: FieldType.TEXT, label: 'Shipment Name' },
     { universalIdentifier: 'd45b1a20-3b99-4c22-b7e2-45e0f33381bb', name: 'vesselName', type: FieldType.TEXT, label: 'Vessel Name' },
     { universalIdentifier: 'e56b1a20-3b99-4c22-b7e2-45e0f33381cc', name: 'containerNumber', type: FieldType.TEXT, label: 'Container Number' },

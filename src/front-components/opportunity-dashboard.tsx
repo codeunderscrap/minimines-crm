@@ -62,6 +62,8 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
   }
 };
 
+const VIRTUAL_IDENTITIES = ['Associate 1', 'Associate 2', 'Associate 3', 'Associate 4', 'Associate 5'];
+
 const OpportunityDashboard = () => {
   const userRole = useUserRole();
   const [opportunities, setOpportunities] = useState<any[]>([]);
@@ -69,6 +71,17 @@ const OpportunityDashboard = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<any>(null);
+  
+  // Soft RLS Virtual Identity State
+  const [virtualIdentity, setVirtualIdentity] = useState<string>(
+    typeof window !== 'undefined' ? (window.localStorage.getItem('virtualIdentity') || 'All') : 'All'
+  );
+
+  const handleIdentityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setVirtualIdentity(val);
+    if (typeof window !== 'undefined') window.localStorage.setItem('virtualIdentity', val);
+  };
 
   const searchStr = typeof window !== 'undefined' && window.location ? window.location.search : '';
   const urlParams = new URLSearchParams(searchStr);
@@ -127,6 +140,7 @@ const OpportunityDashboard = () => {
           proposedRate: { amountMicros: 0, currencyCode: 'INR' },
           approvalStatus: 'DRAFT',
           linkedOpportunityId: opp.id,
+          associateName: opp.associateName || '',
         }),
       });
       const quot = await res.json();
@@ -177,6 +191,7 @@ const OpportunityDashboard = () => {
         quantity: 0,
         fulfillmentStatus: 'PENDING',
         company: opp.companyNameId ? { connect: { id: opp.companyNameId } } : undefined,
+        associateName: opp.associateName || '',
       });
       
       let newSoId = null;
@@ -229,17 +244,50 @@ const OpportunityDashboard = () => {
           {successMsg && successMsg}
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', borderBottom: `2px solid ${BRAND.primary}`, paddingBottom: '24px' }}>
-            <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '32px', color: BRAND.primary, margin: '0 0 8px 0', textTransform: 'uppercase' }}>
-              BD Opportunity Pipeline
-            </h1>
-            <div style={{ fontFamily: "'Roboto Slab', serif", fontSize: '16px', color: BRAND.text }}>
-              Manage transferred leads, negotiate deals, and convert to sales orders.
+            <div>
+              <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '32px', color: BRAND.primary, margin: '0 0 8px 0', textTransform: 'uppercase' }}>
+                BD Opportunity Pipeline
+              </h1>
+              <div style={{ fontFamily: "'Roboto Slab', serif", fontSize: '16px', color: BRAND.text }}>
+                Manage transferred leads, negotiate deals, and convert to sales orders.
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <label style={{ fontWeight: 600, fontSize: '14px', color: BRAND.secondary }}>
+                Viewing As:
+              </label>
+              <select
+                value={virtualIdentity}
+                onChange={handleIdentityChange}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  border: `1px solid ${BRAND.border}`,
+                  fontSize: '14px',
+                  outline: 'none',
+                  backgroundColor: BRAND.white,
+                  color: BRAND.primary,
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="All">View All (Manager/HOD)</option>
+                {VIRTUAL_IDENTITIES.map(name => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
             {STAGES.map(stage => {
-              const stageOpps = opportunities.filter(o => o.stage === stage.id || (!o.stage && stage.id === 'REQUIREMENTS'));
+              // Apply Soft RLS filtering
+              const filteredOpps = opportunities.filter(o => 
+                (virtualIdentity === 'All' || o.associateName === virtualIdentity)
+              );
+              
+              const stageOpps = filteredOpps.filter(o => o.stage === stage.id || (!o.stage && stage.id === 'REQUIREMENTS'));
               return (
                 <div key={stage.id} style={{ backgroundColor: BRAND.white, borderRadius: '8px', border: `1px solid ${BRAND.border}`, display: 'flex', flexDirection: 'column' }}>
                   

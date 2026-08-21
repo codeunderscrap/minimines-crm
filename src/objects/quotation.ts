@@ -11,6 +11,13 @@ export default defineObject({
   icon: 'IconReceipt',
   labelIdentifierFieldMetadataUniversalIdentifier: '0c0fe0ec-93aa-4c3c-aeaf-d891d8a03981',
   fields: [
+    {
+      name: 'associateName',
+      label: 'Associate Name',
+      type: FieldType.TEXT,
+      description: 'Virtual identity of the associate (Soft RLS)',
+      icon: 'IconUser',
+    },
     { universalIdentifier: '0c0fe0ec-93aa-4c3c-aeaf-d891d8a03981', name: 'quoteNumber', type: FieldType.TEXT, label: 'Quote Number' },
     { universalIdentifier: '4399ed12-2c2e-4f33-8ff6-d7bc99bc704b', name: 'buyerCompanyId',
       type: FieldType.RELATION,

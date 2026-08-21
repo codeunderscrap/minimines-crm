@@ -279,6 +279,7 @@ const LeadsDashboard = () => {
         linkedLeadId: lead.id,
         companyName: (typeof lead.company === 'object' && lead.company !== null ? lead.company.name : lead.company) || '',
         stage: 'REQUIREMENTS',
+        associateName: lead.workedby || '',
       });
       try {
         await fetchApi('opportunities', 'POST', {

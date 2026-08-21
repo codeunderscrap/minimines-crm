@@ -12,6 +12,13 @@ export default defineObject({
   labelIdentifierFieldMetadataUniversalIdentifier: 'c4da7b23-1c32-4d56-8a9d-b841accd5f48',
   fields: [
     {
+      name: 'associateName',
+      label: 'Associate Name',
+      type: FieldType.TEXT,
+      description: 'Virtual identity of the associate (Soft RLS)',
+      icon: 'IconUser',
+    },
+    {
       universalIdentifier: 'c4da7b23-1c32-4d56-8a9d-b841accd5f48',
       name: 'name',
       type: FieldType.TEXT,

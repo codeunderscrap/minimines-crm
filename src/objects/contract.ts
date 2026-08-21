@@ -10,6 +10,13 @@ export default defineObject({
   icon: 'IconBox',
   labelIdentifierFieldMetadataUniversalIdentifier: 'c83b1a20-3b99-4c22-b7e2-45e0f11181aa',
   fields: [
+    {
+      name: 'associateName',
+      label: 'Associate Name',
+      type: FieldType.TEXT,
+      description: 'Virtual identity of the associate (Soft RLS)',
+      icon: 'IconUser',
+    },
     { universalIdentifier: 'c83b1a20-3b99-4c22-b7e2-45e0f11181aa', name: 'name', type: FieldType.TEXT, label: 'Contract Name' },
     { universalIdentifier: 'd45b1a20-3b99-4c22-b7e2-45e0f11181bb', name: 'startDate', type: FieldType.DATE_TIME, label: 'Start Date' },
     { universalIdentifier: 'e56b1a20-3b99-4c22-b7e2-45e0f11181cc', name: 'endDate', type: FieldType.DATE_TIME, label: 'End Date' },

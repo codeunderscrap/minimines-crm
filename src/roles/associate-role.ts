@@ -58,13 +58,5 @@ export default defineRole({
   fieldPermissions: [],
   // "Only leads assigned to me" — Lead.assignedAssociate IS the
   // current workspace member.
-  rowLevelPermissionPredicates: [
-    {
-      universalIdentifier: ASSOCIATE_ROLE_OWNERSHIP_PREDICATE_UNIVERSAL_IDENTIFIER,
-      objectUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
-      fieldUniversalIdentifier: LEAD_ASSIGNED_ASSOCIATE_FIELD_UNIVERSAL_IDENTIFIER,
-      operand: RowLevelPermissionPredicateOperand.IS,
-      workspaceMemberFieldUniversalIdentifier: WORKSPACE_MEMBER.fields.id.universalIdentifier,
-    },
-  ],
+  rowLevelPermissionPredicates: [],
 });
