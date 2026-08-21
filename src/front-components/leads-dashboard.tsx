@@ -73,7 +73,9 @@ const LeadsDashboard = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterAssigned, setFilterAssigned] = useState('');
-    const [filterWorkedBy, setFilterWorkedBy] = useState('');
+  const [filterWorkedBy, setFilterWorkedBy] = useState<string>(
+    typeof window !== 'undefined' ? (window.localStorage.getItem('virtualIdentity') || '') : ''
+  );
 
 
   const [successMsg, setSuccessMsg] = useState<React.ReactNode>(null);
@@ -483,8 +485,12 @@ const LeadsDashboard = () => {
             </select>
 
             <select 
-              value={filterWorkedBy}
-              onChange={(e) => setFilterWorkedBy(e.target.value)}
+              value={filterWorkedBy === 'All' ? '' : filterWorkedBy}
+              onChange={(e) => {
+                const val = e.target.value;
+                setFilterWorkedBy(val);
+                if (typeof window !== 'undefined') window.localStorage.setItem('virtualIdentity', val || 'All');
+              }}
               style={{ padding: '8px 12px', borderRadius: '4px', border: `1px solid ${BRAND.border}`, fontSize: '13px', minWidth: '180px' }}
             >
               <option value="">-- Filter by Associate --</option>

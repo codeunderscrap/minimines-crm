@@ -351,10 +351,7 @@ const ShipmentTracker = ({ shipments = [] }: { shipments: any[] }) => {
           {safeShipments.map(s => <option key={s.id} value={s.id}>{s.vesselName || `Shipment ${(s.id || '').substring(0,6)}`}</option>)}
         </select>
       </div>
-      
-      <div style={{ backgroundColor: BRAND.bg, padding: '20px', border: `1px solid ${BRAND.border}` }}>
-        <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '16px' }}>Vessel & Cargo</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={{ color: BRAND.text, fontSize: '15px' }}>Vessel:</span>
             <span style={{ fontWeight: 600, color: BRAND.primary, fontSize: '15px' }}>{shipment.vesselName || 'TBD'}</span>
@@ -368,8 +365,7 @@ const ShipmentTracker = ({ shipments = [] }: { shipments: any[] }) => {
             <span style={{ fontWeight: 600, color: shipment.qaStatus === 'PASSED' ? BRAND.accent : BRAND.primary, fontSize: '15px' }}>{shipment.qaStatus || 'PENDING'}</span>
           </div>
         </div>
-      </div>
-
+      
       <div style={{ backgroundColor: BRAND.bg, padding: '24px 16px', border: `1px solid ${BRAND.border}`, display: 'flex', flexDirection: 'column', justifyContent: 'center', flexGrow: 1 }}>
         <div style={{ fontSize: '14px', color: BRAND.secondary, textTransform: 'uppercase', fontWeight: 600, marginBottom: '28px' }}>Transit Progress</div>
         <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', margin: '0 8px' }}>
@@ -554,6 +550,56 @@ const MainPage = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [pageLinks, setPageLinks] = useState<Record<string, string>>({});
+  
+  const [totalLeads, setTotalLeads] = useState(0);
+  const [totalOpps, setTotalOpps] = useState(0);
+  const [totalQuotations, setTotalQuotations] = useState(0);
+  const [totalSalesOrders, setTotalSalesOrders] = useState(0);
+  
+  // Virtual Identity State
+  const [virtualIdentity, setVirtualIdentity] = useState<string>(
+    typeof window !== 'undefined' ? (window.localStorage.getItem('virtualIdentity') || 'All') : 'All'
+  );
+  const [workedbyOptions, setWorkedbyOptions] = useState<string[]>([]);
+  const userName = "Admin";
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadStats = async () => {
+      try {
+        const [leadsData, oppsData, quoData, soData, schema] = await Promise.all([
+          fetchTwenty('leads?limit=1'),
+          fetchTwenty('opportunities?limit=1'),
+          fetchTwenty('quotations?limit=1'),
+          fetchTwenty('salesOrders?limit=1'),
+          fetchGraphQL(`{ __type(name: "LeadWorkedbyEnum") { enumValues { name } } }`)
+        ]);
+
+        if (!isMounted) return;
+
+        // Extract totals from nodes
+        const getCount = (res: any) => {
+          if (res?.data?.totalCount !== undefined) return res.data.totalCount;
+          if (res?.data?.edges) return res.data.edges.length; // fallback
+          if (Array.isArray(res)) return res.length;
+          return 0;
+        };
+
+        setTotalLeads(getCount(leadsData));
+        setTotalOpps(getCount(oppsData));
+        setTotalQuotations(getCount(quoData));
+        setTotalSalesOrders(getCount(soData));
+        
+        const opts = schema?.__type?.enumValues?.map((e: any) => e.name) || [];
+        setWorkedbyOptions(opts);
+
+      } catch (err) {
+        console.error('Failed to load stats', err);
+      }
+    };
+    loadStats();
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -637,6 +683,37 @@ const MainPage = () => {
             <div>
               <h1 className="h1">MiniMines BD CRM [v5]</h1>
               <div className="subtitle">Corporate Command Center</div>
+            </div>
+            
+            {/* Global Virtual Identity Selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: BRAND.white, padding: '10px 16px', borderRadius: '8px', border: `1px solid ${BRAND.border}`, boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+              <label style={{ fontWeight: 600, fontSize: '14px', color: BRAND.secondary }}>
+                Viewing As:
+              </label>
+              <select
+                value={virtualIdentity}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setVirtualIdentity(val);
+                  if (typeof window !== 'undefined') window.localStorage.setItem('virtualIdentity', val);
+                }}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  border: `1px solid ${BRAND.border}`,
+                  fontSize: '14px',
+                  outline: 'none',
+                  backgroundColor: BRAND.bg,
+                  color: BRAND.primary,
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="All">All Associates (Manager View)</option>
+                {workedbyOptions.map(name => (
+                  <option key={name} value={name}>{name.replace(/_/g, ' ')}</option>
+                ))}
+              </select>
             </div>
             <div style={{ display: 'flex', gap: '16px' }}>
               <a href={pageLinks[CONTRACT_PAGE_UID] || '/objects/contracts'} className="btn btn-outline">Contracts</a>
