@@ -65,6 +65,7 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
 const OpportunityDashboard = () => {
   const userRole = useUserRole();
   const [opportunities, setOpportunities] = useState<any[]>([]);
+  const [quotations, setQuotations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -106,11 +107,13 @@ const OpportunityDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     const schemaQuery = `{ __type(name: "LeadWorkedbyEnum") { enumValues { name } } }`;
-    const [data, schema] = await Promise.all([
+    const [data, schema, quosData] = await Promise.all([
       fetchTwenty('bdOpportunities?limit=100'),
-      fetchGraphQL(schemaQuery)
+      fetchGraphQL(schemaQuery),
+      fetchTwenty('quotations?limit=100')
     ]);
     setOpportunities(Array.isArray(data) ? data : []);
+    setQuotations(Array.isArray(quosData) ? quosData : []);
     
     const opts = schema?.__type?.enumValues?.map((e: any) => e.name) || [];
     setWorkedbyOptions(opts);
@@ -323,11 +326,24 @@ const OpportunityDashboard = () => {
                   </div>
 
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, backgroundColor: BRAND.bg }}>
-                    {stageOpps.map(opp => (
+                    {stageOpps.map(opp => {
+                      // Fetch Quotation logic
+                      const oppQuotations = quotations.filter(q => q.linkedOpportunityId === opp.id);
+                      const hasApprovedQuote = oppQuotations.some(q => q.approvalStatus === 'HOD_APPROVED');
+                      const latestQuote = oppQuotations.length > 0 ? oppQuotations[oppQuotations.length - 1] : null;
+
+                      return (
                       <div key={opp.id} id={`opp-row-${opp.id}`} style={{ backgroundColor: BRAND.white, border: `1px solid ${BRAND.border}`, borderRadius: '6px', padding: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
                         <div style={{ fontWeight: 600, color: BRAND.primary, marginBottom: '4px' }}>{opp.name}</div>
                         <div style={{ fontSize: '12px', color: BRAND.secondary, marginBottom: '12px' }}>{opp.companyName || 'No Company'}</div>
                         
+                        {/* Approval Status Badge */}
+                        {latestQuote && opp.stage === 'NEGOTIATION' && (
+                          <div style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: latestQuote.approvalStatus === 'HOD_APPROVED' ? '#dcfce7' : (latestQuote.approvalStatus === 'REJECTED' ? '#fee2e2' : '#fef9c3'), color: latestQuote.approvalStatus === 'HOD_APPROVED' ? '#166534' : (latestQuote.approvalStatus === 'REJECTED' ? '#991b1b' : '#854d0e'), borderRadius: '12px', marginBottom: '12px', fontWeight: 600, display: 'inline-block' }}>
+                            Quote Status: {latestQuote.approvalStatus?.replace(/_/g, ' ') || 'DRAFT'}
+                          </div>
+                        )}
+
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           <select 
                             value={opp.stage || 'REQUIREMENTS'} 
@@ -335,31 +351,35 @@ const OpportunityDashboard = () => {
                             disabled={isUpdating}
                             style={{ width: '100%', padding: '6px', fontSize: '12px', borderRadius: '4px', border: `1px solid ${BRAND.border}` }}
                           >
-                            {STAGES.map(s => <option key={s.id} value={s.id}>Move to: {s.label}</option>)}
+                            <option value="REQUIREMENTS">Move to: Requirements</option>
+                            <option value="NEGOTIATION">Move to: Negotiation</option>
+                            <option value="WON" disabled={!hasApprovedQuote}>Move to: Won {(!hasApprovedQuote) && '(Requires HOD Approval)'}</option>
+                            <option value="LOST">Move to: Lost</option>
                           </select>
 
                           {opp.stage === 'NEGOTIATION' && (
                             <button
                               onClick={() => handleCreateQuotation(opp)}
-                              disabled={isUpdating}
-                              style={{ width: '100%', padding: '8px', backgroundColor: '#3B82F6', color: BRAND.white, border: 'none', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}
+                              disabled={isUpdating || (latestQuote && latestQuote.approvalStatus !== 'REJECTED' && latestQuote.approvalStatus !== 'DRAFT')}
+                              style={{ width: '100%', padding: '8px', backgroundColor: (latestQuote && latestQuote.approvalStatus !== 'REJECTED' && latestQuote.approvalStatus !== 'DRAFT') ? BRAND.secondary : '#3B82F6', color: BRAND.white, border: 'none', borderRadius: '4px', fontWeight: 600, cursor: (latestQuote && latestQuote.approvalStatus !== 'REJECTED' && latestQuote.approvalStatus !== 'DRAFT') ? 'not-allowed' : 'pointer', fontSize: '12px' }}
                             >
-                              + Create Quotation
+                              {latestQuote ? (latestQuote.approvalStatus === 'REJECTED' ? '+ Re-create Quotation' : 'Quotation In Progress') : '+ Create Quotation'}
                             </button>
                           )}
 
                           {opp.stage === 'WON' && (
                             <button 
                               onClick={() => handleGenerateSalesOrder(opp)}
-                              disabled={isUpdating}
-                              style={{ width: '100%', padding: '8px', backgroundColor: BRAND.primary, color: BRAND.white, border: 'none', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}
+                              disabled={isUpdating || !hasApprovedQuote}
+                              style={{ width: '100%', padding: '8px', backgroundColor: hasApprovedQuote ? BRAND.primary : BRAND.secondary, color: BRAND.white, border: 'none', borderRadius: '4px', fontWeight: 600, cursor: hasApprovedQuote ? 'pointer' : 'not-allowed', fontSize: '12px' }}
                             >
                               + Create Sales Order
                             </button>
                           )}
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                     {stageOpps.length === 0 && (
                       <div style={{ textAlign: 'center', padding: '20px', color: BRAND.secondary, fontSize: '12px', fontStyle: 'italic' }}>
                         No opportunities in this stage.
