@@ -27,10 +27,16 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "twenty-client-sdk": "2.19.0",
-    "twenty-sdk": "2.19.0",
+    "twenty-sdk": "^2.31.0",
     "twenty-ui": "1.0.0-alpha.1",
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^4.2.1",
     "vitest": "^4.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "html2pdf.js": "^0.14.0",
+    "node-fetch": "^3.3.2",
+    "yahoo-finance2": "^4.0.2"
   }
 }

@@ -68,6 +68,12 @@ export default defineObject({
       type: FieldType.TEXT,
       label: 'Client Requirements',
     },
+    {
+      universalIdentifier: 'f3918076-13a8-444a-a9a3-5f07df591d29',
+      name: 'assignedManagerPrimaryId',
+      type: FieldType.TEXT,
+      label: 'Assigned Manager ID',
+      description: 'Used for frontend soft RLS filtering',
+    },
   ],
 });
-

@@ -63,7 +63,7 @@ const patchRecord = async (path: string, body: any) => {
 const STEPS = [
   { id: 'DRAFT', label: 'Draft', color: '#9CA3AF' },
   { id: 'HOD_REVIEW', label: 'HOD Review', color: '#f59e0b' },
-  { id: 'CEO_APPROVED', label: 'CEO Approved', color: '#3b82f6' },
+  { id: 'HOD_APPROVED', label: 'HOD Approved', color: '#3b82f6' },
   { id: 'CONVERTED_TO_ORDER', label: 'Converted', color: '#10b981' },
 ];
 
@@ -89,6 +89,18 @@ const getCurrencyValue = (field: any): number => {
 const fmtCurrency = (field: any): string => {
   const val = getCurrencyValue(field);
   return `₹${val.toLocaleString('en-IN')}`;
+};
+
+const getBuyerName = (q: any): string => {
+  if (typeof q.buyerCompanyId === 'object' && q.buyerCompanyId !== null) return q.buyerCompanyId.name || 'N/A';
+  return q.buyerCompanyId || 'N/A';
+};
+
+const getProductName = (q: any): string => {
+  if (typeof q.productMaster === 'object' && q.productMaster !== null) {
+    return q.productMaster.materialName || q.productMaster.sku || 'N/A';
+  }
+  return q.productId || 'N/A';
 };
 
 const StatCard = ({ title, value, color }: { title: string; value: string | number; color: string }) => (
@@ -142,6 +154,7 @@ const QuotationDashboard = () => {
   const userRole = useUserRole();
   const recordId = useRecordId();
   const [allQuotations, setAllQuotations] = useState<any[]>([]);
+  const [lmeRates, setLmeRates] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -154,8 +167,12 @@ const QuotationDashboard = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const items = await fetchList('quotations?limit=200');
+    const [items, lmeData] = await Promise.all([
+      fetchList('quotations?limit=200&depth=1'),
+      fetchList('lMETrackers?limit=10&orderBy=createdAt,desc')
+    ]);
     setAllQuotations(items);
+    setLmeRates(lmeData);
     setLoading(false);
   };
 
@@ -200,11 +217,11 @@ const QuotationDashboard = () => {
       btns.push({ label: 'Submit for Review', newStatus: 'HOD_REVIEW', color: BRAND.white, bg: BRAND.yellow });
     }
     if (status === 'HOD_REVIEW' && (userRole === 'hod' || userRole === 'manager')) {
-      btns.push({ label: 'Approve', newStatus: 'CEO_APPROVED', color: BRAND.white, bg: BRAND.green });
+      btns.push({ label: 'Approve', newStatus: 'HOD_APPROVED', color: BRAND.white, bg: BRAND.green });
       btns.push({ label: 'Reject', newStatus: 'REJECTED', color: BRAND.white, bg: BRAND.red });
       btns.push({ label: 'Back to Draft (Revise)', newStatus: 'DRAFT', color: BRAND.primary, bg: '#E0E0E0' });
     }
-    if (status === 'CEO_APPROVED' && userRole === 'hod') {
+    if (status === 'HOD_APPROVED' && userRole === 'hod') {
       btns.push({ label: 'Convert to Order', newStatus: 'CONVERTED_TO_ORDER', color: BRAND.white, bg: BRAND.accent });
       btns.push({ label: 'Revise (Back to Draft)', newStatus: 'DRAFT', color: BRAND.primary, bg: '#E0E0E0' });
     }
@@ -274,7 +291,7 @@ const QuotationDashboard = () => {
                         {btn.label}
                       </button>
                     ))}
-                    <a href={`/object/quotation/${selected.id}`} target="_parent" style={{ padding: '7px 14px', backgroundColor: BRAND.bg, color: BRAND.primary, borderRadius: '4px', fontWeight: 600, fontSize: '12px', textDecoration: 'none', border: `1px solid ${BRAND.border}` }}>
+                    <a href={`/object/quotation/${selected.id}`} style={{ padding: '7px 14px', backgroundColor: BRAND.bg, color: BRAND.primary, borderRadius: '4px', fontWeight: 600, fontSize: '12px', textDecoration: 'none', border: `1px solid ${BRAND.border}` }}>
                       Edit Record
                     </a>
                   </div>
@@ -287,7 +304,11 @@ const QuotationDashboard = () => {
                   </div>
                   <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
                     <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Buyer</div>
-                    <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{selected.buyerCompanyId || 'N/A'}</div>
+                    <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{getBuyerName(selected)}</div>
+                  </div>
+                  <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
+                    <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Material</div>
+                    <div style={{ fontSize: '16px', fontWeight: 600, color: BRAND.primary }}>{getProductName(selected)}</div>
                   </div>
                   <div style={{ padding: '12px', backgroundColor: BRAND.bg, borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
                     <div style={{ fontSize: '10px', textTransform: 'uppercase', color: BRAND.text, fontWeight: 600 }}>Quantity</div>
@@ -301,12 +322,31 @@ const QuotationDashboard = () => {
               </div>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
-              <StatCard title="Total Quotations" value={totalCount} color={BRAND.accent} />
-              <StatCard title="Pending HOD Review" value={pendingReview} color={BRAND.yellow} />
-              <StatCard title="CEO Approved" value={approved} color={BRAND.blue} />
-              <StatCard title="Converted to Order" value={converted} color={BRAND.green} />
-              <StatCard title="Rejected" value={rejected} color={BRAND.red} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {lmeRates.length > 0 && (
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center', backgroundColor: BRAND.bg, padding: '8px 12px', borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
+                  <div style={{ fontSize: '11px', fontWeight: 600, color: BRAND.secondary, textTransform: 'uppercase', marginRight: '4px' }}>
+                    LIVE MARKET:
+                  </div>
+                  {['CU', 'AL', 'FE'].map(metal => {
+                    const rate = lmeRates.find(r => r.metalType === metal);
+                    if (!rate) return null;
+                    return (
+                      <div key={metal} style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: '10px', color: BRAND.text, fontWeight: 600 }}>{metal}</span>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: BRAND.primary }}>${rate.rateUSD}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
+                <StatCard title="Total Quotations" value={totalCount} color={BRAND.accent} />
+                <StatCard title="Pending HOD Review" value={pendingReview} color={BRAND.yellow} />
+                <StatCard title="HOD Approved" value={approved} color={BRAND.blue} />
+                <StatCard title="Converted to Order" value={converted} color={BRAND.green} />
+                <StatCard title="Rejected" value={rejected} color={BRAND.red} />
+              </div>
             </div>
           )}
         </div>
@@ -351,7 +391,7 @@ const QuotationDashboard = () => {
                     {q.quoteNumber || (q.id || '').substring(0, 8)}
                     {q.linkedOpportunityId && <span style={{ display: 'block', fontSize: '10px', color: BRAND.blue }}>Linked to Opp</span>}
                   </div>
-                  <div style={{ color: BRAND.secondary, fontSize: '12px' }}>{q.buyerCompanyId || q.productId || 'N/A'}</div>
+                  <div style={{ color: BRAND.secondary, fontSize: '12px' }}>{getProductName(q)} / {getBuyerName(q)}</div>
                   <div style={{ color: BRAND.primary }}>{q.quantity || 0}</div>
                   <div style={{ color: BRAND.primary }}>{fmtCurrency(q.proposedRate)}</div>
                   <div>

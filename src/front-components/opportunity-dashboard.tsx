@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { defineFrontComponent } from 'twenty-sdk/define';
+import { useUserId } from 'twenty-sdk/front-component';
 import { OPPORTUNITY_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
 import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
@@ -64,28 +65,34 @@ const fetchTwenty = async (path: string, method = 'GET', body: any = null) => {
 
 const OpportunityDashboard = () => {
   const userRole = useUserRole();
+  const rawUserId = useUserId();
+  const [currentMemberId, setCurrentMemberId] = useState<string>('');
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [quotations, setQuotations] = useState<any[]>([]);
+  const [lmeRates, setLmeRates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [selectedOppIds, setSelectedOppIds] = useState<Set<string>>(new Set());
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<any>(null);
   const [workedbyOptions, setWorkedbyOptions] = useState<string[]>([]);
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   
   // Soft RLS Virtual Identity State
   const [virtualIdentity, setVirtualIdentity] = useState<string>(
     typeof window !== 'undefined' ? (window.localStorage.getItem('virtualIdentity') || 'All') : 'All'
   );
 
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const handleIdentityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setVirtualIdentity(val);
     if (typeof window !== 'undefined') window.localStorage.setItem('virtualIdentity', val);
   };
-
-  const searchStr = typeof window !== 'undefined' && window.location ? window.location.search : '';
-  const urlParams = new URLSearchParams(searchStr);
-  const urlHighlightId = (typeof window !== 'undefined' && window.sessionStorage ? window.sessionStorage.getItem('urlHighlightId') : null) || urlParams.get('id');
 
   const fetchGraphQL = async (query: string) => {
     try {
@@ -107,13 +114,25 @@ const OpportunityDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     const schemaQuery = `{ __type(name: "LeadWorkedbyEnum") { enumValues { name } } }`;
-    const [data, schema, quosData] = await Promise.all([
-      fetchTwenty('bdOpportunities?limit=100'),
+    const [data, schema, quosData, membersData, lmeData] = await Promise.all([
+      fetchTwenty('bdOpportunities?limit=100&depth=1'),
       fetchGraphQL(schemaQuery),
-      fetchTwenty('quotations?limit=100')
+      fetchTwenty('quotations?limit=100'),
+      fetchTwenty('workspaceMembers?limit=100'),
+      fetchTwenty('lMETrackers?limit=50&orderBy=createdAt,desc')
     ]);
     setOpportunities(Array.isArray(data) ? data : []);
     setQuotations(Array.isArray(quosData) ? quosData : []);
+    setLmeRates(Array.isArray(lmeData) ? lmeData : []);
+    
+    let members = membersData?.workspaceMembers || membersData || [];
+    if (members?.edges) members = members.edges.map((e: any) => e.node);
+    const me = (Array.isArray(members) ? members : []).find(
+      (m: any) => m.userId === rawUserId || m.id === rawUserId
+    );
+    if (me) {
+      setCurrentMemberId(me.id);
+    }
     
     const opts = schema?.__type?.enumValues?.map((e: any) => e.name) || [];
     setWorkedbyOptions(opts);
@@ -125,15 +144,12 @@ const OpportunityDashboard = () => {
     loadData();
   }, []);
 
-  // Auto-filtering based on query parameters from Company Dashboard
   useEffect(() => {
     const params = new URLSearchParams(typeof window !== 'undefined' && window.location ? window.location.search : '');
     const highlightId = params.get('id');
     
     if (highlightId && opportunities.length > 0) {
-      // Auto select the specific record
       setSelectedOppIds(new Set([highlightId]));
-      // Scroll to it
       setTimeout(() => {
         const el = document.getElementById(`opp-row-${highlightId}`);
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -154,6 +170,16 @@ const OpportunityDashboard = () => {
     setErrorMsg(null);
     setSuccessMsg(null);
     try {
+      // Guess metal type from context
+      const text = (opp.name + ' ' + (opp.requirements || '')).toUpperCase();
+      let guessedMetal = 'CU';
+      if (text.includes('ALUMINUM') || text.includes('ALUMINIUM')) guessedMetal = 'AL';
+      else if (text.includes('IRON')) guessedMetal = 'FE';
+      else if (text.includes('LITHIUM')) guessedMetal = 'LI';
+      
+      const latestRateRecord = lmeRates.find((r) => r.metalType === guessedMetal);
+      let baseRate = latestRateRecord?.rateUSD || 0;
+
       const url = `https://minimines.twenty.com/rest/quotations`;
       const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJlYzFlMDcwZi0yZmE0LTQ3MjMtYmVmMy0xYmY5NGFlNTg4ZDEiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiZWMxZTA3MGYtMmZhNC00NzIzLWJlZjMtMWJmOTRhZTU4OGQxIiwiaWF0IjoxNzg2MTAxMzgzLCJleHAiOjQ5Mzk3MDEzODIsImp0aSI6IjhjZmY3MGFlLTgzZmItNDQ4NS05YjI0LWFlNjczYzQzZmE0NSJ9.Wg93DjZtbUC8-a1I2IoVSMixlv4TIdA4ayjXG6C8Zm258IW6nQbEIyX7t3R9hdGeMfy6ssbplJRP2vWHBW6Odg';
       const res = await fetch(url, {
@@ -164,14 +190,13 @@ const OpportunityDashboard = () => {
           buyerCompanyId: opp.companyNameId ? { connect: { id: opp.companyNameId } } : undefined,
           productId: '',
           quantity: 0,
-          proposedRate: { amountMicros: 0, currencyCode: 'INR' },
+          proposedRate: { amountMicros: Math.round(baseRate * 1000000), currencyCode: 'USD' },
           approvalStatus: 'DRAFT',
           linkedOpportunityId: opp.id,
           associateName: opp.associateName || '',
         }),
       });
       const quot = await res.json();
-      console.log('Quotation POST response:', JSON.stringify(quot));
 
       if (!res.ok) {
         const errMsg = quot?.error?.message || quot?.message || JSON.stringify(quot);
@@ -187,8 +212,7 @@ const OpportunityDashboard = () => {
             Quotation created!{' '}
             <a href={`/object/quotation/${newId}`} target="_parent" style={{ color: '#1D4ED8', fontWeight: 'bold', textDecoration: 'underline' }}>
               Open Quotation to fill in details
-            </a>{' '}
-            — it will appear on the Quotation Dashboard.
+            </a>
           </div>
         );
       } else {
@@ -212,8 +236,9 @@ const OpportunityDashboard = () => {
     setErrorMsg(null);
     setSuccessMsg(null);
     try {
+      const oppCompanyName = (typeof opp.companyName === 'object' && opp.companyName !== null ? opp.companyName.name : opp.companyName) || opp.name;
       const so = await fetchTwenty('salesOrders', 'POST', {
-        name: `Order for ${opp.companyName || opp.name}`,
+        name: `Order for ${oppCompanyName}`,
         linkedOpportunityId: opp.id,
         quantity: 0,
         fulfillmentStatus: 'PENDING',
@@ -299,7 +324,7 @@ const OpportunityDashboard = () => {
                   cursor: 'pointer'
                 }}
               >
-                <option value="All">View All (Manager/HOD)</option>
+                <option value="All">View All ({userRole === 'hod' ? 'HOD Bird View' : 'Team View'})</option>
                 {workedbyOptions.map(name => (
                   <option key={name} value={name}>{name.replace(/_/g, ' ')}</option>
                 ))}
@@ -309,10 +334,10 @@ const OpportunityDashboard = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
             {STAGES.map(stage => {
-              // Apply Soft RLS filtering
-              const filteredOpps = opportunities.filter(o => 
-                (virtualIdentity === 'All' || o.associateName === virtualIdentity)
-              );
+              const filteredOpps = opportunities.filter(o => {
+                if (userRole === 'manager' && o.assignedManagerPrimaryId !== currentMemberId) return false;
+                return (virtualIdentity === 'All' || o.associateName === virtualIdentity);
+              });
               
               const stageOpps = filteredOpps.filter(o => o.stage === stage.id || (!o.stage && stage.id === 'REQUIREMENTS'));
               return (
@@ -327,7 +352,6 @@ const OpportunityDashboard = () => {
 
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, backgroundColor: BRAND.bg }}>
                     {stageOpps.map(opp => {
-                      // Fetch Quotation logic
                       const oppQuotations = quotations.filter(q => q.linkedOpportunityId === opp.id);
                       const hasApprovedQuote = oppQuotations.some(q => q.approvalStatus === 'HOD_APPROVED');
                       const latestQuote = oppQuotations.length > 0 ? oppQuotations[oppQuotations.length - 1] : null;
@@ -335,12 +359,15 @@ const OpportunityDashboard = () => {
                       return (
                       <div key={opp.id} id={`opp-row-${opp.id}`} style={{ backgroundColor: BRAND.white, border: `1px solid ${BRAND.border}`, borderRadius: '6px', padding: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
                         <div style={{ fontWeight: 600, color: BRAND.primary, marginBottom: '4px' }}>{opp.name}</div>
-                        <div style={{ fontSize: '12px', color: BRAND.secondary, marginBottom: '12px' }}>{opp.companyName || 'No Company'}</div>
+                        <div style={{ fontSize: '12px', color: BRAND.secondary, marginBottom: '12px' }}>{(typeof opp.companyName === 'object' && opp.companyName !== null ? opp.companyName.name : opp.companyName) || 'No Company'}</div>
                         
                         {/* Approval Status Badge */}
                         {latestQuote && opp.stage === 'NEGOTIATION' && (
-                          <div style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: latestQuote.approvalStatus === 'HOD_APPROVED' ? '#dcfce7' : (latestQuote.approvalStatus === 'REJECTED' ? '#fee2e2' : '#fef9c3'), color: latestQuote.approvalStatus === 'HOD_APPROVED' ? '#166534' : (latestQuote.approvalStatus === 'REJECTED' ? '#991b1b' : '#854d0e'), borderRadius: '12px', marginBottom: '12px', fontWeight: 600, display: 'inline-block' }}>
-                            Quote Status: {latestQuote.approvalStatus?.replace(/_/g, ' ') || 'DRAFT'}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                            <div style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: latestQuote.approvalStatus === 'HOD_APPROVED' ? '#dcfce7' : (latestQuote.approvalStatus === 'REJECTED' ? '#fee2e2' : '#fef9c3'), color: latestQuote.approvalStatus === 'HOD_APPROVED' ? '#166534' : (latestQuote.approvalStatus === 'REJECTED' ? '#991b1b' : '#854d0e'), borderRadius: '12px', fontWeight: 600 }}>
+                              Quote Status: {latestQuote.approvalStatus?.replace(/_/g, ' ') || 'DRAFT'}
+                            </div>
+                            <div />
                           </div>
                         )}
 
@@ -361,9 +388,9 @@ const OpportunityDashboard = () => {
                             <button
                               onClick={() => handleCreateQuotation(opp)}
                               disabled={isUpdating || (latestQuote && latestQuote.approvalStatus !== 'REJECTED' && latestQuote.approvalStatus !== 'DRAFT')}
-                              style={{ width: '100%', padding: '8px', backgroundColor: (latestQuote && latestQuote.approvalStatus !== 'REJECTED' && latestQuote.approvalStatus !== 'DRAFT') ? BRAND.secondary : '#3B82F6', color: BRAND.white, border: 'none', borderRadius: '4px', fontWeight: 600, cursor: (latestQuote && latestQuote.approvalStatus !== 'REJECTED' && latestQuote.approvalStatus !== 'DRAFT') ? 'not-allowed' : 'pointer', fontSize: '12px' }}
+                              style={{ width: '100%', padding: '8px', backgroundColor: (latestQuote && latestQuote.approvalStatus !== 'REJECTED' && latestQuote.approvalStatus !== 'DRAFT') ? (latestQuote.approvalStatus === 'HOD_APPROVED' ? BRAND.green : BRAND.secondary) : '#3B82F6', color: BRAND.white, border: 'none', borderRadius: '4px', fontWeight: 600, cursor: (latestQuote && latestQuote.approvalStatus !== 'REJECTED' && latestQuote.approvalStatus !== 'DRAFT') ? 'not-allowed' : 'pointer', fontSize: '12px' }}
                             >
-                              {latestQuote ? (latestQuote.approvalStatus === 'REJECTED' ? '+ Re-create Quotation' : 'Quotation In Progress') : '+ Create Quotation'}
+                              {latestQuote ? (latestQuote.approvalStatus === 'REJECTED' ? '+ Re-create Quotation' : (latestQuote.approvalStatus === 'HOD_APPROVED' ? 'In Talk with Client' : 'Quotation In Progress')) : '+ Create Quotation'}
                             </button>
                           )}
 

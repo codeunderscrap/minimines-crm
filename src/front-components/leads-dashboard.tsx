@@ -254,14 +254,14 @@ const LeadsDashboard = () => {
     if (selectedLeadIds.size === 0 || !selectedMemberId || !canAssign) return;
     setIsUpdating(true);
     try {
-      const field = role === 'hod' ? 'assignedManagerPrimaryId' : 'assignedAssociateId';
+      const field = role === 'hod' ? 'assignedManagerPrimaryId' : 'workedby';
       const promises = Array.from(selectedLeadIds).map(id =>
         fetchApi(`leads/${id}`, 'PATCH', { [field]: selectedMemberId })
       );
       await Promise.all(promises);
       setSelectedLeadIds(new Set());
+      const targetName = role === 'hod' ? (getMemberName(selectedMemberId) || 'member') : selectedMemberId.replace(/_/g, ' ');
       setSelectedMemberId('');
-      const targetName = getMemberName(selectedMemberId) || 'member';
       setSuccessMsg(`${promises.length} lead(s) assigned to ${targetName}`);
       setTimeout(() => setSuccessMsg(null), 4000);
       await loadData();
@@ -276,12 +276,14 @@ const LeadsDashboard = () => {
     if (!canConvert) return;
     setIsUpdating(true);
     try {
+      const leadCompanyId = typeof lead.company === 'object' && lead.company !== null ? lead.company.id : (lead.companyId || null);
       const opp = await fetchApi('bdOpportunities', 'POST', {
         name: `${((typeof lead.company === 'object' && lead.company !== null ? lead.company.name : lead.company) || lead.name)} - Opportunity`,
         linkedLeadId: lead.id,
-        companyName: (typeof lead.company === 'object' && lead.company !== null ? lead.company.name : lead.company) || '',
         stage: 'REQUIREMENTS',
         associateName: lead.workedby || '',
+        companyName: leadCompanyId ? { connect: { id: leadCompanyId } } : undefined,
+        assignedManagerPrimaryId: (typeof lead.assignedManagerPrimary === 'object' && lead.assignedManagerPrimary) ? lead.assignedManagerPrimary.id : (lead.assignedManagerPrimaryId || null),
       });
       try {
         await fetchApi('opportunities', 'POST', {
@@ -434,9 +436,13 @@ const LeadsDashboard = () => {
                   <option value="">
                     {role === 'hod' ? '-- Select Manager --' : '-- Select Associate --'}
                   </option>
-                  {assignableMembers.map((m: any) => (
+                  {role === 'hod' ? assignableMembers.map((m: any) => (
                     <option key={m.id} value={m.id}>
                       {getMemberName(m.id) || 'Unnamed'}
+                    </option>
+                  )) : workedbyOptions.map((name: string) => (
+                    <option key={name} value={name}>
+                      {name.replace(/_/g, ' ')}
                     </option>
                   ))}
                 </select>

@@ -168,7 +168,7 @@ const SalesOrderDashboard = () => {
                     {order.fulfillmentStatus || 'PENDING'}
                   </span>
                 </div>
-                <div>
+                <div style={{ display: 'flex', gap: '8px' }}>
                   <button 
                     onClick={() => handleCreateShipment(order)}
                     disabled={isUpdating}

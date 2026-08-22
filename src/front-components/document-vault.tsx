@@ -170,7 +170,7 @@ const DocumentVault = () => {
                       </div>
                     </div>
                     
-                    <a href={doc.fullUrl || '#'} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', backgroundColor: BRAND.bg, border: `1px solid ${BRAND.border}`, textAlign: 'center', padding: '8px', borderRadius: '4px', color: BRAND.accent, fontWeight: 600, fontSize: '12px', display: 'block' }}>
+                    <a href={(doc.file && doc.file.length > 0) ? doc.file[0].url : '#'} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', backgroundColor: BRAND.bg, border: `1px solid ${BRAND.border}`, textAlign: 'center', padding: '8px', borderRadius: '4px', color: BRAND.accent, fontWeight: 600, fontSize: '12px', display: 'block' }}>
                       Download / View
                     </a>
                   </div>

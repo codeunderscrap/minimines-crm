@@ -1,5 +1,5 @@
 import { defineObject, FieldType , RelationType , OnDeleteAction , STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from 'twenty-sdk/define';
-import { QUOTATION_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+import { QUOTATION_OBJECT_UNIVERSAL_IDENTIFIER, PRODUCT_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
 
 export default defineObject({
   universalIdentifier: QUOTATION_OBJECT_UNIVERSAL_IDENTIFIER,
@@ -30,6 +30,19 @@ export default defineObject({
         joinColumnName: 'buyerCompanyId',
       }, label: 'Buyer Company ID' },
     { universalIdentifier: 'b9cd4ab3-d101-473e-a621-a999f268b00f', name: 'productId', type: FieldType.TEXT, label: 'Product ID' },
+    {
+      universalIdentifier: 'c556d792-ff70-42d8-bb93-a85f797d8644',
+      name: 'productMaster',
+      type: FieldType.RELATION,
+      relationTargetObjectMetadataUniversalIdentifier: PRODUCT_OBJECT_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier: '061767af-9d84-4c58-b3a9-b8b2765aaecb',
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'productMasterId',
+      },
+      label: 'Material / Product (Product Master)',
+    },
     { universalIdentifier: 'a93ea01d-63c2-4a98-9dc6-368b903ff6bc', name: 'quantity', type: FieldType.NUMBER, label: 'Quantity (MT)' },
     { universalIdentifier: '310a84ba-5e4a-48a9-964d-432d55829457', name: 'proposedRate', type: FieldType.CURRENCY, label: 'Proposed Rate (INR)' },
     { universalIdentifier: 'f2a164c9-b75d-4680-8525-0a19f04ec0e5', name: 'linkedOpportunityId', type: FieldType.TEXT, label: 'Linked Opportunity ID' },
