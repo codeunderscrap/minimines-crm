@@ -154,7 +154,6 @@ const QuotationDashboard = () => {
   const userRole = useUserRole();
   const recordId = useRecordId();
   const [allQuotations, setAllQuotations] = useState<any[]>([]);
-  const [lmeRates, setLmeRates] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -167,12 +166,8 @@ const QuotationDashboard = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [items, lmeData] = await Promise.all([
-      fetchList('quotations?limit=200&depth=1'),
-      fetchList('lMETrackers?limit=10&orderBy=createdAt,desc')
-    ]);
+    const items = await fetchList('quotations?limit=200&depth=1');
     setAllQuotations(items);
-    setLmeRates(lmeData);
     setLoading(false);
   };
 
@@ -323,23 +318,6 @@ const QuotationDashboard = () => {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {lmeRates.length > 0 && (
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center', backgroundColor: BRAND.bg, padding: '8px 12px', borderRadius: '6px', border: `1px solid ${BRAND.border}` }}>
-                  <div style={{ fontSize: '11px', fontWeight: 600, color: BRAND.secondary, textTransform: 'uppercase', marginRight: '4px' }}>
-                    LIVE MARKET:
-                  </div>
-                  {['CU', 'AL', 'FE'].map(metal => {
-                    const rate = lmeRates.find(r => r.metalType === metal);
-                    if (!rate) return null;
-                    return (
-                      <div key={metal} style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '10px', color: BRAND.text, fontWeight: 600 }}>{metal}</span>
-                        <span style={{ fontSize: '13px', fontWeight: 700, color: BRAND.primary }}>${rate.rateUSD}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
                 <StatCard title="Total Quotations" value={totalCount} color={BRAND.accent} />
                 <StatCard title="Pending HOD Review" value={pendingReview} color={BRAND.yellow} />

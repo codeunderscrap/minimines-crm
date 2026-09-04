@@ -163,6 +163,12 @@ export default defineObject({
       label: 'Internal Notes',
     },
     {
+      universalIdentifier: 'b8a92357-1941-482f-870f-c30c82fb66a1',
+      name: 'commonNotes',
+      type: FieldType.RICH_TEXT,
+      label: 'Common Notes & Status',
+    },
+    {
       universalIdentifier: '820464be-4131-482a-a9e9-d7b4db1b4432',
       name: 'convertedToOpportunityId',
       type: FieldType.TEXT,

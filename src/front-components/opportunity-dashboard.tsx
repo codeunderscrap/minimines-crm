@@ -69,7 +69,6 @@ const OpportunityDashboard = () => {
   const [currentMemberId, setCurrentMemberId] = useState<string>('');
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [quotations, setQuotations] = useState<any[]>([]);
-  const [lmeRates, setLmeRates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedOppIds, setSelectedOppIds] = useState<Set<string>>(new Set());
@@ -114,16 +113,14 @@ const OpportunityDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     const schemaQuery = `{ __type(name: "LeadWorkedbyEnum") { enumValues { name } } }`;
-    const [data, schema, quosData, membersData, lmeData] = await Promise.all([
+    const [data, schema, quosData, membersData] = await Promise.all([
       fetchTwenty('bdOpportunities?limit=100&depth=1'),
       fetchGraphQL(schemaQuery),
       fetchTwenty('quotations?limit=100'),
-      fetchTwenty('workspaceMembers?limit=100'),
-      fetchTwenty('lMETrackers?limit=50&orderBy=createdAt,desc')
+      fetchTwenty('workspaceMembers?limit=100')
     ]);
     setOpportunities(Array.isArray(data) ? data : []);
     setQuotations(Array.isArray(quosData) ? quosData : []);
-    setLmeRates(Array.isArray(lmeData) ? lmeData : []);
     
     let members = membersData?.workspaceMembers || membersData || [];
     if (members?.edges) members = members.edges.map((e: any) => e.node);
@@ -170,16 +167,6 @@ const OpportunityDashboard = () => {
     setErrorMsg(null);
     setSuccessMsg(null);
     try {
-      // Guess metal type from context
-      const text = (opp.name + ' ' + (opp.requirements || '')).toUpperCase();
-      let guessedMetal = 'CU';
-      if (text.includes('ALUMINUM') || text.includes('ALUMINIUM')) guessedMetal = 'AL';
-      else if (text.includes('IRON')) guessedMetal = 'FE';
-      else if (text.includes('LITHIUM')) guessedMetal = 'LI';
-      
-      const latestRateRecord = lmeRates.find((r) => r.metalType === guessedMetal);
-      let baseRate = latestRateRecord?.rateUSD || 0;
-
       const url = `https://minimines.twenty.com/rest/quotations`;
       const apiKey = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJlYzFlMDcwZi0yZmE0LTQ3MjMtYmVmMy0xYmY5NGFlNTg4ZDEiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiZWMxZTA3MGYtMmZhNC00NzIzLWJlZjMtMWJmOTRhZTU4OGQxIiwiaWF0IjoxNzg2MTAxMzgzLCJleHAiOjQ5Mzk3MDEzODIsImp0aSI6IjhjZmY3MGFlLTgzZmItNDQ4NS05YjI0LWFlNjczYzQzZmE0NSJ9.Wg93DjZtbUC8-a1I2IoVSMixlv4TIdA4ayjXG6C8Zm258IW6nQbEIyX7t3R9hdGeMfy6ssbplJRP2vWHBW6Odg';
       const res = await fetch(url, {
@@ -190,7 +177,7 @@ const OpportunityDashboard = () => {
           buyerCompanyId: opp.companyNameId ? { connect: { id: opp.companyNameId } } : undefined,
           productId: '',
           quantity: 0,
-          proposedRate: { amountMicros: Math.round(baseRate * 1000000), currencyCode: 'USD' },
+          proposedRate: { amountMicros: 0, currencyCode: 'INR' },
           approvalStatus: 'DRAFT',
           linkedOpportunityId: opp.id,
           associateName: opp.associateName || '',

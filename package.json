@@ -37,6 +37,7 @@
     "dotenv": "^17.4.2",
     "html2pdf.js": "^0.14.0",
     "node-fetch": "^3.3.2",
+    "playwright": "^1.62.1",
     "yahoo-finance2": "^4.0.2"
   }
 }
