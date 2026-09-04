@@ -14,22 +14,22 @@ export default defineObject({
   universalIdentifier: '685d5f57-e14b-4494-b258-005db38d8108',
   description: 'Tracks detailed conversation history (what I said, what they said) with specific contacts on a Lead.',
   icon: 'IconMessageCircle',
-  labelIdentifierFieldMetadataUniversalIdentifier: 'a4b2a8c1-1234-4567-89ab-cdef01234567',
+  labelIdentifierFieldMetadataUniversalIdentifier: 'fa449233-be57-4588-8e0e-d28b690dcde7',
   fields: [
     {
-      universalIdentifier: 'a4b2a8c1-1234-4567-89ab-cdef01234567',
+      universalIdentifier: 'fa449233-be57-4588-8e0e-d28b690dcde7',
       name: 'personName',
       type: FieldType.TEXT,
       label: 'Contact Person Name',
       description: 'The specific person you spoke with',
     },
     {
-      universalIdentifier: 'b5c3b9d2-2345-5678-90bc-def012345678',
+      universalIdentifier: '9509ce7e-f644-4f2c-b013-6b99ce51ebbe',
       name: 'lead',
       type: FieldType.RELATION,
       label: 'Related Lead',
       relationTargetObjectMetadataUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
-      relationTargetFieldMetadataUniversalIdentifier: 'c6d4cae3-3456-6789-01cd-ef0123456789', // We'll let Twenty auto-generate the reverse field on Lead
+      relationTargetFieldMetadataUniversalIdentifier: '30fd6c9d-55df-441d-b8b5-1a338baa2ba2', // We'll let Twenty auto-generate the reverse field on Lead
       universalSettings: {
         relationType: RelationType.MANY_TO_ONE,
         onDelete: OnDeleteAction.CASCADE,
@@ -37,19 +37,19 @@ export default defineObject({
       },
     },
     {
-      universalIdentifier: 'd7e5dbf4-4567-7890-12de-f0123456789a',
+      universalIdentifier: '2dd098a5-cb3d-4453-a300-44294ac5f77d',
       name: 'interactionDate',
       type: FieldType.DATE_TIME,
       label: 'Date & Time',
     },
     {
-      universalIdentifier: 'e8f6ecd5-5678-8901-23ef-0123456789ab',
+      universalIdentifier: 'adf38c0b-10cc-4f0f-9c4a-4318c112f6a8',
       name: 'whatISaid',
       type: FieldType.RICH_TEXT,
       label: 'What I Said',
     },
     {
-      universalIdentifier: 'f907fde6-6789-9012-34f0-123456789abc',
+      universalIdentifier: '0e954298-4a8e-41b4-9869-f6ae82bb4f0f',
       name: 'whatTheySaid',
       type: FieldType.RICH_TEXT,
       label: 'What They Said',
