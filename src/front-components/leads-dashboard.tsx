@@ -76,6 +76,7 @@ const LeadsDashboard = () => {
   const [filterWorkedBy, setFilterWorkedBy] = useState<string>(
     typeof window !== 'undefined' ? (window.localStorage.getItem('virtualIdentity') || '') : ''
   );
+  const [expandedLeadId, setExpandedLeadId] = useState<string | null>(null);
 
 
   const [successMsg, setSuccessMsg] = useState<React.ReactNode>(null);
@@ -537,14 +538,16 @@ const LeadsDashboard = () => {
               const assocName = relationName(lead, 'assignedAssociate');
 
               return (
-                <div key={lead.id} id={`lead-row-${lead.id}`} style={{
+                <React.Fragment key={lead.id}>
+                <div id={`lead-row-${lead.id}`} onClick={() => setExpandedLeadId(expandedLeadId === lead.id ? null : lead.id)} style={{
                   display: 'grid', gridTemplateColumns: gridCols, gap: '12px', padding: '13px 20px',
                   borderBottom: `1px solid ${BRAND.border}`, alignItems: 'center', fontSize: '13px',
-                  backgroundColor: (isSelected || lead.id === urlHighlightId) ? '#F0F8FF' : 'transparent',
-                  borderLeft: (isSelected || lead.id === urlHighlightId) ? '4px solid #1E507B' : '4px solid transparent',
+                  backgroundColor: (isSelected || lead.id === urlHighlightId || expandedLeadId === lead.id) ? '#F0F8FF' : 'transparent',
+                  borderLeft: (isSelected || lead.id === urlHighlightId || expandedLeadId === lead.id) ? '4px solid #1E507B' : '4px solid transparent',
+                  cursor: 'pointer'
                 }}>
                   {canAssign && (
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
                       <input type="checkbox" checked={isSelected}
                         onChange={() => toggleLeadSelection(lead.id)}
                         style={{ cursor: 'pointer', width: '15px', height: '15px' }}
@@ -576,7 +579,7 @@ const LeadsDashboard = () => {
                       {mgrName ? <span>Mgr: <span style={{ color: BRAND.blue, fontWeight: 600 }}>{mgrName}</span></span> : <span style={{ color: '#999' }}>Unassigned Mgr</span>}
                     </div>
                   </div>
-                  <div>
+                  <div onClick={(e) => e.stopPropagation()}>
                     <select
                       value={lead.workedby || ''}
                       onChange={(e) => handleUpdateWorkedBy(lead.id, e.target.value)}
@@ -591,7 +594,7 @@ const LeadsDashboard = () => {
                       {workedbyOptions.map(opt => <option key={opt} value={opt}>{opt.replace(/_/g, ' ')}</option>)}
                     </select>
                   </div>
-                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
                     <select
                       value={lead.followUpStatus || 'NONE'}
                       onChange={e => handleUpdateFollowUp(lead.id, e.target.value)}
@@ -635,6 +638,31 @@ const LeadsDashboard = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Expansion Panel for Notes & Interactions */}
+                {expandedLeadId === lead.id && (
+                  <div style={{ padding: '20px', backgroundColor: '#FAFAFA', borderBottom: \`1px solid \${BRAND.border}\`, borderLeft: '4px solid #1E507B' }}>
+                    <div style={{ display: 'flex', gap: '40px' }}>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ margin: '0 0 10px 0', color: BRAND.primary }}>Common Status / Notes</h4>
+                        <textarea
+                          readOnly
+                          style={{ width: '100%', height: '80px', padding: '10px', borderRadius: '6px', border: \`1px solid \${BRAND.border}\`, backgroundColor: '#fff', fontSize: '13px' }}
+                          value={lead.commonNotes || 'No common notes added yet.'}
+                        />
+                        <button style={{ marginTop: '10px', padding: '6px 12px', backgroundColor: BRAND.blue, color: '#fff', borderRadius: '4px', border: 'none', fontSize: '12px', cursor: 'pointer' }}>Edit Common Notes</button>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ margin: '0 0 10px 0', color: BRAND.primary }}>Recent Interaction Logs</h4>
+                        <div style={{ backgroundColor: '#fff', border: \`1px solid \${BRAND.border}\`, borderRadius: '6px', padding: '10px', fontSize: '12px', color: BRAND.secondary }}>
+                          <i>View full logs in standard record view.</i><br/><br/>
+                          <button style={{ padding: '6px 12px', backgroundColor: BRAND.green, color: '#fff', borderRadius: '4px', border: 'none', fontSize: '12px', cursor: 'pointer' }}>+ Log Interaction</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                </React.Fragment>
               );
             })}
 
