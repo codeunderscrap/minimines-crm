@@ -18,10 +18,10 @@ export default defineObject({
   fields: [
     {
       universalIdentifier: 'fa449233-be57-4588-8e0e-d28b690dcde7',
-      name: 'personName',
+      name: 'logName',
       type: FieldType.TEXT,
-      label: 'Contact Person Name',
-      description: 'The specific person you spoke with',
+      label: 'Log Name',
+      description: 'Title or person associated with this log',
     },
     {
       universalIdentifier: '9509ce7e-f644-4f2c-b013-6b99ce51ebbe',
@@ -44,15 +44,9 @@ export default defineObject({
     },
     {
       universalIdentifier: 'adf38c0b-10cc-4f0f-9c4a-4318c112f6a8',
-      name: 'whatISaid',
+      name: 'notes',
       type: FieldType.RICH_TEXT,
-      label: 'What I Said',
-    },
-    {
-      universalIdentifier: '0e954298-4a8e-41b4-9869-f6ae82bb4f0f',
-      name: 'whatTheySaid',
-      type: FieldType.RICH_TEXT,
-      label: 'What They Said',
+      label: 'Notes',
     },
   ],
 });
