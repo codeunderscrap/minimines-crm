@@ -1,32 +1,27 @@
 import { definePageLayout, PageLayoutTabLayoutMode } from 'twenty-sdk/define';
 
-import {
-  SHIPMENT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
-  SHIPMENT_DASHBOARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  SHIPMENT_DASHBOARD_PAGE_LAYOUT_TAB_UNIVERSAL_IDENTIFIER,
-  SHIPMENT_DASHBOARD_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+
 
 export default definePageLayout({
-  universalIdentifier: SHIPMENT_DASHBOARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '81463067-26a7-44cf-8e8f-72de3806f9cd',
   name: 'Shipment Dashboard',
   type: 'STANDALONE_PAGE',
   tabs: [
     {
-      universalIdentifier: SHIPMENT_DASHBOARD_PAGE_LAYOUT_TAB_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: '1a458875-2c85-4314-9526-b32b08f69c6a',
       title: 'Overview',
       position: 0,
       icon: 'IconShip',
       layoutMode: PageLayoutTabLayoutMode.CANVAS,
       widgets: [
         {
-          universalIdentifier: SHIPMENT_DASHBOARD_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
+          universalIdentifier: 'ca9aae25-187a-453a-a3f5-4997a0f59e36',
           title: ' ',
           type: 'FRONT_COMPONENT',
           position: { layoutMode: PageLayoutTabLayoutMode.CANVAS },
           configuration: {
             configurationType: 'FRONT_COMPONENT',
-            frontComponentUniversalIdentifier: SHIPMENT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+            frontComponentUniversalIdentifier: 'c87af8fb-27cb-4b36-a19e-4c55d064a371',
           },
         },
       ],

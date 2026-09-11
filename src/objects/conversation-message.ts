@@ -4,33 +4,21 @@ import {
   RelationType,
   OnDeleteAction,
 } from 'twenty-sdk/define';
-import {
-  CONVERSATION_MESSAGE_OBJECT_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_BODY_FIELD_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_ENQUIRY_FIELD_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_ENQUIRY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_DIRECTION_FIELD_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_SENDER_NAME_FIELD_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_SENDER_TYPE_FIELD_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_CHANNEL_FIELD_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_SENT_AT_FIELD_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_IS_READ_FIELD_UNIVERSAL_IDENTIFIER,
-  ENQUIRY_OBJECT_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+
 
 export default defineObject({
-  universalIdentifier: CONVERSATION_MESSAGE_OBJECT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'e8f2d4a6-1b3c-4f7e-9d5a-2c6b8a4f1e3d',
   nameSingular: 'conversationMessage',
   namePlural: 'conversationMessages',
   labelSingular: 'Conversation Message',
   labelPlural: 'Conversation Messages',
   description: 'Individual messages within an enquiry conversation thread. Stores the full chat history between customers and the MiniMines team.',
   icon: 'IconMessage',
-  labelIdentifierFieldMetadataUniversalIdentifier: CONVERSATION_MESSAGE_BODY_FIELD_UNIVERSAL_IDENTIFIER,
+  labelIdentifierFieldMetadataUniversalIdentifier: 'b1e5a3c7-2f4d-4b9a-8ce6-4a3d7b1f5c2e',
   fields: [
     // ── Content ─────────────────────────────────────────────────────────────
     {
-      universalIdentifier: CONVERSATION_MESSAGE_BODY_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'b1e5a3c7-2f4d-4b9a-8ce6-4a3d7b1f5c2e',
       name: 'body',
       type: FieldType.TEXT,
       label: 'Message Body',
@@ -38,7 +26,7 @@ export default defineObject({
 
     // ── Direction & sender ──────────────────────────────────────────────────
     {
-      universalIdentifier: CONVERSATION_MESSAGE_DIRECTION_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'd6f2b4e8-7a9c-4d1f-b3e7-5c2a6d4b8f1e',
       name: 'direction',
       type: FieldType.SELECT,
       label: 'Direction',
@@ -48,13 +36,13 @@ export default defineObject({
       ],
     },
     {
-      universalIdentifier: CONVERSATION_MESSAGE_SENDER_NAME_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'c9a3f7e1-4b6d-4c2a-a5f9-6b4a8c3f1d7e',
       name: 'senderName',
       type: FieldType.TEXT,
       label: 'Sender Name',
     },
     {
-      universalIdentifier: CONVERSATION_MESSAGE_SENDER_TYPE_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'a5e9c1f3-8b2d-4f6a-9dc8-7e1b5f9a3c2d',
       name: 'senderType',
       type: FieldType.SELECT,
       label: 'Sender Type',
@@ -67,7 +55,7 @@ export default defineObject({
 
     // ── Channel ─────────────────────────────────────────────────────────────
     {
-      universalIdentifier: CONVERSATION_MESSAGE_CHANNEL_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'e3b7d5a9-1c4f-4e8b-82d6-8f3c7a1e5b4d',
       name: 'channel',
       type: FieldType.SELECT,
       label: 'Channel',
@@ -82,13 +70,13 @@ export default defineObject({
 
     // ── Timestamps & state ──────────────────────────────────────────────────
     {
-      universalIdentifier: CONVERSATION_MESSAGE_SENT_AT_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'f7a1e3b5-9d2c-4a4f-b8e4-9c6d2f8a5b3e',
       name: 'sentAt',
       type: FieldType.DATE_TIME,
       label: 'Sent At',
     },
     {
-      universalIdentifier: CONVERSATION_MESSAGE_IS_READ_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'b5d9f3a7-6e4c-4b2d-a1f5-1e8b4d6a9c7f',
       name: 'isRead',
       type: FieldType.BOOLEAN,
       label: 'Is Read',
@@ -96,12 +84,12 @@ export default defineObject({
 
     // ── Relation to parent enquiry ───────────────────────────────────────────
     {
-      universalIdentifier: CONVERSATION_MESSAGE_ENQUIRY_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'a3c7f1b9-5e2d-4a8c-b6f4-7d1e3c9f5a2b',
       name: 'enquiry',
       type: FieldType.RELATION,
       label: 'Enquiry',
-      relationTargetObjectMetadataUniversalIdentifier: ENQUIRY_OBJECT_UNIVERSAL_IDENTIFIER,
-      relationTargetFieldMetadataUniversalIdentifier: CONVERSATION_MESSAGE_ENQUIRY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+      relationTargetObjectMetadataUniversalIdentifier: '60b1d481-b270-4fea-896e-df5d49279735',
+      relationTargetFieldMetadataUniversalIdentifier: 'f4b8e2d6-9c1a-4f3b-a7e5-3d6c2b8f4a1e',
       universalSettings: {
         relationType: RelationType.MANY_TO_ONE,
         onDelete: OnDeleteAction.CASCADE,

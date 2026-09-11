@@ -1,21 +1,18 @@
 import { defineObject, FieldType } from 'twenty-sdk/define';
-import {
-  DEPARTMENT_OBJECT_UNIVERSAL_IDENTIFIER,
-  DEPARTMENT_NAME_FIELD_UNIVERSAL_IDENTIFIER,
-} from '../constants/universal-identifiers';
+
 
 export default defineObject({
   nameSingular: 'department',
   namePlural: 'departments',
   labelSingular: 'Department',
   labelPlural: 'Departments',
-  universalIdentifier: DEPARTMENT_OBJECT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '2d76ead8-21ea-4c17-bbbb-6f511175ebeb',
   description: 'A department in the HOD -> Manager -> Associate hierarchy (Sales, BD, and any added later).',
   icon: 'IconBuildingSkyscraper',
-  labelIdentifierFieldMetadataUniversalIdentifier: DEPARTMENT_NAME_FIELD_UNIVERSAL_IDENTIFIER,
+  labelIdentifierFieldMetadataUniversalIdentifier: '71368bf5-acae-41dc-a367-2d28836a4988',
   fields: [
     {
-      universalIdentifier: DEPARTMENT_NAME_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: '71368bf5-acae-41dc-a367-2d28836a4988',
       name: 'name',
       type: FieldType.TEXT,
       label: 'Department Name',

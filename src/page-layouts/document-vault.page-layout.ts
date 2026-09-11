@@ -1,32 +1,27 @@
 import { definePageLayout, PageLayoutTabLayoutMode } from 'twenty-sdk/define';
 
-import {
-  DOCUMENT_VAULT_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
-  DOCUMENT_VAULT_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  DOCUMENT_VAULT_PAGE_LAYOUT_TAB_UNIVERSAL_IDENTIFIER,
-  DOCUMENT_VAULT_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+
 
 export default definePageLayout({
-  universalIdentifier: DOCUMENT_VAULT_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'e0e42bf2-5132-4c07-99a1-a77b0b8fb95f',
   name: 'Document Vault',
   type: 'STANDALONE_PAGE',
   tabs: [
     {
-      universalIdentifier: DOCUMENT_VAULT_PAGE_LAYOUT_TAB_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'd3bf5ebd-2d9a-4c48-a493-3853dd3185cc',
       title: 'Vault',
       position: 0,
       icon: 'IconLock',
       layoutMode: PageLayoutTabLayoutMode.CANVAS,
       widgets: [
         {
-          universalIdentifier: DOCUMENT_VAULT_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
+          universalIdentifier: '6c5488b9-92e0-4f4e-8525-ca443c4b9d79',
           title: ' ',
           type: 'FRONT_COMPONENT',
           position: { layoutMode: PageLayoutTabLayoutMode.CANVAS },
           configuration: {
             configurationType: 'FRONT_COMPONENT',
-            frontComponentUniversalIdentifier: DOCUMENT_VAULT_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+            frontComponentUniversalIdentifier: 'b653a373-f56f-4807-b12a-863697f3a008',
           },
         },
       ],

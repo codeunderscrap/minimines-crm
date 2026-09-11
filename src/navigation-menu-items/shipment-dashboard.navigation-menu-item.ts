@@ -1,16 +1,12 @@
 import { defineNavigationMenuItem, NavigationMenuItemType } from 'twenty-sdk/define';
-import {
-  SHIPMENT_DASHBOARD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
-  SHIPMENT_DASHBOARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  SHIPMENTS_FOLDER_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER
-} from '../constants/universal-identifiers';
+
 
 export default defineNavigationMenuItem({
-  universalIdentifier: SHIPMENT_DASHBOARD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'c6477e48-6e81-4ad1-a3bb-6d5e275c2161',
   name: 'Shipment Dashboard',
   icon: 'IconShip',
   position: 6,
   type: NavigationMenuItemType.PAGE_LAYOUT,
-  folderUniversalIdentifier: SHIPMENTS_FOLDER_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
-  pageLayoutUniversalIdentifier: SHIPMENT_DASHBOARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  folderUniversalIdentifier: 'e509066c-922a-4a95-a682-de66d26a9d6d',
+  pageLayoutUniversalIdentifier: '81463067-26a7-44cf-8e8f-72de3806f9cd',
 });

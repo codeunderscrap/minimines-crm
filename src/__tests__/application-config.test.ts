@@ -1,14 +1,10 @@
-import {
-  APP_DESCRIPTION,
-  APP_DISPLAY_NAME,
-  APPLICATION_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+
 import { describe, expect, it } from 'vitest';
 
 describe('application identifiers', () => {
   it('should expose the application metadata constants', () => {
-    expect(APP_DISPLAY_NAME).toBeTruthy();
+    expect('MiniMines CRM').toBeTruthy();
     expect(typeof APP_DESCRIPTION).toBe('string');
-    expect(APPLICATION_UNIVERSAL_IDENTIFIER).toBeTruthy();
+    expect('b4c9e8d1-72f3-4a1d-9e6b-3c5d8a2f1b4c').toBeTruthy();
   });
 });

@@ -1,14 +1,11 @@
 import { defineNavigationMenuItem, NavigationMenuItemType } from 'twenty-sdk/define';
-import {
-  DEPARTMENT_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
-  DEPARTMENT_OBJECT_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+
 
 export default defineNavigationMenuItem({
-  universalIdentifier: DEPARTMENT_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '8e258e76-f2af-4c78-b983-d428cbeb6f95',
   name: 'Departments',
   icon: 'IconBuildingSkyscraper',
   type: NavigationMenuItemType.OBJECT,
-  targetObjectUniversalIdentifier: DEPARTMENT_OBJECT_UNIVERSAL_IDENTIFIER,
+  targetObjectUniversalIdentifier: '2d76ead8-21ea-4c17-bbbb-6f511175ebeb',
   position: 16,
 });

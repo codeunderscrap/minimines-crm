@@ -1,8 +1,8 @@
 import { defineObject, FieldType } from 'twenty-sdk/define';
-import { EXPORT_DOCUMENT_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+
 
 export default defineObject({
-  universalIdentifier: EXPORT_DOCUMENT_OBJECT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'df236eba-da40-419a-abb7-2f2fc0f8d2ab',
   nameSingular: 'exportDocument',
   namePlural: 'exportDocuments',
   labelSingular: 'Export Document',

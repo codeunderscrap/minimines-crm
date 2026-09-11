@@ -4,7 +4,7 @@ import {
   RelationType,
   OnDeleteAction,
 } from 'twenty-sdk/define';
-import { LEAD_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+
 
 export default defineObject({
   nameSingular: 'interactionLog',
@@ -28,7 +28,7 @@ export default defineObject({
       name: 'lead',
       type: FieldType.RELATION,
       label: 'Related Lead',
-      relationTargetObjectMetadataUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
+      relationTargetObjectMetadataUniversalIdentifier: '0e354212-7b75-46d7-ba6e-cdb07c970645',
       relationTargetFieldMetadataUniversalIdentifier: '30fd6c9d-55df-441d-b8b5-1a338baa2ba2',
       universalSettings: {
         relationType: RelationType.MANY_TO_ONE,

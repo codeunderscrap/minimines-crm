@@ -1,16 +1,11 @@
 import { definePageLayout, PageLayoutTabLayoutMode, PageLayoutType } from 'twenty-sdk/define';
-import {
-  QUOTATION_OBJECT_UNIVERSAL_IDENTIFIER,
-  QUOTATION_RECORD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  QUOTATION_FIELDS_VIEW_UNIVERSAL_IDENTIFIER,
-  QUOTATION_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER
-} from '../constants/universal-identifiers';
+
 
 export default definePageLayout({
-  universalIdentifier: QUOTATION_RECORD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '27132806-9a86-4304-9abc-9fa41b53112b',
   name: 'Default Quotation Layout',
   type: PageLayoutType.RECORD_PAGE,
-  objectUniversalIdentifier: QUOTATION_OBJECT_UNIVERSAL_IDENTIFIER,
+  objectUniversalIdentifier: '71ba2bb5-f601-40b0-ba63-3dab06028c57',
   tabs: [
     {
       universalIdentifier: 'a2913e65-e765-42aa-b0f5-23745691fd02',
@@ -25,7 +20,7 @@ export default definePageLayout({
           type: 'FRONT_COMPONENT',
           configuration: {
             configurationType: 'FRONT_COMPONENT',
-            frontComponentUniversalIdentifier: QUOTATION_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER
+            frontComponentUniversalIdentifier: '1e644aba-73c0-42f3-853c-69a22a310d17'
           },
         },
         {
@@ -34,7 +29,7 @@ export default definePageLayout({
           type: 'FIELDS',
           configuration: {
             configurationType: 'FIELDS',
-            viewUniversalIdentifier: QUOTATION_FIELDS_VIEW_UNIVERSAL_IDENTIFIER,
+            viewUniversalIdentifier: '659f0064-f97b-4664-8659-e0c8d5ad8a42',
           },
         },
       ],

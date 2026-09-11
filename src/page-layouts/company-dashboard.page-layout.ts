@@ -1,32 +1,27 @@
 import { definePageLayout, PageLayoutTabLayoutMode } from 'twenty-sdk/define';
 
-import {
-  COMPANY_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
-  COMPANY_DASHBOARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  COMPANY_DASHBOARD_PAGE_LAYOUT_TAB_UNIVERSAL_IDENTIFIER,
-  COMPANY_DASHBOARD_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+
 
 export default definePageLayout({
-  universalIdentifier: COMPANY_DASHBOARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '540e4303-4b30-4a39-948a-ec80389463d5',
   name: 'Company Dashboard',
   type: 'STANDALONE_PAGE',
   tabs: [
     {
-      universalIdentifier: COMPANY_DASHBOARD_PAGE_LAYOUT_TAB_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: '92f595dc-824c-498a-aa06-657a71c3e1fe',
       title: 'Overview',
       position: 0,
       icon: 'IconBuildingCommunity',
       layoutMode: PageLayoutTabLayoutMode.CANVAS,
       widgets: [
         {
-          universalIdentifier: COMPANY_DASHBOARD_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
+          universalIdentifier: '2ef351ff-b335-4640-abce-5f9b100cd981',
           title: ' ',
           type: 'FRONT_COMPONENT',
           position: { layoutMode: PageLayoutTabLayoutMode.CANVAS },
           configuration: {
             configurationType: 'FRONT_COMPONENT',
-            frontComponentUniversalIdentifier: COMPANY_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+            frontComponentUniversalIdentifier: '4cf03718-59fa-4ce1-9869-019a277cdfdc',
           },
         },
       ],

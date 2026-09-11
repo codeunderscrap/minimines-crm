@@ -1,15 +1,12 @@
 import { defineNavigationMenuItem, NavigationMenuItemType } from 'twenty-sdk/define';
-import { 
-  LEAD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER, 
-  LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
-} from '../constants/universal-identifiers';
+
 
 export default defineNavigationMenuItem({
-  universalIdentifier: LEAD_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'd02fd48c-6841-4ec6-8260-72e49c924b5a',
   name: 'Lead Database',
   icon: 'IconDatabase',
   position: 10,
   type: NavigationMenuItemType.OBJECT,
-  targetObjectUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
+  targetObjectUniversalIdentifier: '0e354212-7b75-46d7-ba6e-cdb07c970645',
 });
 

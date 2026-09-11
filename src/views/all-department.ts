@@ -1,13 +1,10 @@
 import { defineView } from 'twenty-sdk/define';
-import {
-  DEPARTMENT_ALL_VIEW_UNIVERSAL_IDENTIFIER,
-  DEPARTMENT_OBJECT_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+
 
 export default defineView({
-  universalIdentifier: DEPARTMENT_ALL_VIEW_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '971021e3-ff53-47e6-9a5c-785faf406195',
   name: 'all-department',
-  objectUniversalIdentifier: DEPARTMENT_OBJECT_UNIVERSAL_IDENTIFIER,
+  objectUniversalIdentifier: '2d76ead8-21ea-4c17-bbbb-6f511175ebeb',
   icon: 'IconList',
   position: 0,
   fields: [],

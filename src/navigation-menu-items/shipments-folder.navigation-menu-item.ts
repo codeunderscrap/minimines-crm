@@ -1,8 +1,8 @@
 import { defineNavigationMenuItem, NavigationMenuItemType } from 'twenty-sdk/define';
-import { SHIPMENTS_FOLDER_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+
 
 export default defineNavigationMenuItem({
-  universalIdentifier: SHIPMENTS_FOLDER_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'e509066c-922a-4a95-a682-de66d26a9d6d',
   name: 'Shipments',
   icon: 'IconShip',
   position: 30,

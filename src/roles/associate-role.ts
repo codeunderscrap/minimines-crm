@@ -1,14 +1,5 @@
 import { defineRole, RowLevelPermissionPredicateOperand, STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from 'twenty-sdk/define';
-import {
-  ASSOCIATE_ROLE_UNIVERSAL_IDENTIFIER,
-  LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
-  LEAD_ASSIGNED_ASSOCIATE_FIELD_UNIVERSAL_IDENTIFIER,
-  ASSOCIATE_ROLE_OWNERSHIP_PREDICATE_UNIVERSAL_IDENTIFIER,
-  OPPORTUNITY_OBJECT_UNIVERSAL_IDENTIFIER,
-  QUOTATION_OBJECT_UNIVERSAL_IDENTIFIER,
-  ENQUIRY_OBJECT_UNIVERSAL_IDENTIFIER,
-  EXPORT_DOCUMENT_OBJECT_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+
 
 const WORKSPACE_MEMBER = STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.workspaceMember;
 
@@ -31,7 +22,7 @@ const ASSOCIATE_ACCESS = {
  * have direct read/update access.
  */
 export default defineRole({
-  universalIdentifier: ASSOCIATE_ROLE_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '0a43c88f-751d-49a0-9406-6eebaafaf9bd',
   label: 'Associate',
   description: 'Works leads handed down by their Manager. Scoped to their own department and their own assigned leads only. Has access to pipeline, quotations, contracts, shipments, and compliance tracking.',
   canBeAssignedToUsers: true,
@@ -41,16 +32,16 @@ export default defineRole({
   canDestroyAllObjectRecords: false,
   objectPermissions: [
     {
-      objectUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
+      objectUniversalIdentifier: '0e354212-7b75-46d7-ba6e-cdb07c970645',
       canReadObjectRecords: true,
       canUpdateObjectRecords: true,
       canSoftDeleteObjectRecords: false,
       canDestroyObjectRecords: false,
     },
-    { objectUniversalIdentifier: OPPORTUNITY_OBJECT_UNIVERSAL_IDENTIFIER, ...ASSOCIATE_ACCESS },
-    { objectUniversalIdentifier: QUOTATION_OBJECT_UNIVERSAL_IDENTIFIER, ...ASSOCIATE_ACCESS },
-    { objectUniversalIdentifier: ENQUIRY_OBJECT_UNIVERSAL_IDENTIFIER, ...ASSOCIATE_ACCESS },
-    { objectUniversalIdentifier: EXPORT_DOCUMENT_OBJECT_UNIVERSAL_IDENTIFIER, ...ASSOCIATE_ACCESS },
+    { objectUniversalIdentifier: 'eb3a7200-27aa-42d9-9271-24b70ff8a255', ...ASSOCIATE_ACCESS },
+    { objectUniversalIdentifier: '71ba2bb5-f601-40b0-ba63-3dab06028c57', ...ASSOCIATE_ACCESS },
+    { objectUniversalIdentifier: '60b1d481-b270-4fea-896e-df5d49279735', ...ASSOCIATE_ACCESS },
+    { objectUniversalIdentifier: 'df236eba-da40-419a-abb7-2f2fc0f8d2ab', ...ASSOCIATE_ACCESS },
     { objectUniversalIdentifier: CONTRACT_OBJECT_UNIVERSAL_IDENTIFIER, ...ASSOCIATE_ACCESS },
     { objectUniversalIdentifier: SALES_ORDER_OBJECT_UNIVERSAL_IDENTIFIER, ...ASSOCIATE_ACCESS },
     { objectUniversalIdentifier: EXPORT_SHIPMENT_OBJECT_UNIVERSAL_IDENTIFIER, ...ASSOCIATE_ACCESS },

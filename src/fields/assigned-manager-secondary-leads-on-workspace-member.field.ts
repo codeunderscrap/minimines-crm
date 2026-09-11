@@ -4,22 +4,18 @@ import {
   RelationType,
   STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS,
 } from 'twenty-sdk/define';
-import {
-  LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
-  LEAD_ASSIGNED_MANAGER_SECONDARY_FIELD_UNIVERSAL_IDENTIFIER,
-  LEAD_ASSIGNED_MANAGER_SECONDARY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
-} from '../constants/universal-identifiers';
+
 
 export default defineField({
-  universalIdentifier: LEAD_ASSIGNED_MANAGER_SECONDARY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'c22b7361-17b5-4bce-a4dd-b1461f803e53',
   objectUniversalIdentifier:
     STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.workspaceMember.universalIdentifier,
   type: FieldType.RELATION,
   name: 'assignedManagerSecondaryLeads',
   label: 'Leads (as Secondary Manager)',
-  relationTargetObjectMetadataUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
+  relationTargetObjectMetadataUniversalIdentifier: '0e354212-7b75-46d7-ba6e-cdb07c970645',
   relationTargetFieldMetadataUniversalIdentifier:
-    LEAD_ASSIGNED_MANAGER_SECONDARY_FIELD_UNIVERSAL_IDENTIFIER,
+    '297abbb4-fbea-4725-a31c-56d353f2ad06',
   universalSettings: {
     relationType: RelationType.ONE_TO_MANY,
   },

@@ -1,10 +1,10 @@
 import { defineView, ViewType } from 'twenty-sdk/define';
-import { LEAD_ALL_VIEW_UNIVERSAL_IDENTIFIER, LEAD_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+
 
 export default defineView({
-  universalIdentifier: LEAD_ALL_VIEW_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'dd7bbe96-0f43-4c0c-820e-4f43d74d5721',
   name: 'all-lead',
-  objectUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
+  objectUniversalIdentifier: '0e354212-7b75-46d7-ba6e-cdb07c970645',
   type: ViewType.TABLE,
   icon: 'IconList',
 });

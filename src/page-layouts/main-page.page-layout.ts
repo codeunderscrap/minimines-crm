@@ -1,27 +1,21 @@
 import { definePageLayout, PageLayoutTabLayoutMode } from 'twenty-sdk/define';
 
-import {
-  APP_DISPLAY_NAME,
-  MAIN_PAGE_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
-  MAIN_PAGE_LAYOUT_TAB_UNIVERSAL_IDENTIFIER,
-  MAIN_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  MAIN_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+
 
 export default definePageLayout({
-  universalIdentifier: MAIN_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  name: APP_DISPLAY_NAME,
+  universalIdentifier: '6d7d5294-ed49-46f1-9367-e853a1728b6a',
+  name: 'MiniMines CRM',
   type: 'STANDALONE_PAGE',
   tabs: [
     {
-      universalIdentifier: MAIN_PAGE_LAYOUT_TAB_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'a02acca0-be5d-4a55-81aa-6e199ef7f9e1',
       title: 'Overview',
       position: 0,
       icon: 'IconApps',
       layoutMode: PageLayoutTabLayoutMode.CANVAS,
       widgets: [
         {
-          universalIdentifier: MAIN_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
+          universalIdentifier: '9f8b67d1-6527-499c-a424-a08b5ea13de4',
           title: ' ',
           type: 'FRONT_COMPONENT',
           position: { layoutMode: PageLayoutTabLayoutMode.CANVAS },

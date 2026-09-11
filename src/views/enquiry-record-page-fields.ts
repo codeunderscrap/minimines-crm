@@ -1,9 +1,9 @@
 import { defineView } from 'twenty-sdk/define';
-import { ENQUIRY_FIELDS_VIEW_UNIVERSAL_IDENTIFIER, ENQUIRY_OBJECT_UNIVERSAL_IDENTIFIER } from 'src/constants/universal-identifiers';
+
 
 export default defineView({
-  universalIdentifier: ENQUIRY_FIELDS_VIEW_UNIVERSAL_IDENTIFIER,
-  objectUniversalIdentifier: ENQUIRY_OBJECT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'faab960b-00ee-4528-b87d-f96c07354910',
+  objectUniversalIdentifier: '60b1d481-b270-4fea-896e-df5d49279735',
   name: 'enquiry-record-page-fields',
   // Use any to bypass TS error temporarily
   type: 'FIELDS_WIDGET' as any,

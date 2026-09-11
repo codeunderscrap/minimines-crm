@@ -1,15 +1,12 @@
 import { defineNavigationMenuItem, NavigationMenuItemType } from 'twenty-sdk/define';
-import {
-  EXPORT_DOCUMENT_TRACKER_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
-  EXPORT_DOCUMENT_TRACKER_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-} from '../constants/universal-identifiers';
+
 
 export default defineNavigationMenuItem({
-  universalIdentifier: EXPORT_DOCUMENT_TRACKER_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '8d440c4c-4f42-4f7e-b254-684d5947382e',
   name: 'Export Documents',
   icon: 'IconFiles',
   position: 14,
   type: NavigationMenuItemType.PAGE_LAYOUT,
   folderUniversalIdentifier: 'f1b3e9c6-42b0-578c-94da-15e277dfb03b',
-  pageLayoutUniversalIdentifier: EXPORT_DOCUMENT_TRACKER_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  pageLayoutUniversalIdentifier: 'a42520ef-fdd7-4159-b1bf-c2fe6d9b9828',
 });

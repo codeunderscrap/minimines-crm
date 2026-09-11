@@ -1,14 +1,11 @@
 import { defineNavigationMenuItem, NavigationMenuItemType } from 'twenty-sdk/define';
-import {
-  DOCUMENT_VAULT_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
-  DOCUMENT_VAULT_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-} from '../constants/universal-identifiers';
+
 
 export default defineNavigationMenuItem({
-  universalIdentifier: DOCUMENT_VAULT_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '60735e87-06df-41e4-b34f-1c7a7f3c21ed',
   name: 'Document Vault',
   icon: 'IconLock',
   position: 40,
   type: NavigationMenuItemType.PAGE_LAYOUT,
-  pageLayoutUniversalIdentifier: DOCUMENT_VAULT_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  pageLayoutUniversalIdentifier: 'e0e42bf2-5132-4c07-99a1-a77b0b8fb95f',
 });

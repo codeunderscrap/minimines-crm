@@ -1,8 +1,8 @@
 import { defineObject, FieldType } from 'twenty-sdk/define';
-import { PRODUCT_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+
 
 export default defineObject({
-  universalIdentifier: PRODUCT_OBJECT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '89f006c5-0854-488a-9a8c-750974c8a222',
   nameSingular: 'product',
   namePlural: 'products',
   labelSingular: 'Product Master',

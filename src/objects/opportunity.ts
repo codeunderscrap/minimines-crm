@@ -1,12 +1,12 @@
 import { defineObject, FieldType , RelationType , OnDeleteAction , STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from 'twenty-sdk/define';
-import { OPPORTUNITY_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+
 
 export default defineObject({
   nameSingular: 'bdOpportunity',
   namePlural: 'bdOpportunities',
   labelSingular: 'Opportunity',
   labelPlural: 'Opportunities',
-  universalIdentifier: OPPORTUNITY_OBJECT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'eb3a7200-27aa-42d9-9271-24b70ff8a255',
   description: 'Active BD deals converted from leads, tracking requirements and negotiations.',
   icon: 'IconTarget',
   labelIdentifierFieldMetadataUniversalIdentifier: 'c4da7b23-1c32-4d56-8a9d-b841accd5f48',

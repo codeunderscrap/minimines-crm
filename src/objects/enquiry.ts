@@ -5,26 +5,12 @@ import {
   OnDeleteAction,
   STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS,
 } from 'twenty-sdk/define';
-import {
-  ENQUIRY_OBJECT_UNIVERSAL_IDENTIFIER,
-  ENQUIRY_CONTACT_EMAIL_FIELD_UNIVERSAL_IDENTIFIER,
-  ENQUIRY_CONTACT_PHONE_FIELD_UNIVERSAL_IDENTIFIER,
-  ENQUIRY_COMPANY_FIELD_UNIVERSAL_IDENTIFIER,
-  ENQUIRY_PRIORITY_FIELD_UNIVERSAL_IDENTIFIER,
-  ENQUIRY_RESOLVED_AT_FIELD_UNIVERSAL_IDENTIFIER,
-  ENQUIRY_CHANNEL_FIELD_UNIVERSAL_IDENTIFIER,
-  ENQUIRY_EXTERNAL_ID_FIELD_UNIVERSAL_IDENTIFIER,
-  ENQUIRY_ASSIGNED_TO_FIELD_UNIVERSAL_IDENTIFIER,
-  ENQUIRY_ASSIGNED_TO_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_OBJECT_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_ENQUIRY_FIELD_UNIVERSAL_IDENTIFIER,
-  CONVERSATION_MESSAGE_ENQUIRY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+
 
 const WORKSPACE_MEMBER = STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.workspaceMember;
 
 export default defineObject({
-  universalIdentifier: ENQUIRY_OBJECT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '60b1d481-b270-4fea-896e-df5d49279735',
   nameSingular: 'enquiry',
   namePlural: 'enquiries',
   labelSingular: 'Enquiry',
@@ -54,13 +40,13 @@ export default defineObject({
       label: 'Company / Organization',
     },
     {
-      universalIdentifier: ENQUIRY_CONTACT_EMAIL_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'e1d5b9c3-2a8f-4e7d-a3c9-4b7f1e3d5a8c',
       name: 'contactEmail',
       type: FieldType.EMAILS,
       label: 'Contact Email',
     },
     {
-      universalIdentifier: ENQUIRY_CONTACT_PHONE_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'c7f3a5e9-4d1b-4b8c-b2f6-5a4c7b1f3d9e',
       name: 'contactPhone',
       type: FieldType.PHONES,
       label: 'Contact Phone',
@@ -81,14 +67,14 @@ export default defineObject({
       ],
     },
     {
-      universalIdentifier: ENQUIRY_CHANNEL_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'd3a9c5f1-4e7b-4d6a-a8c2-9c6b3d1a5f7e',
       name: 'channel',
       type: FieldType.TEXT,
       label: 'Channel Identifier',
       description: 'Internal channel routing key (e.g. website, email, whatsapp). Used for webhook integrations.',
     },
     {
-      universalIdentifier: ENQUIRY_EXTERNAL_ID_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'e7b1f9d3-5c8a-4b2e-84f6-1d9c5b3f7a2e',
       name: 'externalId',
       type: FieldType.TEXT,
       label: 'External Thread ID',
@@ -128,7 +114,7 @@ export default defineObject({
       ],
     },
     {
-      universalIdentifier: ENQUIRY_PRIORITY_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'f5c3b7e1-2d9a-4f4c-b6e2-7a8e5f1c9b3d',
       name: 'priority',
       type: FieldType.SELECT,
       label: 'Priority',
@@ -140,7 +126,7 @@ export default defineObject({
       ],
     },
     {
-      universalIdentifier: ENQUIRY_RESOLVED_AT_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'a1f5e3b7-6c2d-4a9f-91c4-8b3a7f5e1c9d',
       name: 'resolvedAt',
       type: FieldType.DATE_TIME,
       label: 'Resolved At',
@@ -148,12 +134,12 @@ export default defineObject({
 
     // ── Reverse relation: conversation messages in this thread ──────────────
     {
-      universalIdentifier: CONVERSATION_MESSAGE_ENQUIRY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'f4b8e2d6-9c1a-4f3b-a7e5-3d6c2b8f4a1e',
       name: 'conversationMessages',
       type: FieldType.RELATION,
       label: 'Conversation Messages',
-      relationTargetObjectMetadataUniversalIdentifier: CONVERSATION_MESSAGE_OBJECT_UNIVERSAL_IDENTIFIER,
-      relationTargetFieldMetadataUniversalIdentifier: CONVERSATION_MESSAGE_ENQUIRY_FIELD_UNIVERSAL_IDENTIFIER,
+      relationTargetObjectMetadataUniversalIdentifier: 'e8f2d4a6-1b3c-4f7e-9d5a-2c6b8a4f1e3d',
+      relationTargetFieldMetadataUniversalIdentifier: 'a3c7f1b9-5e2d-4a8c-b6f4-7d1e3c9f5a2b',
       universalSettings: {
         relationType: RelationType.ONE_TO_MANY,
       },
@@ -161,12 +147,12 @@ export default defineObject({
 
     // ── Assignment ──────────────────────────────────────────────────────────
     {
-      universalIdentifier: ENQUIRY_ASSIGNED_TO_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'c4d8a2f6-1b5e-4c7d-b9f3-2e7a4c8d2f1b',
       name: 'assignedTo',
       type: FieldType.RELATION,
       label: 'Assigned To',
       relationTargetObjectMetadataUniversalIdentifier: WORKSPACE_MEMBER.universalIdentifier,
-      relationTargetFieldMetadataUniversalIdentifier: ENQUIRY_ASSIGNED_TO_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier: 'f9e3d7b1-8c4a-4e5f-a2d8-3a1f9e3b7c4d',
       universalSettings: {
         relationType: RelationType.MANY_TO_ONE,
         onDelete: OnDeleteAction.SET_NULL,

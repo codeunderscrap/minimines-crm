@@ -1,6 +1,6 @@
 import { CoreApiClient } from 'twenty-client-sdk/core';
 import { MetadataApiClient } from 'twenty-client-sdk/metadata';
-import { APPLICATION_UNIVERSAL_IDENTIFIER } from 'src/constants/universal-identifiers';
+
 import { describe, expect, it } from 'vitest';
 
 describe('App installation', () => {
@@ -17,7 +17,7 @@ describe('App installation', () => {
 
     const app = result.findManyApplications.find(
       (a: { universalIdentifier: string }) =>
-        a.universalIdentifier === APPLICATION_UNIVERSAL_IDENTIFIER,
+        a.universalIdentifier === 'b4c9e8d1-72f3-4a1d-9e6b-3c5d8a2f1b4c',
     );
 
     expect(app).toBeDefined();

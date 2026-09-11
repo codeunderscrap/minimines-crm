@@ -1,8 +1,8 @@
 import { defineObject, FieldType , RelationType , OnDeleteAction , STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from 'twenty-sdk/define';
-import { QUOTATION_OBJECT_UNIVERSAL_IDENTIFIER, PRODUCT_OBJECT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
+
 
 export default defineObject({
-  universalIdentifier: QUOTATION_OBJECT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '71ba2bb5-f601-40b0-ba63-3dab06028c57',
   nameSingular: 'quotation',
   namePlural: 'quotations',
   labelSingular: 'Quotation (Domestic)',
@@ -34,7 +34,7 @@ export default defineObject({
       universalIdentifier: 'c556d792-ff70-42d8-bb93-a85f797d8644',
       name: 'productMaster',
       type: FieldType.RELATION,
-      relationTargetObjectMetadataUniversalIdentifier: PRODUCT_OBJECT_UNIVERSAL_IDENTIFIER,
+      relationTargetObjectMetadataUniversalIdentifier: '89f006c5-0854-488a-9a8c-750974c8a222',
       relationTargetFieldMetadataUniversalIdentifier: '061767af-9d84-4c58-b3a9-b8b2765aaecb',
       universalSettings: {
         relationType: RelationType.MANY_TO_ONE,

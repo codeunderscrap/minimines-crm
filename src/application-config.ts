@@ -1,13 +1,7 @@
 import { defineApplication } from 'twenty-sdk/define';
 
-import {
-  APP_DESCRIPTION,
-  APP_DISPLAY_NAME,
-  APPLICATION_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
-
 export default defineApplication({
-  universalIdentifier: APPLICATION_UNIVERSAL_IDENTIFIER,
-  displayName: APP_DISPLAY_NAME,
-  description: APP_DESCRIPTION,
+  universalIdentifier: 'b4c9e8d1-72f3-4a1d-9e6b-3c5d8a2f1b4c',
+  displayName: 'MiniMines CRM',
+  description: '',
 });

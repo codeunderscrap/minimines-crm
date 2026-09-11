@@ -1,16 +1,11 @@
 import { definePageLayout, PageLayoutTabLayoutMode, PageLayoutType } from 'twenty-sdk/define';
-import {
-  PRODUCT_OBJECT_UNIVERSAL_IDENTIFIER,
-  PRODUCT_RECORD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  PRODUCT_FIELDS_VIEW_UNIVERSAL_IDENTIFIER,
-  PRODUCT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER
-} from '../constants/universal-identifiers';
+
 
 export default definePageLayout({
-  universalIdentifier: PRODUCT_RECORD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '4b2f50a6-42d4-4a41-adb6-e560c5950100',
   name: 'Default Product Layout',
   type: PageLayoutType.RECORD_PAGE,
-  objectUniversalIdentifier: PRODUCT_OBJECT_UNIVERSAL_IDENTIFIER,
+  objectUniversalIdentifier: '89f006c5-0854-488a-9a8c-750974c8a222',
   tabs: [
     {
       universalIdentifier: '1e985a36-24d6-4641-ad69-67c24f18c4eb',
@@ -25,7 +20,7 @@ export default definePageLayout({
           type: 'FRONT_COMPONENT',
           configuration: {
             configurationType: 'FRONT_COMPONENT',
-            frontComponentUniversalIdentifier: PRODUCT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER
+            frontComponentUniversalIdentifier: '5d2183d3-4eea-4228-bdcd-68859871c430'
           },
         },
         {
@@ -34,7 +29,7 @@ export default definePageLayout({
           type: 'FIELDS',
           configuration: {
             configurationType: 'FIELDS',
-            viewUniversalIdentifier: PRODUCT_FIELDS_VIEW_UNIVERSAL_IDENTIFIER,
+            viewUniversalIdentifier: 'e2df3922-20e5-41c3-a074-3eb6c88f8ca1',
           },
         },
       ],

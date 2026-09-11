@@ -5,16 +5,7 @@ import {
   OnDeleteAction,
   STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS,
 } from 'twenty-sdk/define';
-import {
-  LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
-  LEAD_DEPARTMENT_FIELD_UNIVERSAL_IDENTIFIER,
-  LEAD_ASSIGNED_ASSOCIATE_FIELD_UNIVERSAL_IDENTIFIER,
-  LEAD_ASSIGNED_ASSOCIATE_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
-  LEAD_ASSIGNED_MANAGER_PRIMARY_FIELD_UNIVERSAL_IDENTIFIER,
-  LEAD_ASSIGNED_MANAGER_PRIMARY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
-  LEAD_ASSIGNED_MANAGER_SECONDARY_FIELD_UNIVERSAL_IDENTIFIER,
-  LEAD_ASSIGNED_MANAGER_SECONDARY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
-} from '../constants/universal-identifiers';
+
 
 const WORKSPACE_MEMBER = STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.workspaceMember;
 
@@ -23,7 +14,7 @@ export default defineObject({
   namePlural: 'leads',
   labelSingular: 'Lead',
   labelPlural: 'Leads',
-  universalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '0e354212-7b75-46d7-ba6e-cdb07c970645',
   description: 'A prospect lead captured from website, LinkedIn, calls, or direct sources.',
   icon: 'IconUserPlus',
   labelIdentifierFieldMetadataUniversalIdentifier: '12b90fc3-ebff-4269-a4f1-ec1d1634aad7',
@@ -193,7 +184,7 @@ export default defineObject({
       label: 'Acknowledgment Sent',
     },
     {
-      universalIdentifier: LEAD_DEPARTMENT_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: '4a4ec7bc-c6d3-414a-9c46-ca2cf8820cae',
       name: 'department',
       type: FieldType.SELECT,
       label: 'Department',
@@ -206,12 +197,12 @@ export default defineObject({
     // scoping (see src/roles/associate-role.ts, src/roles/manager-role.ts).
     // onDelete SET_NULL so removing a workspace member never deletes leads.
     {
-      universalIdentifier: LEAD_ASSIGNED_ASSOCIATE_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: '299a8c6a-4e53-44c0-87b0-e9115cce7ec2',
       name: 'assignedAssociate',
       type: FieldType.RELATION,
       label: 'Assigned Associate',
       relationTargetObjectMetadataUniversalIdentifier: WORKSPACE_MEMBER.universalIdentifier,
-      relationTargetFieldMetadataUniversalIdentifier: LEAD_ASSIGNED_ASSOCIATE_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier: '1ebe0014-a739-4d65-9dfb-2d2ec166d1b7',
       universalSettings: {
         relationType: RelationType.MANY_TO_ONE,
         onDelete: OnDeleteAction.SET_NULL,
@@ -219,12 +210,12 @@ export default defineObject({
       },
     },
     {
-      universalIdentifier: LEAD_ASSIGNED_MANAGER_PRIMARY_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: 'f64b6578-3781-48af-a80a-2109d738f07a',
       name: 'assignedManagerPrimary',
       type: FieldType.RELATION,
       label: 'Assigned Manager',
       relationTargetObjectMetadataUniversalIdentifier: WORKSPACE_MEMBER.universalIdentifier,
-      relationTargetFieldMetadataUniversalIdentifier: LEAD_ASSIGNED_MANAGER_PRIMARY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier: '76717513-7efa-4f96-bf5d-c532cb0397e8',
       universalSettings: {
         relationType: RelationType.MANY_TO_ONE,
         onDelete: OnDeleteAction.SET_NULL,
@@ -234,12 +225,12 @@ export default defineObject({
     {
       // Only set when the Associate reports to a second Manager at the same
       // time (e.g. Aditya, who reports to both Manish Chauhan and Hanuman).
-      universalIdentifier: LEAD_ASSIGNED_MANAGER_SECONDARY_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: '297abbb4-fbea-4725-a31c-56d353f2ad06',
       name: 'assignedManagerSecondary',
       type: FieldType.RELATION,
       label: 'Assigned Manager (secondary)',
       relationTargetObjectMetadataUniversalIdentifier: WORKSPACE_MEMBER.universalIdentifier,
-      relationTargetFieldMetadataUniversalIdentifier: LEAD_ASSIGNED_MANAGER_SECONDARY_REVERSE_FIELD_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier: 'c22b7361-17b5-4bce-a4dd-b1461f803e53',
       universalSettings: {
         relationType: RelationType.MANY_TO_ONE,
         onDelete: OnDeleteAction.SET_NULL,

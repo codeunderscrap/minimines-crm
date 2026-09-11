@@ -1,32 +1,26 @@
 import { definePageLayout, PageLayoutTabLayoutMode, PageLayoutType } from 'twenty-sdk/define';
-import {
-  DEPARTMENT_OBJECT_UNIVERSAL_IDENTIFIER,
-  DEPARTMENT_RECORD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  DEPARTMENT_RECORD_PAGE_LAYOUT_TAB_UNIVERSAL_IDENTIFIER,
-  DEPARTMENT_RECORD_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
-  DEPARTMENT_FIELDS_VIEW_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+
 
 export default definePageLayout({
-  universalIdentifier: DEPARTMENT_RECORD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'a29e370b-1402-4b5d-8e21-38e30dfee9ae',
   name: 'Default Department Layout',
   type: PageLayoutType.RECORD_PAGE,
-  objectUniversalIdentifier: DEPARTMENT_OBJECT_UNIVERSAL_IDENTIFIER,
+  objectUniversalIdentifier: '2d76ead8-21ea-4c17-bbbb-6f511175ebeb',
   tabs: [
     {
-      universalIdentifier: DEPARTMENT_RECORD_PAGE_LAYOUT_TAB_UNIVERSAL_IDENTIFIER,
+      universalIdentifier: '0a72acee-22e8-455b-96a6-2ff43793ff35',
       title: 'Home',
       position: 10,
       icon: 'IconHome',
       layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
       widgets: [
         {
-          universalIdentifier: DEPARTMENT_RECORD_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
+          universalIdentifier: '584e2622-ffbe-4463-ab90-07bcd0b09571',
           title: 'Fields',
           type: 'FIELDS',
           configuration: {
             configurationType: 'FIELDS',
-            viewUniversalIdentifier: DEPARTMENT_FIELDS_VIEW_UNIVERSAL_IDENTIFIER,
+            viewUniversalIdentifier: '9d693e3c-5a18-4789-b5b4-8de9baac8a8a',
           },
         },
       ],
