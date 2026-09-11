@@ -108,7 +108,7 @@ interface Rate {
   trend: string;
 }
 
-export default function LmeDashboardWidget() {
+function LmeDashboardWidget() {
     const userRole = useUserRole();
     const [rates, setRates] = useState<Rate[]>([]);
 
