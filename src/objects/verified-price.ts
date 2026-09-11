@@ -31,7 +31,7 @@ export default defineObject({
     },
     {
       universalIdentifier: '3a4792d7-b8f6-4fba-a9e9-1f4864fc1cf8',
-      name: 'currency',
+      name: 'currencyCode',
       type: FieldType.SELECT,
       label: 'Currency',
       options: [

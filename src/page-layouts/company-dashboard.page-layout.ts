@@ -23,7 +23,7 @@ export default definePageLayout({
           universalIdentifier: COMPANY_DASHBOARD_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
           title: ' ',
           type: 'FRONT_COMPONENT',
-          gridPosition: { row: 0, column: 0, rowSpan: 12, columnSpan: 12 },
+          position: { layoutMode: PageLayoutTabLayoutMode.CANVAS },
           configuration: {
             configurationType: 'FRONT_COMPONENT',
             frontComponentUniversalIdentifier: COMPANY_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
