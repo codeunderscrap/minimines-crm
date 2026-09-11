@@ -246,6 +246,17 @@ export default defineObject({
         joinColumnName: 'assignedManagerSecondaryId',
       },
     },
+    {
+      universalIdentifier: '30fd6c9d-55df-441d-b8b5-1a338baa2ba2',
+      name: 'interactionLogs',
+      label: 'Interaction Logs',
+      type: FieldType.RELATION,
+      relationTargetObjectMetadataUniversalIdentifier: '685d5f57-e14b-4494-b258-005db38d8108',
+      relationTargetFieldMetadataUniversalIdentifier: '9509ce7e-f644-4f2c-b013-6b99ce51ebbe',
+      universalSettings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
   ],
 });
 
