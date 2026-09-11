@@ -1,3 +1,4 @@
+import { defineFrontComponent } from 'twenty-sdk/define';
 import React, { useState, useEffect } from 'react';
 import { useRecordId } from 'twenty-sdk/front-component';
 
@@ -774,5 +775,9 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
-
+export default defineFrontComponent({
+  universalIdentifier: '15f463bc-e392-4681-bdbb-047e4d3ad1e9',
+  name: 'MiniMines CRM',
+  description: 'MiniMines Custom CRM Dashboard',
+  component: MainPage,
+});

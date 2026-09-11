@@ -1,9 +1,0 @@
-﻿import { defineFrontComponent } from 'twenty-sdk/define';
-import LmeDashboardWidget from './lme-dashboard';
-
-export default defineFrontComponent({
-  universalIdentifier: '8c9c7f1a-b620-4a8f-b98a-12e9b038c11f',
-  name: 'LmeDashboardWidget',
-  description: 'A beautiful dashboard widget displaying LME rates',
-  component: LmeDashboardWidget,
-});
