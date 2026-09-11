@@ -22,7 +22,7 @@ export default definePageLayout({
           configuration: {
             configurationType: 'FRONT_COMPONENT',
             frontComponentUniversalIdentifier:
-              MAIN_PAGE_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+              '15f463bc-e392-4681-bdbb-047e4d3ad1e9',
           },
         },
       ],

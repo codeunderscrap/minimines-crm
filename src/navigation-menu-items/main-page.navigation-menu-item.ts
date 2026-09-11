@@ -6,7 +6,7 @@ import {
 
 
 export default defineNavigationMenuItem({
-  universalIdentifier: MAIN_PAGE_NAVIGATION_MENU_ITEM_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'fe3d8608-c53e-43d1-972c-d364426207ec',
   name: 'MiniMines CRM',
   icon: 'IconFile',
   position: 0,
