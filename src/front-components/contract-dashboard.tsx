@@ -1,6 +1,5 @@
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useEffect, useState } from 'react';
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useRecordId } from 'twenty-sdk/front-component';
 import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
@@ -452,10 +451,6 @@ const ContractDashboard = () => {
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: 'c35471eb-1b1d-453b-9e48-3a25ef14b439',
-  name: 'Contract Dashboard',
-  component: ContractDashboard,
-});
+export default ContractDashboard;
 
 // cache-bust: 1786104341226

@@ -1,4 +1,3 @@
-import { defineFrontComponent } from 'twenty-sdk/define';
 import React, { useState, useEffect, useMemo } from 'react';
 
 const BRAND = {
@@ -491,8 +490,4 @@ const CompanyDashboard = () => {
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: '4cf03718-59fa-4ce1-9869-019a277cdfdc',
-  name: 'Company Dashboard',
-  component: CompanyDashboard,
-});
+export default CompanyDashboard;

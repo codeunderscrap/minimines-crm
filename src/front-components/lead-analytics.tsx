@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserId } from 'twenty-sdk/front-component';
 import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
@@ -492,11 +491,6 @@ const LeadAnalytics = () => {
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: 'd6bc6e6c-45f6-48b7-a4f3-8f8336f43526',
-  name: 'Lead Analytics',
-  description: 'Production-ready interactive analytics for Lead Conversion',
-  component: LeadAnalytics,
-});
+export default LeadAnalytics;
 
 // cache-bust: 1786104341999

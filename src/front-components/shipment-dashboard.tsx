@@ -1,6 +1,5 @@
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useEffect, useState } from 'react';
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useRecordId } from 'twenty-sdk/front-component';
 import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
@@ -560,10 +559,6 @@ const ShipmentLogisticsDashboard = () => {
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: 'c87af8fb-27cb-4b36-a19e-4c55d064a371',
-  name: 'Shipment & Logistics Tracker',
-  component: ShipmentLogisticsDashboard,
-});
+export default ShipmentLogisticsDashboard;
 
 // cache-bust: 1786104341240

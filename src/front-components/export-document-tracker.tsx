@@ -1,6 +1,5 @@
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useEffect, useState } from 'react';
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useRecordId } from 'twenty-sdk/front-component';
 import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
@@ -377,10 +376,6 @@ const ExportDocumentTracker = () => {
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: 'd3087b5b-ef89-475d-8caa-629abff0be7e',
-  name: 'Export Compliance Checklist',
-  component: ExportDocumentTracker,
-});
+export default ExportDocumentTracker;
 
 // cache-bust: 1786104341231

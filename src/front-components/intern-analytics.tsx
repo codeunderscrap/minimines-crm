@@ -1,6 +1,5 @@
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useState, useEffect } from 'react';
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
 const BRAND = {
@@ -397,10 +396,6 @@ export const RoleLoading = () => (
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: '970a20de-6142-4a05-a871-6eaa13fdb035',
-  name: 'Team Accountability Tracker',
-  component: AssociateAnalytics,
-});
+export default AssociateAnalytics;
 
 // cache-bust: 1786111300000

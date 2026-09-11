@@ -1,6 +1,5 @@
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useEffect, useState } from 'react';
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useRecordId } from 'twenty-sdk/front-component';
 import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
@@ -242,11 +241,7 @@ const ProductDashboard = () => {
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: '5d2183d3-4eea-4228-bdcd-68859871c430',
-  name: 'Product Master Dashboard',
-  component: ProductDashboard,
-});
+export default ProductDashboard;
 
 
 // cache-bust: 1786104341237

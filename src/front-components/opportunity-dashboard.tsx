@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserId } from 'twenty-sdk/front-component';
 import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
@@ -491,12 +490,7 @@ const OpportunityDashboard = () => {
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: 'dd02c145-f505-45d4-9846-fc1f734ac41b',
-  name: 'Opportunity Pipeline',
-  description: 'Kanban view for tracking deal negotiations',
-  component: OpportunityDashboard,
-});
+export default OpportunityDashboard;
 
 
 // cache-bust: 1786104341236

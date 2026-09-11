@@ -1,6 +1,5 @@
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useEffect, useState } from 'react';
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
 const BRAND = {
@@ -327,8 +326,4 @@ const OnboardingContracts = () => {
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: 'ebadd2b2-c515-4df5-ac2f-0ec3262b6bc5',
-  name: 'Company Contracts',
-  component: OnboardingContracts,
-});
+export default OnboardingContracts;

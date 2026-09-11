@@ -1,6 +1,5 @@
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useEffect, useState } from 'react';
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
 const BRAND = {
@@ -276,12 +275,7 @@ const SalesOrderDashboard = () => {
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: '22192d04-e682-4a94-afd3-1508a7d8bdb0',
-  name: 'Sales Order Dashboard',
-  description: 'View for confirmed deals transferred from BD',
-  component: SalesOrderDashboard,
-});
+export default SalesOrderDashboard;
 
 
 // cache-bust: 1786104341238

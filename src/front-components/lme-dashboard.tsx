@@ -109,11 +109,7 @@ interface Rate {
   trend: string;
 }
 
-export default defineFrontComponent({
-  universalIdentifier: '8c9c7f1a-b620-4a8f-b98a-12e9b038c11f',
-  name: 'LmeDashboardWidget',
-  description: 'A beautiful dashboard widget displaying LME rates',
-  component: () => {
+export default function LmeDashboardWidget() {
     const userRole = useUserRole();
     const [rates, setRates] = useState<Rate[]>([]);
 
@@ -218,4 +214,3 @@ export default defineFrontComponent({
       </div>
     );
   }
-});

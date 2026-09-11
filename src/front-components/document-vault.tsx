@@ -1,6 +1,5 @@
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useEffect, useState } from 'react';
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserRole, AccessDenied, RoleLoading } from '../utils/role-gate';
 
 const BRAND = {
@@ -265,8 +264,4 @@ const DocumentVault = () => {
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: 'b653a373-f56f-4807-b12a-863697f3a008',
-  name: 'Document Vault',
-  component: DocumentVault,
-});
+export default DocumentVault;

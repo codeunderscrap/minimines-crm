@@ -1,6 +1,5 @@
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useEffect, useState, useCallback } from 'react';
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserRole, RoleLoading } from '../utils/role-gate';
 
 export type UserRole = 'hod' | 'manager' | 'associate';
@@ -355,10 +354,6 @@ const EnquiryInbox = () => {
   );
 };
 
-export default defineFrontComponent({
-  universalIdentifier: '6e51a256-6090-4531-84ee-c2f8543f1b5e',
-  name: 'Website Inbound Leads',
-  component: EnquiryInbox,
-});
+export default EnquiryInbox;
 
 // cache-bust: 1786111300001
