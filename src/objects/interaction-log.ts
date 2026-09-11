@@ -29,7 +29,7 @@ export default defineObject({
       type: FieldType.RELATION,
       label: 'Related Lead',
       relationTargetObjectMetadataUniversalIdentifier: LEAD_OBJECT_UNIVERSAL_IDENTIFIER,
-      relationTargetFieldMetadataUniversalIdentifier: '30fd6c9d-55df-441d-b8b5-1a338baa2ba2', // We'll let Twenty auto-generate the reverse field on Lead
+      relationTargetFieldMetadataUniversalIdentifier: '30fd6c9d-55df-441d-b8b5-1a338baa2ba2',
       universalSettings: {
         relationType: RelationType.MANY_TO_ONE,
         onDelete: OnDeleteAction.CASCADE,
