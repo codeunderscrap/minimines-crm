@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useRecords } from 'twenty-sdk/react';
-import { VERIFIED_PRICE_OBJECT_IDENTIFIER } from '../constants/universal-identifiers';
 import { IconCheckCircle, IconEdit, IconLock, IconPlus } from '@tabler/icons-react';
 
 export default function VerifiedPriceDashboard() {

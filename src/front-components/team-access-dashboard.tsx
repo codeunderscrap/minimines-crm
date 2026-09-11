@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserId } from 'twenty-sdk/front-component';
-import { TEAM_ACCESS_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
 
 const BRAND = {
   primary: '#001B2E',

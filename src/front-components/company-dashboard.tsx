@@ -1,6 +1,5 @@
 import { defineFrontComponent } from 'twenty-sdk/define';
 import React, { useState, useEffect, useMemo } from 'react';
-import { COMPANY_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
 
 const BRAND = {
   primary: '#0F172A',

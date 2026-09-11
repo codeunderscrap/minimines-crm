@@ -2,10 +2,6 @@ import { defineFrontComponent } from 'twenty-sdk/define';
 import React, { useState, useEffect } from 'react';
 import { useRecordId } from 'twenty-sdk/front-component';
 
-import {
-  APP_DISPLAY_NAME,
-  MAIN_PAGE_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
-} from '../constants/universal-identifiers';
 
 const BRAND = {
   primary: '#001B2E',

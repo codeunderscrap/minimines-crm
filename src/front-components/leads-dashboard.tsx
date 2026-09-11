@@ -1,7 +1,6 @@
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useState, useEffect, useMemo } from 'react';
-import { LEADS_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from '../constants/universal-identifiers';
 
 const relationId = (record: any, name: string): string | null => {
   const nested = record?.[name];
