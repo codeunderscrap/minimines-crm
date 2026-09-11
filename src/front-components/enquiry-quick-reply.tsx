@@ -277,7 +277,7 @@ const EnquiryInbox = () => {
 };
 
 export default defineFrontComponent({
-  universalIdentifier: ENQUIRY_QUICK_REPLY_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '6e51a256-6090-4531-84ee-c2f8543f1b5e',
   name: 'Website Inbound Leads',
   component: EnquiryInbox,
 });

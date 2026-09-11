@@ -372,7 +372,7 @@ const ContractDashboard = () => {
 };
 
 export default defineFrontComponent({
-  universalIdentifier: CONTRACT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'c35471eb-1b1d-453b-9e48-3a25ef14b439',
   name: 'Contract Dashboard',
   component: ContractDashboard,
 });

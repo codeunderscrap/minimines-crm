@@ -185,7 +185,7 @@ const DocumentVault = () => {
 };
 
 export default defineFrontComponent({
-  universalIdentifier: DOCUMENT_VAULT_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'b653a373-f56f-4807-b12a-863697f3a008',
   name: 'Document Vault',
   component: DocumentVault,
 });

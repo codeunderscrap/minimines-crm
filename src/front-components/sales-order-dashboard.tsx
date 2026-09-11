@@ -196,7 +196,7 @@ const SalesOrderDashboard = () => {
 };
 
 export default defineFrontComponent({
-  universalIdentifier: SALES_ORDER_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '22192d04-e682-4a94-afd3-1508a7d8bdb0',
   name: 'Sales Order Dashboard',
   description: 'View for confirmed deals transferred from BD',
   component: SalesOrderDashboard,

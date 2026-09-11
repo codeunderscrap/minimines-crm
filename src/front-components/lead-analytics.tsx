@@ -413,7 +413,7 @@ const LeadAnalytics = () => {
 };
 
 export default defineFrontComponent({
-  universalIdentifier: LEAD_ANALYTICS_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'd6bc6e6c-45f6-48b7-a4f3-8f8336f43526',
   name: 'Lead Analytics',
   description: 'Production-ready interactive analytics for Lead Conversion',
   component: LeadAnalytics,

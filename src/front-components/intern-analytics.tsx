@@ -317,7 +317,7 @@ const AssociateAnalytics = () => {
 };
 
 export default defineFrontComponent({
-  universalIdentifier: INTERN_ANALYTICS_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '970a20de-6142-4a05-a871-6eaa13fdb035',
   name: 'Team Accountability Tracker',
   component: AssociateAnalytics,
 });

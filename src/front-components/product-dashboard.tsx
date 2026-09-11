@@ -162,7 +162,7 @@ const ProductDashboard = () => {
 };
 
 export default defineFrontComponent({
-  universalIdentifier: PRODUCT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '5d2183d3-4eea-4228-bdcd-68859871c430',
   name: 'Product Master Dashboard',
   component: ProductDashboard,
 });

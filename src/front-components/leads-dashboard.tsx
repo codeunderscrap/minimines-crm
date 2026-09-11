@@ -693,7 +693,7 @@ const LeadsDashboard = () => {
 };
 
 export default defineFrontComponent({
-  universalIdentifier: LEADS_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'f7a521d2-1f7e-41a8-a29d-62bd99f7f960',
   name: 'Leads Dashboard',
   description: 'Role-aware lead distribution dashboard with cascading assignment.',
   component: LeadsDashboard,

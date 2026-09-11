@@ -297,7 +297,7 @@ const ExportDocumentTracker = () => {
 };
 
 export default defineFrontComponent({
-  universalIdentifier: EXPORT_DOCUMENT_TRACKER_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: 'd3087b5b-ef89-475d-8caa-629abff0be7e',
   name: 'Export Compliance Checklist',
   component: ExportDocumentTracker,
 });

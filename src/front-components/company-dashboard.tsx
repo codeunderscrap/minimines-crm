@@ -493,7 +493,7 @@ const CompanyDashboard = () => {
 };
 
 export default defineFrontComponent({
-  universalIdentifier: COMPANY_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: '4cf03718-59fa-4ce1-9869-019a277cdfdc',
   name: 'Company Dashboard',
   component: CompanyDashboard,
 });
