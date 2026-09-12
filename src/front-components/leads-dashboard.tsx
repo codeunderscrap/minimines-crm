@@ -640,20 +640,20 @@ const LeadsDashboard = () => {
 
                 {/* Expansion Panel for Notes & Interactions */}
                 {expandedLeadId === lead.id && (
-                  <div style={{ padding: '20px', backgroundColor: '#FAFAFA', borderBottom: \`1px solid \${BRAND.border}\`, borderLeft: '4px solid #1E507B' }}>
+                  <div style={{ padding: '20px', backgroundColor: '#FAFAFA', borderBottom: `1px solid \${BRAND.border}`, borderLeft: '4px solid #1E507B' }}>
                     <div style={{ display: 'flex', gap: '40px' }}>
                       <div style={{ flex: 1 }}>
                         <h4 style={{ margin: '0 0 10px 0', color: BRAND.primary }}>Common Status / Notes</h4>
                         <textarea
                           readOnly
-                          style={{ width: '100%', height: '80px', padding: '10px', borderRadius: '6px', border: \`1px solid \${BRAND.border}\`, backgroundColor: '#fff', fontSize: '13px' }}
+                          style={{ width: '100%', height: '80px', padding: '10px', borderRadius: '6px', border: `1px solid \${BRAND.border}`, backgroundColor: '#fff', fontSize: '13px' }}
                           value={lead.commonNotes || 'No common notes added yet.'}
                         />
                         <button style={{ marginTop: '10px', padding: '6px 12px', backgroundColor: BRAND.blue, color: '#fff', borderRadius: '4px', border: 'none', fontSize: '12px', cursor: 'pointer' }}>Edit Common Notes</button>
                       </div>
                       <div style={{ flex: 1 }}>
                         <h4 style={{ margin: '0 0 10px 0', color: BRAND.primary }}>Recent Interaction Logs</h4>
-                        <div style={{ backgroundColor: '#fff', border: \`1px solid \${BRAND.border}\`, borderRadius: '6px', padding: '10px', fontSize: '12px', color: BRAND.secondary }}>
+                        <div style={{ backgroundColor: '#fff', border: `1px solid \${BRAND.border}`, borderRadius: '6px', padding: '10px', fontSize: '12px', color: BRAND.secondary }}>
                           <i>View full logs in standard record view.</i><br/><br/>
                           <button style={{ padding: '6px 12px', backgroundColor: BRAND.green, color: '#fff', borderRadius: '4px', border: 'none', fontSize: '12px', cursor: 'pointer' }}>+ Log Interaction</button>
                         </div>
