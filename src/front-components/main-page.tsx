@@ -777,7 +777,8 @@ const MainPage = () => {
 
 export default defineFrontComponent({
   universalIdentifier: '15f463bc-e392-4681-bdbb-047e4d3ad1e9',
-  name: 'MiniMines CRM',
+  name: APP_DISPLAY_NAME,
   description: 'MiniMines Custom CRM Dashboard',
   component: MainPage,
 });
+

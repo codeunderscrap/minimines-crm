@@ -1,27 +1,11 @@
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useEffect, useState } from 'react';
+import { defineFrontComponent } from 'twenty-sdk/define';
 
-const BRAND = {
-  primary: '#001B2E',
-  secondary: '#54595F',
-  text: '#7A7A7A',
-  accent: '#3B6E93',
-  lightAccent: '#4C9EAF',
-  white: '#FFFFFF',
-  border: '#EAEAEA',
-  bg: '#F9F9F9',
-  green: '#10b981',
-  red: '#ef4444',
-  blue: '#3b82f6',
-};
-
-const FONTS = `
-  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=Roboto+Slab:wght@400&family=Barlow:wght@400;
 
 type UserRole = 'hod' | 'manager' | 'associate';
 
-const API_KEY =
+const ROLE_API_KEY =
   'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJlYzFlMDcwZi0yZmE0LTQ3MjMtYmVmMy0xYmY5NGFlNTg4ZDEiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiZWMxZTA3MGYtMmZhNC00NzIzLWJlZjMtMWJmOTRhZTU4OGQxIiwiaWF0IjoxNzg2MTAxMzgzLCJleHAiOjQ5Mzk3MDEzODIsImp0aSI6IjhjZmY3MGFlLTgzZmItNDQ4NS05YjI0LWFlNjczYzQzZmE0NSJ9.Wg93DjZtbUC8-a1I2IoVSMixlv4TIdA4ayjXG6C8Zm258IW6nQbEIyX7t3R9hdGeMfy6ssbplJRP2vWHBW6Odg';
 
 const useUserRole = (): UserRole | null => {
@@ -33,7 +17,7 @@ const useUserRole = (): UserRole | null => {
       try {
         const res = await fetch(
           'https://minimines.twenty.com/rest/workspaceMembers?limit=100',
-          { headers: { Authorization: API_KEY, 'Content-Type': 'application/json' } },
+          { headers: { Authorization: ROLE_API_KEY, 'Content-Type': 'application/json' } },
         );
         const json = await res.json();
         let items = json?.data?.workspaceMembers ?? json?.data ?? [];
@@ -98,7 +82,23 @@ const RoleLoading = () => (
   </div>
 );
 
-500;600&display=swap');
+
+const BRAND = {
+  primary: '#001B2E',
+  secondary: '#54595F',
+  text: '#7A7A7A',
+  accent: '#3B6E93',
+  lightAccent: '#4C9EAF',
+  white: '#FFFFFF',
+  border: '#EAEAEA',
+  bg: '#F9F9F9',
+  green: '#10b981',
+  red: '#ef4444',
+  blue: '#3b82f6',
+};
+
+const FONTS = `
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=Roboto+Slab:wght@400&family=Barlow:wght@400;500;600&display=swap');
 `;
 
 const API_URL = 'https://minimines.twenty.com/rest';

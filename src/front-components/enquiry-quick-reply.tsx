@@ -1,10 +1,11 @@
-import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useEffect, useState, useCallback } from 'react';
+import { defineFrontComponent } from 'twenty-sdk/define';
+
 
 type UserRole = 'hod' | 'manager' | 'associate';
 
-const API_KEY =
+const ROLE_API_KEY =
   'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJlYzFlMDcwZi0yZmE0LTQ3MjMtYmVmMy0xYmY5NGFlNTg4ZDEiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiZWMxZTA3MGYtMmZhNC00NzIzLWJlZjMtMWJmOTRhZTU4OGQxIiwiaWF0IjoxNzg2MTAxMzgzLCJleHAiOjQ5Mzk3MDEzODIsImp0aSI6IjhjZmY3MGFlLTgzZmItNDQ4NS05YjI0LWFlNjczYzQzZmE0NSJ9.Wg93DjZtbUC8-a1I2IoVSMixlv4TIdA4ayjXG6C8Zm258IW6nQbEIyX7t3R9hdGeMfy6ssbplJRP2vWHBW6Odg';
 
 const useUserRole = (): UserRole | null => {
@@ -16,7 +17,7 @@ const useUserRole = (): UserRole | null => {
       try {
         const res = await fetch(
           'https://minimines.twenty.com/rest/workspaceMembers?limit=100',
-          { headers: { Authorization: API_KEY, 'Content-Type': 'application/json' } },
+          { headers: { Authorization: ROLE_API_KEY, 'Content-Type': 'application/json' } },
         );
         const json = await res.json();
         let items = json?.data?.workspaceMembers ?? json?.data ?? [];
@@ -80,6 +81,7 @@ const RoleLoading = () => (
     Loading...
   </div>
 );
+
 
 // Brand tokens
 const B = {
@@ -359,3 +361,4 @@ export default defineFrontComponent({
   name: 'Website Inbound Leads',
   component: EnquiryInbox,
 });
+

@@ -1,5 +1,5 @@
-import { defineFrontComponent } from 'twenty-sdk/define';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserId } from 'twenty-sdk/front-component';
 
 const BRAND = {
@@ -561,3 +561,4 @@ export default defineFrontComponent({
   description: 'Admin control center for people, roles, departments, and org hierarchy.',
   component: TeamAccessDashboard,
 });
+
