@@ -2,12 +2,12 @@ import { defineFrontComponent } from 'twenty-sdk/define';
 import { useUserId } from 'twenty-sdk/front-component';
 import React, { useEffect, useState, useCallback } from 'react';
 
-export type UserRole = 'hod' | 'manager' | 'associate';
+type UserRole = 'hod' | 'manager' | 'associate';
 
 const API_KEY =
   'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjA5OTdlNjcwLWJmYTEtNGMxZS1hZWQzLTc1M2JjNjQ4ZDY1MSJ9.eyJzdWIiOiJlYzFlMDcwZi0yZmE0LTQ3MjMtYmVmMy0xYmY5NGFlNTg4ZDEiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiZWMxZTA3MGYtMmZhNC00NzIzLWJlZjMtMWJmOTRhZTU4OGQxIiwiaWF0IjoxNzg2MTAxMzgzLCJleHAiOjQ5Mzk3MDEzODIsImp0aSI6IjhjZmY3MGFlLTgzZmItNDQ4NS05YjI0LWFlNjczYzQzZmE0NSJ9.Wg93DjZtbUC8-a1I2IoVSMixlv4TIdA4ayjXG6C8Zm258IW6nQbEIyX7t3R9hdGeMfy6ssbplJRP2vWHBW6Odg';
 
-export const useUserRole = (): UserRole | null => {
+const useUserRole = (): UserRole | null => {
   const rawUserId = useUserId();
   const [role, setRole] = useState<UserRole | null>(null);
 
@@ -41,7 +41,7 @@ export const useUserRole = (): UserRole | null => {
   return role;
 };
 
-export const AccessDenied = ({
+const AccessDenied = ({
   minRole = 'manager',
 }: {
   minRole?: 'hod' | 'manager';
@@ -75,7 +75,7 @@ export const AccessDenied = ({
   </div>
 );
 
-export const RoleLoading = () => (
+const RoleLoading = () => (
   <div style={{ padding: '40px', fontFamily: "'Barlow', sans-serif", color: '#7A7A7A' }}>
     Loading...
   </div>
